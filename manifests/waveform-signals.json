@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "timescale_source": "VCD header",
+  "signals": {
+    "link_state": "tb_credit_mvp.dut.r_state",
+    "tx_credit": "tb_credit_mvp.dut.r_tx_credit",
+    "got_fct": "tb_credit_mvp.dut.w_got_fct",
+    "send_nchar": "tb_credit_mvp.dut.w_send_nchar",
+    "credit_error": "tb_credit_mvp.dut.w_credit_err",
+    "tx_credit_overflow": "tb_credit_mvp.dut.w_tx_credit_err",
+    "nchar_valid": "tb_credit_mvp.nchar_valid",
+    "nchar_ready": "tb_credit_mvp.nchar_ready"
+  }
+}

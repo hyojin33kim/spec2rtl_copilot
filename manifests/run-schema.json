@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "spec2rtl-copilot-run-v1",
+  "title": "Spec2RTL Copilot MVP Run",
+  "type": "object",
+  "required": [
+    "schema_version", "run_id", "status", "started_at", "finished_at",
+    "duration_seconds", "source_snapshot", "tool_versions", "commands",
+    "tests", "summary", "artifacts"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "run_id": {"type": "string"},
+    "status": {"enum": ["PASS", "FAIL", "ERROR"]},
+    "started_at": {"type": "string"},
+    "finished_at": {"type": "string"},
+    "duration_seconds": {"type": "number", "minimum": 0},
+    "source_snapshot": {"type": "string"},
+    "fault_injection": {"enum": ["none", "compile", "simulation"]},
+    "tool_versions": {"type": "object"},
+    "commands": {"type": "array"},
+    "tests": {"type": "array"},
+    "summary": {"type": "object"},
+    "artifacts": {"type": "object"}
+  }
+}

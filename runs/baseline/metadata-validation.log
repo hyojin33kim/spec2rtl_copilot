@@ -1,0 +1,9 @@
+test_every_requirement_has_one_trace (tests.test_w0_w3_metadata.W0W3MetadataTest.test_every_requirement_has_one_trace) ... ok
+test_snapshot_hashes (tests.test_w0_w3_metadata.W0W3MetadataTest.test_snapshot_hashes) ... ok
+test_trace_files_and_symbols_exist (tests.test_w0_w3_metadata.W0W3MetadataTest.test_trace_files_and_symbols_exist) ... ok
+test_yaml_documents_parse (tests.test_w0_w3_metadata.W0W3MetadataTest.test_yaml_documents_parse) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.033s
+
+OK

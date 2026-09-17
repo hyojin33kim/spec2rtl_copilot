@@ -1,0 +1,58 @@
+schema_version: 1
+pilot_id: PILOT-TX-CREDIT
+baseline_manifest: manifests/source-baseline.yaml
+locator_policy: commit_and_symbol_are_authoritative; line_ranges_are_snapshot_hints
+
+traces:
+  - requirement: REQ-FC-E1
+    spec: {clause: 5.5.4.e.1, document: ECSS-E-ST-50-12C-Rev.1}
+    golden:
+      - {file: assets/golden/spw_ref_model.py, symbol: SpWLink.on_char, lines: "619-630", role: oracle}
+    rtl:
+      - {file: assets/rtl/spw_datalink_v2.sv, symbol: r_tx_credit, lines: "657-680", role: implementation}
+    tests:
+      - {file: assets/tb/tb_credit.sv, symbol: tb_credit, anchor: ERRATA-20, lines: "71-82", level: rtl_block}
+      - {file: assets/golden/spw_ref_model_test_v5.py, symbol: scenario_3_flow_control, lines: "230-268", level: golden_system}
+
+  - requirement: REQ-FC-E2
+    spec: {clause: 5.5.4.e.2, document: ECSS-E-ST-50-12C-Rev.1}
+    golden:
+      - {file: assets/golden/spw_ref_model.py, symbol: SpWLink.note_tx_char_sent, lines: "645-657", role: oracle}
+    rtl:
+      - {file: assets/rtl/spw_datalink_v2.sv, symbol: r_tx_credit, lines: "657-683", role: implementation}
+      - {file: assets/rtl/spw_datalink_v2.sv, symbol: w_send_nchar, lines: "873-891", role: send_event}
+    tests:
+      - {file: assets/tb/tb_race_check.sv, symbol: tb_race_check, level: rtl_block}
+      - {file: assets/golden/spw_ref_model_test_v5.py, symbol: scenario_3_flow_control, lines: "230-268", level: golden_system}
+
+  - requirement: REQ-FC-F
+    spec: {clause: 5.5.4.f, document: ECSS-E-ST-50-12C-Rev.1}
+    golden:
+      - {file: assets/golden/spw_ref_model.py, symbol: SpWNode._select_next_tx_char, lines: "1039-1047", role: oracle_gate}
+    rtl:
+      - {file: assets/rtl/spw_datalink_v2.sv, symbol: w_send_nchar, lines: "873-883", role: implementation_gate}
+      - {file: assets/rtl/spw_datalink_v2.sv, symbol: ow_nchar_ready, lines: "955-966", role: interface_observable}
+    tests:
+      - {file: assets/golden/spw_ref_model_test_v5.py, symbol: scenario_3_flow_control, lines: "230-268", level: golden_system}
+      - {file: assets/tb/tb_priority.sv, symbol: tb_priority, lines: "104-145", level: rtl_block}
+
+  - requirement: REQ-FC-HJ
+    spec: {clauses: [5.5.4.h, 5.5.4.j, 5.5.5.a.2], document: ECSS-E-ST-50-12C-Rev.1}
+    golden:
+      - {file: assets/golden/spw_ref_model.py, symbol: SpWLink.MAX_CREDIT, lines: "459-460", role: bound}
+      - {file: assets/golden/spw_ref_model.py, symbol: SpWLink.on_char, lines: "619-630", role: overflow_oracle}
+    rtl:
+      - {file: assets/rtl/spw_datalink_v2.sv, symbol: MAX_CREDIT, lines: "55-55", role: bound}
+      - {file: assets/rtl/spw_datalink_v2.sv, symbol: w_tx_credit_err, lines: "642-654", role: overflow_detection}
+      - {file: assets/rtl/spw_datalink_v2.sv, symbol: ow_err_credit, lines: "733-738", role: interface_observable}
+    tests:
+      - {file: assets/golden/spw_ref_model_test_v5.py, symbol: scenario_8_credit_boundary_sweep, lines: "528-565", level: golden_boundary}
+      - {file: assets/golden/spw_ref_model_test_v5.py, symbol: scenario_9_credit_error_injection, lines: "571-607", level: golden_error}
+      - {file: assets/tb/tb_credit.sv, symbol: tb_credit, anchor: credit_error, lines: "84-121", level: rtl_block}
+      - {file: assets/tb/tb_credit_boundary_top.sv, symbol: tb_credit_boundary_top, level: rtl_system}
+      - {file: assets/tb/tb_credit_boundary_multipacket.sv, symbol: tb_credit_boundary_multipacket, level: rtl_system}
+
+execution:
+  golden: {cwd: assets/golden, command: "python3 spw_ref_model_test_v5.py"}
+  rtl_baseline: {cwd: ../spec2rtl/spacewire, command: "bash .claude/hooks/post-edit-sv.sh rtl/spw_datalink_v2.sv"}
+  rtl_snapshot_adapter: {status: planned_in_W4, reason: copied upstream hook assumes its original Git repository layout}

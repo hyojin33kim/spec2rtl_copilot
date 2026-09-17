@@ -1,0 +1,51 @@
+schema_version: 1
+document:
+  id: ECSS-E-ST-50-12C-Rev.1
+  published: 2019-05-15
+  asset: assets/spec/ECSS-E-ST-50-12C-Rev.1(15May2019).pdf
+pilot:
+  id: PILOT-TX-CREDIT
+  title: SpaceWire transmit-credit control
+  scope: [5.5.4.e.1, 5.5.4.e.2, 5.5.4.f, 5.5.4.h, 5.5.4.j]
+  out_of_scope: [receive-credit accounting, FCT generation policy, sending priority, link initialization]
+
+requirements:
+  - id: REQ-FC-E1
+    clause: 5.5.4.e.1
+    title: FCT increments transmit credit
+    trigger: encoding layer delivers one independent FCT
+    precondition: link state is Connecting or Run and increment does not exceed MAX_CREDIT
+    expected: tx_credit_next equals tx_credit plus 8
+    observables: [got_fct, tx_credit]
+
+  - id: REQ-FC-E2
+    clause: 5.5.4.e.2
+    title: N-Char transmission decrements transmit credit
+    trigger: data link layer accepts one N-Char for transmission
+    precondition: link state is Run and tx_credit is greater than zero
+    expected: tx_credit_next equals tx_credit minus 1
+    observables: [send_nchar, tx_credit]
+    note: EOP and EEP are N-Chars and consume credit.
+
+  - id: REQ-FC-F
+    clause: 5.5.4.f
+    title: Zero transmit credit blocks N-Char transmission
+    trigger: an N-Char is pending while tx_credit equals zero
+    expected: no N-Char is accepted until an FCT restores credit
+    observables: [nchar_valid, nchar_ready, send_nchar, tx_credit]
+
+  - id: REQ-FC-HJ
+    clauses: [5.5.4.h, 5.5.4.j, 5.5.5.a.2]
+    title: Maximum transmit credit and overflow error
+    trigger: an FCT would increase tx_credit beyond 56
+    expected:
+      - credit_error is asserted
+      - tx_credit is not incremented beyond 56
+    observables: [got_fct, tx_credit, credit_error]
+    note: This approved pilot ID groups the bound and its mandated overflow response.
+
+cross_event_contract:
+  id: DEC-FC-SIMULTANEOUS-001
+  condition: independent FCT reception and N-Char transmission occur in the same cycle
+  expected: both accounting events apply; tx_credit_next equals tx_credit plus 7
+  source_status: existing Golden/RTL implementation behavior, recorded for MVP comparison

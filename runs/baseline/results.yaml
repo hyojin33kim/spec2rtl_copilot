@@ -1,0 +1,23 @@
+schema_version: 1
+run_id: baseline-2026-09-17T132736+0900
+source_snapshot: spacewire-flow-control-2026-09-17
+results:
+  metadata:
+    status: PASS
+    tests: 4
+    log: runs/baseline/metadata-validation.log
+  integrity:
+    status: PASS
+    files_checked: 26
+    log: runs/baseline/integrity.log
+  golden:
+    status: PASS
+    passed: 147
+    failed: 0
+    log: runs/baseline/golden-regression.log
+  rtl:
+    status: PASS
+    passed: 16
+    failed: 0
+    standard: g2005-sv
+    log: runs/baseline/rtl-regression.log

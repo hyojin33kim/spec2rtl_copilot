@@ -1,0 +1,2133 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Spec2RTL Harness Demo V1.7.4.1.1.1</title>
+<style>
+:root{
+  --bg:#f4f7fb; --panel:#ffffff; --line:#dce5f0; --text:#173151; --muted:#71839a;
+  --blue:#1769e0; --blue2:#eaf2ff; --green:#0fa36b; --green2:#e9f8f1;
+  --orange:#ef9d12; --orange2:#fff5e5; --purple:#7347d5; --purple2:#f2ecff;
+  --red:#d94d4d; --red2:#fff0f0; --cyan:#0aa6b5; --shadow:0 10px 28px rgba(31,55,90,.08);
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,"Noto Sans KR",sans-serif}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.app{display:grid;grid-template-columns:222px 1fr;min-height:100vh}
+.sidebar{background:#fff;border-right:1px solid var(--line);padding:18px 14px;position:sticky;top:0;height:100vh;z-index:5}
+.brand{display:flex;gap:10px;align-items:center;font-weight:800;font-size:19px;margin:3px 8px 20px}
+.logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#2584ff,#244fc2);display:grid;place-items:center;color:white;font-weight:900}
+.nav button{width:100%;border:0;background:transparent;text-align:left;padding:10px 11px;border-radius:9px;color:#36506f;margin:2px 0}
+.nav button:hover,.nav button.active{background:#eaf2ff;color:#0d57c7;font-weight:700}
+.sidebar-foot{position:absolute;bottom:18px;left:14px;right:14px;background:linear-gradient(145deg,#142c50,#2b5d99);color:#fff;border-radius:12px;padding:13px;font-size:11px;line-height:1.5}
+.main{padding:16px 20px 28px;min-width:0}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:12px}
+.titlewrap h1{font-size:23px;margin:0}
+.sub{color:var(--muted);font-size:12px;margin-top:4px}
+.actions{display:flex;gap:8px;align-items:center}
+.btn{border:1px solid var(--line);background:#fff;color:#2b4667;padding:8px 12px;border-radius:9px;font-weight:700}
+.btn:hover{box-shadow:0 4px 14px rgba(40,70,110,.12)}
+.btn.primary{background:var(--blue);color:#fff;border-color:var(--blue)}
+.btn.success{background:var(--green);color:#fff;border-color:var(--green)}
+.btn.warn{background:var(--orange);color:#fff;border-color:var(--orange)}
+.btn.danger{background:var(--red);color:#fff;border-color:var(--red)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.search{min-width:270px;border:1px solid var(--line);padding:8px 11px;border-radius:9px;background:#fff}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}
+.panel{padding:14px}
+.hdr{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+.hdr h3,.hdr h2{margin:0}
+.hdr h3{font-size:14px}.hdr h2{font-size:18px}
+.muted{color:var(--muted)}
+.tag,.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 8px;border-radius:999px;font-size:10px;font-weight:800}
+.tag{background:var(--blue2);color:#155bc5}.good{background:var(--green2);color:#087c50}.warnbg{background:var(--orange2);color:#b96a00}.badbg{background:var(--red2);color:#b32626}.purple{background:var(--purple2);color:#5f33b8}.neutral{background:#eef2f7;color:#5f7188}
+.flow{display:flex;align-items:center;gap:7px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin-bottom:12px;overflow:auto}
+.step{display:flex;align-items:center;gap:6px;color:#728399;font-size:11px;white-space:nowrap}
+.step .n{width:23px;height:23px;border-radius:50%;display:grid;place-items:center;background:#edf1f6;font-weight:800}
+.step.done .n{background:var(--green);color:#fff}.step.current .n{background:var(--blue);color:#fff}.arrow{color:#a8b6c8}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-bottom:11px}
+.kpi{padding:13px}.kpi .label{font-size:11px;color:var(--muted)}.kpi .value{font-size:24px;font-weight:850;margin:3px 0}.kpi small{color:var(--muted);font-size:10px}
+.grid3{display:grid;grid-template-columns:1.04fr 1.18fr 1.04fr;gap:11px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.bottom{display:grid;grid-template-columns:1fr 1fr 1.25fr;gap:11px;margin-top:11px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:7px 0;font-size:11px}
+.reqbox{background:#f8fbff;border:1px solid #d8e7fa;border-radius:9px;padding:11px}
+.code{background:#0f172a;color:#d8e5ff;padding:12px;border-radius:9px;font:11px/1.55 var(--mono);white-space:pre-wrap;overflow:auto}
+.table{width:100%;border-collapse:collapse;font-size:10.5px}
+.table th,.table td{padding:7px;border-bottom:1px solid #e7edf5;text-align:left;vertical-align:top}
+.table th{color:#55708e;background:#f8fafc;position:sticky;top:0}
+.table tr.clickable:hover{background:#f6f9fd;cursor:pointer}
+.pillrow{display:flex;gap:6px;flex-wrap:wrap}
+.arch-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.opt{border:1px solid var(--line);border-radius:9px;padding:9px;background:#fff;cursor:pointer}
+.opt.active{border:2px solid var(--blue);background:#f5f9ff}.opt h4{margin:0 0 4px;font-size:12px}.opt p{margin:0;color:var(--muted);font-size:10px;line-height:1.45}
+.diagram{display:flex;align-items:center;justify-content:center;gap:5px;min-height:118px;padding:10px;background:#f8fbff;border:1px solid #dbe8f7;border-radius:9px;overflow:auto}
+.block{padding:9px 11px;border-radius:8px;border:1px solid #bdd4f1;background:white;font-weight:800;font-size:10px;text-align:center;white-space:nowrap}
+.block.green{border-color:#95d3bb;background:#edf9f4}.block.purple{border-color:#c4b0ff;background:#f4f0ff;color:#47308e}.block.orange{border-color:#ffd08a;background:#fff8ec;color:#865100}.block.red{border-color:#f0a4a4;background:#fff2f2;color:#9e2f2f}
+.conn{font-size:17px;color:#7696bd}
+.progress{height:8px;background:#edf1f5;border-radius:99px;overflow:hidden;margin:5px 0 9px}.progress>div{height:100%;background:linear-gradient(90deg,#2d7ff9,#28b686);transition:width .45s}
+.test{display:grid;grid-template-columns:1fr auto;gap:8px;padding:7px 0;border-bottom:1px solid #edf1f6;font-size:11px}
+.trace{display:flex;align-items:center;gap:5px;overflow:auto;padding-bottom:6px}.node{min-width:88px;border:1px solid var(--line);border-radius:8px;padding:7px;background:#fff;font-size:9.5px;text-align:center}
+.tabs{display:flex;gap:6px;border-bottom:1px solid var(--line);margin-bottom:10px}.tabs button{border:0;background:transparent;padding:8px 10px;color:#60748d;font-weight:700}.tabs button.active{color:var(--blue);border-bottom:2px solid var(--blue)}
+.list{max-height:240px;overflow:auto}.split{display:grid;grid-template-columns:280px 1fr;gap:11px}.master{padding:10px}.detail{padding:14px}
+.item{padding:9px;border-radius:8px;border:1px solid transparent;margin-bottom:6px;cursor:pointer;font-size:11px}.item:hover{background:#f7faff}.item.active{background:#eef5ff;border-color:#cfe0fb}
+.meta{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.metabox{background:#f8fafc;border:1px solid #e5ebf3;border-radius:8px;padding:8px}.metabox b{display:block;font-size:13px;margin-top:2px}
+.statusdot{width:8px;height:8px;border-radius:50%;display:inline-block;background:#adb9c7}.statusdot.green{background:var(--green)}.statusdot.orange{background:var(--orange)}.statusdot.red{background:var(--red)}
+.chip{display:inline-block;padding:3px 7px;border-radius:6px;background:#f0f4f8;color:#506780;font-size:9px;margin:2px}
+.twoColCode{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.callout{padding:10px;border-left:4px solid var(--blue);background:#f3f7ff;border-radius:8px;font-size:11px;line-height:1.55}
+.callout.warn{border-color:var(--orange);background:#fff8eb}.callout.red{border-color:var(--red);background:#fff2f2}
+.wave{height:115px;border-radius:8px;background:#0f172a;padding:8px;overflow:hidden}
+.wave svg{width:100%;height:100%}
+.toast{position:fixed;right:24px;bottom:24px;background:#12233d;color:#fff;padding:11px 15px;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.25);opacity:0;transform:translateY(12px);transition:.25s;pointer-events:none;z-index:30}.toast.show{opacity:1;transform:none}
+.modalback{position:fixed;inset:0;background:rgba(15,23,42,.42);display:none;align-items:center;justify-content:center;z-index:25}.modal{width:min(760px,92vw);max-height:84vh;overflow:auto;background:#fff;border-radius:14px;padding:17px;box-shadow:0 25px 70px rgba(0,0,0,.25)}
+.timeline{position:relative;padding-left:18px}.timeline:before{content:"";position:absolute;left:5px;top:5px;bottom:5px;width:2px;background:#dce5f0}.event{position:relative;padding:0 0 14px 13px;font-size:11px}.event:before{content:"";position:absolute;left:-17px;top:4px;width:9px;height:9px;border-radius:50%;background:var(--blue)}
+.diffadd{color:#83f3b0}.diffdel{color:#ff9f9f}.diffctx{color:#c9d6e8}
+@media(max-width:1200px){.app{grid-template-columns:186px 1fr}.kpis{grid-template-columns:repeat(2,1fr)}.grid3,.bottom,.grid2,.grid4,.split{grid-template-columns:1fr}.meta{grid-template-columns:repeat(2,1fr)}.sidebar{position:relative;height:auto}.sidebar-foot{display:none}}
+
+.codeExplorer{display:grid;grid-template-columns:210px minmax(0,1fr) 280px;gap:10px;margin-top:10px}
+.filetree,.sourcepanel{background:#f8fafc;border:1px solid #e2e9f2;border-radius:10px;padding:10px}
+.filetree .file{padding:7px 8px;border-radius:7px;font-size:10.5px;cursor:pointer;margin-bottom:4px}
+.filetree .file:hover,.filetree .file.active{background:#eaf2ff;color:#0d57c7;font-weight:800}
+.editor{background:#0f172a;border-radius:10px;overflow:hidden;border:1px solid #17233b}
+.editorTop{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:#15233a;color:#b7c7dc;font-size:10px}
+.editorBody{display:grid;grid-template-columns:44px 1fr;font:11px/1.55 var(--mono);max-height:520px;overflow:auto}
+.lineNums{background:#111a2b;color:#5f7189;text-align:right;padding:10px 8px;user-select:none}
+.codeLines{padding:10px;color:#dbe7f7;white-space:pre}
+.codeLines .kw{color:#7cc7ff}.codeLines .num{color:#f6c177}.codeLines .sig{color:#9ae6b4}.codeLines .com{color:#7f8ea3}.codeLines .hl{background:rgba(39,109,224,.18);display:block;margin:0 -10px;padding:0 10px}
+.codeTabs{display:flex;gap:5px}
+.codeTabs button{border:0;background:#1d2d46;color:#aebed2;padding:5px 8px;border-radius:6px;font-size:9.5px}
+.codeTabs button.active{background:#2d6cdf;color:#fff}
+.sourcepanel h4{margin:0 0 8px;font-size:12px}
+.traceCard{padding:8px;border:1px solid #e1e8f0;border-radius:8px;background:#fff;margin-bottom:7px;font-size:10.5px}
+.traceCard b{display:block;margin-bottom:3px}
+.lineLink{color:#1769e0;text-decoration:underline;cursor:pointer}
+.assertbox{background:#111827;color:#d8e5ff;padding:10px;border-radius:8px;font:10.5px/1.55 var(--mono);white-space:pre-wrap}
+@media(max-width:1250px){.codeExplorer{grid-template-columns:1fr}.sourcepanel{order:3}}
+
+
+.compileWrap{margin-top:12px}
+.pipeline{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;align-items:stretch}
+.pipeStep{border:1px solid #e0e7f0;border-radius:9px;background:#f8fafc;padding:9px;text-align:center;min-height:72px}
+.pipeStep .ico{font-size:18px;margin-bottom:4px}
+.pipeStep .name{font-size:9.5px;font-weight:800}
+.pipeStep .st{font-size:9px;color:#74869d;margin-top:3px}
+.pipeStep.running{border-color:#efb64e;background:#fff8e8}
+.pipeStep.pass{border-color:#79c9a8;background:#eefaf5}
+.pipeStep.fail{border-color:#e99a9a;background:#fff1f1}
+.logConsole{background:#0b1220;color:#c8d6e8;border-radius:9px;padding:11px;font:10.5px/1.55 var(--mono);height:230px;overflow:auto;white-space:pre-wrap;border:1px solid #15223a}
+.execMeta{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:9px}
+.execMeta .metabox b{font-size:11px}
+@media(max-width:1250px){.pipeline{grid-template-columns:repeat(2,1fr)}.execMeta{grid-template-columns:repeat(2,1fr)}}
+
+
+.failureGrid{display:grid;grid-template-columns:1.05fr 1fr 1fr;gap:10px}
+.failureHero{border:1px solid #f0c2c2;background:#fff5f5;border-radius:10px;padding:12px}
+.failureHero h3{margin:0 0 6px;color:#a93131}
+.hypo{border:1px solid #e1e8f0;border-radius:9px;padding:9px;margin-bottom:7px;background:#fff}
+.hypo.active{border-color:#2f74da;background:#f3f7ff}
+.hypo .pct{float:right;font-weight:900;color:#365b89}
+.evidence{font-size:10px;color:#657991;line-height:1.5;margin-top:4px}
+.waveInteractive{background:#0e1625;border-radius:10px;padding:10px;color:#cfdbeb}
+.waveHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:10px}
+.waveRows{display:grid;gap:8px}
+.signalRow{display:grid;grid-template-columns:105px 1fr;gap:8px;align-items:center}
+.signalName{font:10px var(--mono);color:#9fb0c7}
+.track{position:relative;height:28px;background:#111c2f;border:1px solid #1d2a43;border-radius:5px;overflow:hidden}
+.pulse{position:absolute;top:5px;height:16px;background:#64d8a7;border-radius:2px}
+.pulse.blue{background:#6ea7ff}.pulse.orange{background:#f2b45f}.pulse.red{background:#ef7373}
+.cursorLine{position:absolute;top:0;bottom:0;width:2px;background:#ffda6a;z-index:4}
+.cursorLabel{position:absolute;top:1px;transform:translateX(-50%);background:#ffda6a;color:#172136;padding:1px 4px;border-radius:4px;font-size:8px;z-index:5}
+.cycleBtn{border:0;background:#17233a;color:#9fb0c7;border-radius:6px;padding:5px 7px;font-size:9px}
+.cycleBtn.active{background:#2d6cdf;color:#fff}
+.linkCard{border:1px solid #dce6f1;border-radius:9px;padding:9px;background:#fafdff;margin-bottom:7px}
+.linkCard b{display:block;font-size:11px;margin-bottom:3px}
+.timelineMini{display:flex;gap:4px;align-items:center;overflow:auto;padding:5px 0}
+.miniNode{min-width:88px;text-align:center;border:1px solid #dce5ef;border-radius:7px;padding:6px;background:white;font-size:9px}
+.rootBadge{display:inline-block;padding:4px 7px;border-radius:999px;background:#eef5ff;color:#185ebc;font-size:9px;font-weight:800}
+@media(max-width:1250px){.failureGrid{grid-template-columns:1fr}.signalRow{grid-template-columns:85px 1fr}}
+
+
+.analysisBox{border:1px solid #dbe6f2;background:#f8fbff;border-radius:10px;padding:10px;margin-top:9px}
+.analysisGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:8px}
+.analysisCell{border:1px solid #e1e9f2;background:#fff;border-radius:8px;padding:8px;font-size:10px}
+.analysisCell b{display:block;font-size:12px;margin-top:3px}
+.evidenceList{display:grid;gap:7px;margin-top:9px}
+.evi{border-left:4px solid #2e73d2;background:#f5f9ff;border-radius:7px;padding:8px 9px;font-size:10.5px;line-height:1.45}
+.evi.warn{border-color:#e9a82c;background:#fff8e9}
+.evi.red{border-color:#d95a5a;background:#fff3f3}
+.judgment{border:1px solid #cfe0f5;background:#eef5ff;border-radius:10px;padding:12px}
+.judgment h3{margin:0 0 6px;color:#1b5db9}
+.decisionDraft{border:1px solid #dfd8f3;background:#faf8ff;border-radius:10px;padding:11px}
+.optionButtons{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;margin-top:9px}
+.optionButtons button{border:1px solid #d9e2ed;background:#fff;border-radius:8px;padding:8px;text-align:left;font-size:10px}
+.optionButtons button:hover{background:#f5f9ff}
+.optionButtons button.selected{border-color:#1769e0;background:#eef5ff;color:#0e56ba;font-weight:800}
+.smallmono{font:10px/1.5 var(--mono);background:#111827;color:#d8e5ff;border-radius:8px;padding:9px;white-space:pre-wrap}
+@media(max-width:1100px){.analysisGrid,.optionButtons{grid-template-columns:1fr 1fr}}
+
+
+.evidenceContext{border:1px solid #cfe0f3;background:#f8fbff;border-radius:11px;padding:11px;margin-top:9px}
+.evidenceHeader{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:9px}
+.evidenceHeader h3{margin:0;font-size:14px}
+.windowLabel{font:10px var(--mono);color:#5d718a;background:#eef4fb;border:1px solid #d8e4f1;padding:5px 7px;border-radius:7px}
+.evidenceSections{display:grid;grid-template-columns:1.15fr .95fr 1fr 1fr;gap:8px}
+.eSection{border:1px solid #dfe7f0;background:#fff;border-radius:9px;padding:9px;min-height:150px}
+.eSection h4{margin:0 0 7px;font-size:11px;color:#284d77}
+.eventTimeline{position:relative;padding-left:16px}
+.eventTimeline:before{content:"";position:absolute;left:5px;top:4px;bottom:4px;width:2px;background:#dce6f0}
+.ev{position:relative;padding:0 0 8px 10px;font-size:9.8px;line-height:1.4}
+.ev:before{content:"";position:absolute;left:-14px;top:3px;width:8px;height:8px;border-radius:50%;background:#3d7ed6}
+.ev.fail:before{background:#d95656}.ev.warn:before{background:#e3a329}
+.srcMap{font:9.8px/1.45 var(--mono);background:#111827;color:#dbe7f4;border-radius:7px;padding:8px;white-space:pre-wrap}
+.traceMini{display:grid;gap:5px}
+.traceMini .tm{border:1px solid #e0e8f1;background:#fafcff;border-radius:7px;padding:6px;font-size:9.5px}
+.traceMini .tm b{display:block;margin-bottom:2px;color:#214e83}
+.triggerBox{border:1px solid #efcaca;background:#fff6f6;border-radius:7px;padding:8px;font-size:9.8px;line-height:1.45}
+.triggerBox b{color:#a53434}
+.causalNote{margin-top:8px;padding:8px 9px;border-left:4px solid #2f71cd;background:#eef5ff;border-radius:7px;font-size:10px;line-height:1.5}
+@media(max-width:1300px){.evidenceSections{grid-template-columns:1fr 1fr}}
+@media(max-width:900px){.evidenceSections{grid-template-columns:1fr}}
+
+
+/* V1.7: make every button interaction feel like a real service round-trip */
+button{position:relative}
+button.uiPending{
+  cursor:wait !important;
+  transform:translateY(1px);
+  box-shadow:none !important;
+}
+button.uiPending > *{opacity:.55}
+button.uiPending::after{
+  content:"";
+  position:absolute;
+  width:13px;height:13px;
+  left:50%;top:50%;
+  margin:-7px 0 0 -7px;
+  border:2px solid rgba(80,100,125,.28);
+  border-top-color:#1769e0;
+  border-radius:50%;
+  animation:uiSpin .55s linear infinite;
+  pointer-events:none;
+}
+.btn.primary.uiPending::after,
+.btn.success.uiPending::after,
+.btn.warn.uiPending::after,
+.btn.danger.uiPending::after{
+  border-color:rgba(255,255,255,.35);
+  border-top-color:#fff;
+}
+@keyframes uiSpin{to{transform:rotate(360deg)}}
+
+
+/* V1.7.1: Engineer-authored architecture workspace — additive to V1.7 */
+.designTabs{display:flex;gap:6px;margin-bottom:10px;border-bottom:1px solid var(--line)}
+.designTabs button{border:0;background:transparent;padding:8px 10px;color:#65788f;font-weight:750}
+.designTabs button.active{color:var(--blue);border-bottom:2px solid var(--blue)}
+.designWorkspace{display:grid;grid-template-columns:190px minmax(0,1fr) 260px;gap:10px}
+.palette,.inspector{background:#f8fafc;border:1px solid #e2e9f2;border-radius:10px;padding:10px}
+.palette h4,.inspector h4{margin:0 0 8px;font-size:11px}
+.palette button{width:100%;text-align:left;border:1px solid #dce5ef;background:#fff;border-radius:8px;padding:7px 8px;margin-bottom:5px;font-size:10px}
+.palette button:hover{background:#eef5ff}
+.canvas{min-height:270px;border:1px dashed #b9c9db;border-radius:12px;background:linear-gradient(#fafdff,#f5f9fd);padding:14px}
+.canvasTitle{font-size:10px;color:#75879c;margin-bottom:12px}
+.designFlow{display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:wrap;min-height:170px}
+.designNode{min-width:104px;padding:12px 10px;border:1px solid #bfd3ed;background:#fff;border-radius:9px;font-size:10px;font-weight:800;text-align:center;box-shadow:0 5px 12px rgba(40,70,110,.06)}
+.designNode.user{border:2px solid #1769e0;background:#f2f7ff}
+.designArrow{font-size:18px;color:#7799be}
+.designControls{display:flex;gap:3px;justify-content:center;margin-top:5px}
+.designControls button{border:1px solid #dce5ef;background:#fff;border-radius:6px;padding:3px 6px;font-size:9px}
+.inspector select{width:100%;border:1px solid #dce5ef;background:#fff;border-radius:8px;padding:7px 8px;font-size:10px;margin-bottom:7px}
+.designHint{border-left:4px solid #1769e0;background:#eef5ff;border-radius:7px;padding:8px 9px;font-size:10px;line-height:1.5;margin-top:8px}
+.miniCompare{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:8px}
+.miniCompare .mc{border:1px solid #e1e8f0;border-radius:8px;background:#fff;padding:8px;font-size:9.5px}
+.userDesignBadge{display:inline-flex;padding:4px 8px;border-radius:999px;background:#eaf2ff;color:#145abb;font-size:9.5px;font-weight:800}
+@media(max-width:1250px){.designWorkspace{grid-template-columns:1fr}.miniCompare{grid-template-columns:1fr 1fr}}
+
+
+/* V1.7.2 Behavioral Model Hierarchy Navigator */
+.behaviorTabs{display:flex;gap:6px;margin-bottom:10px;border-bottom:1px solid var(--line)}
+.behaviorTabs button{border:0;background:transparent;padding:8px 10px;color:#64778f;font-weight:750}
+.behaviorTabs button.active{color:var(--blue);border-bottom:2px solid var(--blue)}
+.behaviorLayout{display:grid;grid-template-columns:250px minmax(0,1fr) 290px;gap:10px}
+.behTree,.behInspector{background:#f8fafc;border:1px solid #e2e9f2;border-radius:10px;padding:10px}
+.behTree h4,.behInspector h4{margin:0 0 8px;font-size:11px}
+.treeGroup{margin-bottom:4px}
+.treeGroupHead{display:flex;align-items:center;gap:6px;padding:7px 6px;border-radius:7px;font-size:10px;font-weight:850;cursor:pointer}
+.treeGroupHead:hover{background:#eef4fb}
+.treeChildren{margin-left:14px;border-left:1px solid #dce5ef;padding-left:8px}
+.treeNode{padding:6px 7px;border-radius:7px;font-size:9.8px;cursor:pointer;margin:2px 0}
+.treeNode:hover{background:#edf4ff}
+.treeNode.active{background:#eaf2ff;color:#1159be;font-weight:850;border:1px solid #cbdff8}
+.treeNode .kind{float:right;color:#8b9aab;font-size:8.5px;font-weight:600}
+.behCanvas{border:1px solid #dce6f1;border-radius:11px;background:#fff;padding:12px;min-height:390px}
+.breadcrumb{display:flex;gap:5px;align-items:center;flex-wrap:wrap;font-size:9.5px;color:#6d7e92;margin-bottom:9px}
+.breadcrumb b{color:#254e7a}
+.behHero{border:1px solid #d9e6f5;background:#f8fbff;border-radius:10px;padding:11px}
+.behHero h3{margin:0 0 5px;font-size:15px}
+.contractGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}
+.contractBox{border:1px solid #e0e8f0;background:#fff;border-radius:8px;padding:9px;font-size:10px;line-height:1.5}
+.contractBox b{display:block;margin-bottom:3px;color:#2b527d}
+.behFlow{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;padding:14px 8px;border:1px dashed #c4d2e2;border-radius:9px;background:#fbfdff;margin-top:10px}
+.behFlowNode{padding:9px 10px;border-radius:8px;border:1px solid #bfd4ee;background:#fff;font-size:9.8px;font-weight:800}
+.behFlowNode.focus{border:2px solid #1769e0;background:#eef5ff}
+.behArrow{color:#7898bd;font-size:16px}
+.behInspector .test{font-size:10px}
+.linkMini{border:1px solid #e0e8f0;background:#fff;border-radius:8px;padding:7px;margin-bottom:6px;font-size:9.7px}
+.linkMini b{display:block;margin-bottom:2px;color:#28517f}
+@media(max-width:1250px){.behaviorLayout{grid-template-columns:1fr}}
+
+
+/* V1.7.3 Diagram Service */
+.diagramSvcTabs{display:flex;gap:6px;margin-bottom:10px;border-bottom:1px solid var(--line)}
+.diagramSvcTabs button{border:0;background:transparent;padding:8px 10px;color:#64778f;font-weight:750}
+.diagramSvcTabs button.active{color:var(--blue);border-bottom:2px solid var(--blue)}
+.svcPipeline{display:grid;grid-template-columns:repeat(7,minmax(115px,1fr));gap:7px;align-items:stretch;margin:10px 0}
+.svcNode{border:1px solid #dce6f0;background:#fff;border-radius:10px;padding:10px;font-size:9.6px;line-height:1.45;min-height:96px}
+.svcNode b{display:block;font-size:10.5px;color:#214f82;margin-bottom:4px}
+.svcNode.active{border:2px solid #1769e0;background:#f1f6ff}
+.svcNode.cache{border-color:#a8d7c5;background:#f3fbf7}
+.svcNode.ai{border-color:#d1bdf4;background:#f7f3ff}
+.svcNode.artifact{border-color:#edcb8d;background:#fff9ee}
+.svcArrow{text-align:center;color:#85a0bc;font-size:17px;margin:auto -3px}
+.costGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:9px}
+.costBox{border:1px solid #e0e7ef;border-radius:9px;background:#fff;padding:9px;font-size:10px}
+.costBox b{display:block;margin-bottom:4px;color:#28517f}
+.cacheTable{width:100%;border-collapse:collapse;font-size:9.7px}
+.cacheTable th,.cacheTable td{border-bottom:1px solid #e8eef4;padding:6px;text-align:left}
+.cacheTable th{background:#fafbfd;color:#58718d}
+.schemaGrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.jsonBox{background:#0f172a;color:#dce7f6;border-radius:10px;padding:11px;font:9.8px/1.5 var(--mono);white-space:pre-wrap;overflow:auto;min-height:330px}
+.rfPreview{border:1px solid #dce6f1;border-radius:11px;background:#f9fcff;padding:12px;min-height:330px}
+.rfCanvas{min-height:230px;border:1px dashed #becfe2;border-radius:9px;background:#fff;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;padding:18px}
+.rfNode{min-width:105px;border:1px solid #bcd1ec;border-radius:8px;background:#fff;padding:10px;text-align:center;font-size:9.8px;font-weight:800;box-shadow:0 5px 12px rgba(40,70,110,.06)}
+.rfNode.focus{border:2px solid #1769e0;background:#eef5ff}
+.rfEdge{color:#7194ba;font-size:17px}
+.reqbar{display:grid;grid-template-columns:1.3fr .8fr .8fr auto;gap:7px;align-items:end}
+.reqbar select{border:1px solid #dce5ef;background:#fff;border-radius:8px;padding:7px;font-size:10px;width:100%}
+.smallLabel{display:block;font-size:8.8px;color:#74869b;margin-bottom:3px}
+.hit{color:#0a7f56}.miss{color:#b26b00}
+@media(max-width:1300px){.svcPipeline{grid-template-columns:1fr 1fr 1fr}.schemaGrid{grid-template-columns:1fr}.reqbar{grid-template-columns:1fr 1fr}}
+
+
+/* V1.7.4: visible mock diagram after Show Diagram */
+.diagramPreviewCard{margin-top:10px;border:1px solid var(--line);border-radius:12px;background:#fff;padding:12px}
+.diagramPreviewHead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:9px}
+.diagramPreviewHead h3{margin:0;font-size:13px}
+.diagramStage{border:1px solid #dce6f1;border-radius:11px;background:#f9fcff;padding:16px;min-height:220px;display:flex;align-items:center;justify-content:center}
+.diagramStageInner{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;width:100%}
+.liveNode{min-width:120px;max-width:160px;border:1px solid #bdd1e9;background:#fff;border-radius:9px;padding:11px 10px;text-align:center;font-size:9.8px;font-weight:850;box-shadow:0 5px 13px rgba(40,70,110,.06)}
+.liveNode.rule{border:2px solid #1769e0;background:#eef5ff}
+.liveNode small{display:block;margin-top:4px;color:#7b8ca0;font-weight:600;font-size:8.5px}
+.liveEdge{display:flex;flex-direction:column;align-items:center;color:#7194ba;font-size:18px;min-width:34px}
+.liveEdge small{font-size:8px;color:#7a8ca1;margin-bottom:2px}
+.previewMeta{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
+.previewActions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.genPulse{display:flex;align-items:center;gap:8px;border:1px dashed #c4d2e2;border-radius:10px;background:#fbfdff;padding:14px;color:#667b92;font-size:10px}
+.genDot{width:9px;height:9px;border-radius:50%;background:#1769e0;animation:genBlink .8s ease-in-out infinite alternate}
+@keyframes genBlink{to{opacity:.25}}
+
+/* Live MVP evidence workspace */
+.mvpHeader{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+.mvpReqGrid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(360px,.85fr);gap:12px}
+.mvpReqTabs,.mvpTabs{display:flex;gap:5px;flex-wrap:wrap}
+.mvpReqTitle{font-size:17px;margin:12px 0 5px}
+.mvpProvenance{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:9px 10px;background:#eef5ff;border:1px solid #cfe0f5;border-radius:8px;margin:9px 0}
+.mvpQuote{margin:8px 0;padding:10px 12px;border-left:4px solid #1769e0;background:#f8fbff;font-size:11px;line-height:1.55}
+.mvpBehavior{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:9px}
+.mvpBehavior>div{padding:8px;background:#fafbfd;border:1px solid #e5ebf2;border-radius:7px;font-size:10px;line-height:1.45}
+.mvpBehavior b{display:block;color:#507095;font-size:9px;text-transform:uppercase;margin-bottom:3px}
+.traceGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}
+.traceColumn{border:1px solid #dfe7f0;border-radius:9px;overflow:hidden;background:#fff}
+.traceColumn h4{margin:0;padding:9px 10px;background:#edf5ff;color:#174f99;font-size:11px}
+.traceColumn.rtl h4{background:#eaf8f2;color:#087654}.traceColumn.test h4{background:#f1efff;color:#5540a0}
+.traceItem{display:block;width:100%;border:0;border-top:1px solid #edf1f5;background:#fff;text-align:left;padding:9px 10px;cursor:pointer;color:#1b344f}
+.traceItem:hover{background:#f7faff}.traceItem b{display:block;font-size:10px;white-space:normal}.traceItem small{display:block;color:#718399;margin-top:3px;font-size:8.8px}
+.sourceView{max-height:67vh;overflow:auto;background:#0f172a;border-radius:8px;padding:8px 0;font:11px/1.55 var(--mono);color:#d8e4f2}
+.sourceLine{display:grid;grid-template-columns:52px 1fr;padding:0 10px;white-space:pre}.sourceLine .ln{color:#718199;text-align:right;padding-right:12px;user-select:none}
+.sourceLine.focus{background:#5b4a00;color:#fff5a8;border-left:3px solid #ffd43b}.sourceLine.focus .ln{color:#ffd43b}
+.executeHead{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:10px}
+.mvpTabs{border-bottom:1px solid #dbe4ee}.mvpTabs button{border:0;background:transparent;padding:8px 12px;color:#65798f;font-weight:750;cursor:pointer;border-bottom:2px solid transparent}.mvpTabs button.active{color:#1769e0;border-color:#1769e0;background:#f4f8ff}
+.mvpTabPane{min-height:155px;padding-top:10px}.stageRow{display:grid;grid-template-columns:150px 80px 1fr 65px;gap:8px;align-items:center;border-bottom:1px solid #edf1f5;padding:7px 4px;font-size:10px}
+.mvpLog{max-height:240px;overflow:auto;background:#0f172a;color:#dce7f6;border-radius:8px;padding:10px;font:10px/1.5 var(--mono);white-space:pre-wrap}
+.evidenceGrid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(320px,.65fr);gap:12px;margin-top:12px}
+.mvpWave{width:100%;height:auto;background:#0d1b2a;border-radius:8px}.mvpWave text{font-family:var(--mono)}
+.compactEvidence{width:100%;table-layout:fixed}.compactEvidence th,.compactEvidence td{padding:7px 6px;font-size:9px}.compactEvidence td:last-child,.compactEvidence th:last-child{width:65px}
+.artifactLinks{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
+@media(max-width:1100px){.mvpReqGrid,.evidenceGrid{grid-template-columns:1fr}.traceGrid{grid-template-columns:1fr}.mvpBehavior{grid-template-columns:1fr}}
+
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="logo">S2</div><div>Spec2RTL<br><span style="font-size:10px;color:#73849a;font-weight:600">Harness Demo V1.7.4</span></div></div>
+    <div class="nav" id="nav">
+      <button class="active" data-page="mvp">🧪 MVP Live</button>
+      <button data-page="dashboard">🏠 Dashboard · Mock</button>
+      <button data-page="spec">📄 Specification</button>
+      <button data-page="req">📋 Requirements</button>
+      <button data-page="golden">🧊 Golden Model</button>
+      <button data-page="diagram">🖼 Diagram · Preview</button>
+      <button data-page="arch">🧩 Architecture · Preview</button>
+      <button data-page="uarch">⚙️ uArch · Preview</button>
+      <button data-page="rtl">▣ RTL</button>
+      <button data-page="verify">✅ Verification</button>
+      <button data-page="trace">🔗 Traceability</button>
+      <button data-page="decision">🗂 Decision Log</button>
+    </div>
+    <div class="sidebar-foot"><b>SpaceWire Project</b><br>ECSS-E-ST-50-12C<br><span style="opacity:.76">Interactive prototype · local only</span></div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="titlewrap">
+        <h1 id="pageTitle">프로젝트 대시보드</h1>
+        <div class="sub" id="pageSub">Spec → Requirement → Golden → Architecture → uArch → RTL → Verification</div>
+      </div>
+      <div class="actions">
+        <input class="search" id="globalSearch" placeholder="검색: REQ-ENC-024, §5.4.8, credit..." />
+        <button class="btn" id="resetBtn">Reset</button>
+        <button class="btn primary" id="quickJobBtn">+ Run Job</button>
+      </div>
+    </div>
+    <div id="content"></div>
+  </main>
+</div>
+
+<div class="modalback" id="modalBack">
+  <div class="modal">
+    <div class="hdr"><h2 id="modalTitle"></h2><button class="btn" id="closeModal">닫기</button></div>
+    <div id="modalContent"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+
+/* V1.7 global button latency simulator.
+   All user button clicks wait ~500 ms before the original handler runs.
+   This is UI-only; it does not imply a real backend request. */
+const __uiDelayBypass = new WeakSet();
+const __uiDelayPending = new WeakSet();
+
+document.addEventListener('click', function(ev){
+  const btn = ev.target.closest && ev.target.closest('button');
+  if(!btn) return;
+
+  // Let the delayed synthetic click execute normally.
+  if(__uiDelayBypass.has(btn)){
+    __uiDelayBypass.delete(btn);
+    return;
+  }
+
+  // Ignore repeated clicks while the first one is waiting.
+  if(__uiDelayPending.has(btn)){
+    ev.preventDefault();
+    ev.stopImmediatePropagation();
+    return;
+  }
+
+  // Respect buttons that were already disabled by the app.
+  if(btn.disabled) return;
+
+  ev.preventDefault();
+  ev.stopImmediatePropagation();
+
+  __uiDelayPending.add(btn);
+  btn.classList.add('uiPending');
+  btn.setAttribute('aria-busy','true');
+
+  setTimeout(function(){
+    __uiDelayPending.delete(btn);
+    btn.classList.remove('uiPending');
+    btn.removeAttribute('aria-busy');
+
+    // The page may have re-rendered. Only replay if this exact button still exists.
+    if(!document.documentElement.contains(btn)) return;
+
+    __uiDelayBypass.add(btn);
+    btn.click();
+  }, 500);
+}, true);
+
+const state={
+ page:'mvp', selectedReq:'REQ-ENC-024', selectedClause:'§5.4.8', option:'B',
+ approved:false, rtl:false, b1:0, b2:0, jobs:36, openDecisions:7,
+ uarchTab:'Block Diagram', verifyTab:'B1 Functional', rtlFile:'credit_manager.sv', rtlCodeTab:'code', compileRunning:false, compileResult:'idle', compileLog:'', compilePipeline:{queue:'idle',worker:'idle',docker:'idle',verilator:'idle',iverilog:'idle',cocotb:'idle',artifacts:'idle'}, selectedFailCycle:150, failureKind:'credit_boundary', failureSource:'tb_credit_boundary_multipacket', cycleAnalyzed:false, arbiterResult:null, decision013:null,
+ archMode:'AI Options',
+ myDesign:['RX Decoder','Credit Manager','TX FSM','Encoder','PHY'],
+ myDesignSaved:false, useMyDesign:false,
+ myTiming:'Registered 1-cycle', myInterface:'Decoupled handshake', goldenMode:'Behavior Hierarchy', selectedBehavior:'credit_mgr', expandedBehaviorGroups:{encoding:true,flow:true,datalink:true,network:false}, diagramTab:'Service Architecture', diagramLevel:'Behavioral', diagramCacheStatus:'hit', diagramGenerated:true, diagramStyle:'engineering'
+};
+
+const requirements=[
+ {id:'REQ-ENC-021',clause:'§5.4.7',title:'Normal Character encoding',status:'Verified',coverage:100,prio:'Medium'},
+ {id:'REQ-ENC-024',clause:'§5.4.8',title:'FCT / transmit credit handling',status:'In Progress',coverage:78,prio:'High'},
+ {id:'REQ-ENC-025',clause:'§5.4.8',title:'NULL character handling',status:'Verified',coverage:100,prio:'High'},
+ {id:'REQ-ENC-031',clause:'§5.4.9',title:'Disconnect detection and recovery',status:'In Progress',coverage:64,prio:'High'},
+ {id:'REQ-DL-012',clause:'§5.5.3',title:'Packet termination with EOP/EEP',status:'Draft',coverage:35,prio:'Medium'},
+ {id:'REQ-NET-008',clause:'§5.6.8',title:'Output arbitration ownership',status:'Draft',coverage:20,prio:'Medium'}
+];
+
+const clauses=[
+ {id:'§5.4.7',title:'Data character encoding',text:'Normal characters and control characters shall be encoded according to the SpaceWire character encoding rules. Invalid code sequences shall not be accepted as valid characters.',refs:['REQ-ENC-021'],images:1},
+ {id:'§5.4.8',title:'Flow control and NULL handling',text:'Flow Control Tokens regulate the transmission of normal characters. On receipt of an FCT the transmit credit is increased by eight, subject to the implementation limit. Normal characters shall not be sent when transmit credit is zero.',refs:['REQ-ENC-024','REQ-ENC-025'],images:2},
+ {id:'§5.4.9',title:'Disconnect detection',text:'A disconnect condition shall be detected when no valid transition is observed for the specified interval. The link state machine shall enter the required recovery path.',refs:['REQ-ENC-031'],images:1},
+ {id:'§5.5.3',title:'Packet termination',text:'A packet is terminated by EOP or EEP. EEP indicates an error termination and shall be preserved end-to-end where applicable.',refs:['REQ-DL-012'],images:0},
+ {id:'§5.6.8',title:'Routing switch arbitration',text:'When an output port becomes free, pending requests compete for ownership. The winning input retains the output connection for the packet.',refs:['REQ-NET-008'],images:3}
+];
+
+const decisionLog=[
+ {id:'DEC-012',date:'2026-09-16',title:'Standalone Credit Manager 선택',status:'Approved',req:'REQ-ENC-024',reason:'verification / reuse / traceability 우선',rejected:'A: FSM coupling 증가, C: boundary complexity 증가'},
+ {id:'DEC-007',date:'2026-09-14',title:'Disconnect simultaneous transition 처리',status:'Open',req:'REQ-ENC-031',reason:'Spec 문구와 구현 clock edge 해석 확인 필요',rejected:'—'},
+ {id:'DEC-004',date:'2026-09-12',title:'RX/TX FSM 분리',status:'Approved',req:'REQ-ENC-021',reason:'병렬 동작과 독립 검증 용이',rejected:'통합 FSM: state explosion'},
+ {id:'DEC-002',date:'2026-09-10',title:'MAX_CREDIT=56 검증 경계',status:'Approved',req:'REQ-ENC-024',reason:'48/56 boundary regression을 별도 유지',rejected:'saturation implicit 처리'}
+];
+
+const architecture={
+ A:{name:'TX FSM Integrated',summary:'credit counter를 TX FSM 내부 상태/레지스터로 통합',pros:['면적 낮음','signal 수 적음','초기 구현 빠름'],cons:['FSM coupling 증가','재사용 낮음','formal/local proof 어려움'],score:{Area:'낮음',Latency:'낮음',Verify:'보통',Reuse:'낮음',Risk:'낮음'},blocks:['RX Decoder','TX FSM + Credit','Encoder','PHY']},
+ B:{name:'Standalone Credit Manager',summary:'credit state와 정책을 독립 모듈로 분리',pros:['검증 쉬움','traceability 명확','다른 프로젝트 재사용'],cons:['interface 신호 증가','register 추가'],score:{Area:'보통',Latency:'낮음',Verify:'높음',Reuse:'높음',Risk:'낮음'},blocks:['RX Decoder','Credit Manager','TX FSM','Encoder','PHY']},
+ C:{name:'FIFO-derived Credit',summary:'FIFO occupancy/free-space에서 credit 상태를 유도',pros:['상태 중복 감소 가능','flow control 결합'],cons:['boundary 복잡','backpressure coupling','debug 어려움'],score:{Area:'높음',Latency:'보통',Verify:'낮음',Reuse:'보통',Risk:'보통'},blocks:['RX FIFO','Occupancy Logic','TX FSM','Encoder','PHY']}
+};
+
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1700);}
+function badgeStatus(s){return s==='Verified'?'<span class="badge good">Verified</span>':s==='In Progress'?'<span class="badge warnbg">In Progress</span>':'<span class="badge neutral">Draft</span>'}
+function setTitle(t,s){document.getElementById('pageTitle').textContent=t;document.getElementById('pageSub').textContent=s}
+function openModal(title,html){document.getElementById('modalTitle').textContent=title;document.getElementById('modalContent').innerHTML=html;document.getElementById('modalBack').style.display='flex'}
+document.getElementById('closeModal').onclick=()=>document.getElementById('modalBack').style.display='none';
+document.getElementById('modalBack').onclick=e=>{if(e.target.id==='modalBack')e.currentTarget.style.display='none'};
+document.getElementById('resetBtn').onclick=()=>location.reload();
+document.getElementById('quickJobBtn').onclick=()=>runJob('regression_suite');
+
+function flow(){
+ return `<div class="flow">
+ <div class="step done"><div class="n">✓</div>Spec</div><div class="arrow">→</div>
+ <div class="step done"><div class="n">✓</div>Requirements</div><div class="arrow">→</div>
+ <div class="step done"><div class="n">✓</div>Golden Model</div><div class="arrow">→</div>
+ <div class="step ${state.approved?'done':'current'}"><div class="n">${state.approved?'✓':'4'}</div>Architecture</div><div class="arrow">→</div>
+ <div class="step ${state.approved?'current':''}"><div class="n">5</div>uArch</div><div class="arrow">→</div>
+ <div class="step ${state.rtl?'done':''}"><div class="n">${state.rtl?'✓':'6'}</div>RTL</div><div class="arrow">→</div>
+ <div class="step ${state.b1>0||state.b2>0?'current':''}"><div class="n">7</div>Verification</div>
+ </div>`;
+}
+
+function renderDashboard(){
+ setTitle('프로젝트 대시보드','현재 상태, 설계 결정, 검증 위험을 한 화면에서 확인');
+ const content=document.getElementById('content');
+ content.innerHTML=flow()+`
+ <div class="kpis">
+  <div class="card kpi"><div class="label">전체 요구사항</div><div class="value">128</div><small>완료 98 · 진행 24 · 미시작 6</small></div>
+  <div class="card kpi"><div class="label">Golden Coverage</div><div class="value">92.1%</div><small>118 / 128 requirements</small></div>
+  <div class="card kpi"><div class="label">Open Decisions</div><div class="value">${state.openDecisions}</div><small>Spec ambiguity / Architecture</small></div>
+  <div class="card kpi"><div class="label">RTL 상태</div><div class="value" style="color:${state.rtl?'#0fa36b':'#76879b'}">${state.rtl?'PASS':'READY'}</div><small>${state.rtl?'compile + smoke pass':'아직 생성 전'}</small></div>
+  <div class="card kpi"><div class="label">실행 작업 수</div><div class="value">${state.jobs}</div><small>성공 32 · 실패 3 · 실행중 1</small></div>
+ </div>
+ <div class="grid3">
+  <section class="card panel">
+   <div class="hdr"><h3>현재 Requirement</h3><button class="btn" onclick="go('req')">Open</button></div>
+   <div class="reqbox"><div class="row"><span class="tag">REQ-ENC-024</span><span class="badge warnbg">진행 중</span></div>
+   <b>FCT / transmit credit handling</b>
+   <p class="muted" style="font-size:11px;line-height:1.6">FCT 수신 시 TX credit +8, 최대 56. credit=0이면 Normal Character 전송 금지.</p>
+   <div class="row"><span>관련 Spec</span><b>§5.4.7 · §5.4.8</b></div></div>
+   <h3 style="font-size:13px">Golden Behavior</h3>
+   <div class="code">def on_fct_received(self):
+    self.tx_credit = min(self.tx_credit + 8, 56)
+
+def can_send_normal_char(self):
+    return self.tx_credit > 0</div>
+   <div class="row"><span>Golden tests</span><span class="badge good">3/3 PASS</span></div>
+  </section>
+
+  <section class="card panel">
+   <div class="hdr"><h3>Architecture Exploration</h3><span class="badge purple">AI Suggestions</span></div>
+   ${archOptions()}
+   <table class="table"><tr><th>Metric</th><th>A</th><th>B</th><th>C</th></tr>
+   <tr><td>Area</td><td>낮음</td><td>보통</td><td>높음</td></tr>
+   <tr><td>Verification</td><td>보통</td><td><b style="color:#0a8c61">높음</b></td><td>낮음</td></tr>
+   <tr><td>Reuse</td><td>낮음</td><td><b style="color:#0a8c61">높음</b></td><td>보통</td></tr>
+   <tr><td>Risk</td><td>낮음</td><td>낮음</td><td>보통</td></tr></table>
+   <div class="row"><span>선택: <b>Option ${state.option}</b></span><button class="btn success" onclick="approveArchitecture()" ${state.approved?'disabled':''}>${state.approved?'Approved ✓':'Approve'}</button></div>
+  </section>
+
+  <section class="card panel">
+   <div class="hdr"><h3>Micro-architecture Preview</h3><button class="btn" onclick="go('uarch')">Open</button></div>
+   ${diagram(architecture[state.option].blocks)}
+   <div class="callout" style="margin-top:9px">${state.approved?'<b>uArch contract locked.</b> Option '+state.option+' 기준으로 RTL 생성 가능.':'Architecture 승인 전입니다. 승인 후 uArch contract가 잠깁니다.'}</div>
+   <div class="row"><button class="btn" onclick="showUarchContract()">Contract</button><button class="btn primary" onclick="generateRTL()" ${state.approved&&!state.rtl?'':'disabled'}>${state.rtl?'RTL Generated':'Generate RTL'}</button></div>
+  </section>
+ </div>
+ <div class="bottom">
+  <section class="card panel"><div class="hdr"><h3>Verification Status</h3><button class="btn" onclick="go('verify')">Open</button></div>
+   <div class="row"><span>B1 Functional</span><b>${state.b1}%</b></div><div class="progress"><div style="width:${state.b1}%"></div></div>
+   <div class="row"><span>B2 Implementation</span><b>${state.b2}%</b></div><div class="progress"><div style="width:${state.b2}%"></div></div>
+   <div class="row"><button class="btn" onclick="runVerify('b1')" ${state.rtl?'':'disabled'}>Run B1</button><button class="btn" onclick="runVerify('b2')" ${state.rtl?'':'disabled'}>Run B2</button></div>
+  </section>
+  <section class="card panel"><div class="hdr"><h3>최근 테스트</h3></div>
+   <div class="test"><span>test_credit_increase</span><span class="badge good">PASS</span></div>
+   <div class="test"><span>test_credit_saturation</span><span class="badge good">PASS</span></div>
+   <div class="test"><span>test_no_send_when_zero</span><span class="badge good">PASS</span></div>
+   ${state.rtl?'<div class="test"><span>rtl_smoke_compile</span><span class="badge good">PASS</span></div>':''}
+  </section>
+  <section class="card panel"><div class="hdr"><h3>Traceability</h3><button class="btn" onclick="go('trace')">Open</button></div>
+   ${traceStrip()}
+   <h3 style="font-size:13px;margin-top:12px">Simulation Job</h3>
+   <div class="row"><span id="jobStatusText">idle</span><span class="badge neutral" id="jobStatusBadge">READY</span></div>
+   ${wave()}
+  </section>
+ </div>`;
+ bindArchOptions();
+}
+
+function archOptions(){
+ return `<div class="arch-tabs">
+ ${['A','B','C'].map(x=>`<div class="opt ${state.option===x?'active':''}" data-opt="${x}"><h4>Option ${x}</h4><p>${architecture[x].name}</p></div>`).join('')}
+ </div><div class="reqbox" style="margin:8px 0"><b>Option ${state.option} · ${architecture[state.option].name}</b><p class="muted" style="font-size:10.5px;line-height:1.5;margin-bottom:0">${architecture[state.option].summary}</p></div>`;
+}
+function bindArchOptions(){
+ document.querySelectorAll('.opt[data-opt]').forEach(o=>o.onclick=()=>{
+   if(state.approved){toast('승인된 Architecture는 Reset 전 변경할 수 없습니다.');return}
+   state.option=o.dataset.opt; render();
+ });
+}
+function diagram(blocks){
+ return `<div class="diagram">${blocks.map((b,i)=>`<div class="block ${b.includes('Credit')?'green':b.includes('Encoder')?'purple':b==='PHY'?'orange':''}">${b}</div>${i<blocks.length-1?'<div class="conn">→</div>':''}`).join('')}</div>`;
+}
+function wave(){
+ return `<div class="wave"><svg viewBox="0 0 500 90" preserveAspectRatio="none">
+ <polyline points="0,20 45,20 45,55 95,55 95,20 150,20 150,55 205,55 205,20 255,20 255,55 315,55 315,20 365,20 365,55 420,55 420,20 500,20" fill="none" stroke="#5ee6a8" stroke-width="3"/>
+ <polyline points="0,70 70,70 70,45 130,45 130,70 190,70 190,45 250,45 250,70 320,70 320,45 390,45 390,70 500,70" fill="none" stroke="#6da8ff" stroke-width="3"/></svg></div>`;
+}
+function traceStrip(){
+ return `<div class="trace">
+ <div class="node">Spec<br><b>§5.4.8</b></div><div>→</div><div class="node">Requirement<br><b>REQ-ENC-024</b></div><div>→</div>
+ <div class="node">Golden<br><b>GM-024</b></div><div>→</div><div class="node">Decision<br><b>${state.approved?'DEC-012':'Pending'}</b></div><div>→</div>
+ <div class="node">RTL<br><b>${state.rtl?'credit_manager.sv':'Pending'}</b></div><div>→</div><div class="node">Verify<br><b>${state.b1||state.b2?'Active':'Pending'}</b></div>
+ </div>`;
+}
+
+function renderSpec(){
+ setTitle('Specification','ECSS 원문, clause reference, 파싱 상태와 연결 Requirement 탐색');
+ const selected=clauses.find(c=>c.id===state.selectedClause)||clauses[0];
+ document.getElementById('content').innerHTML=`<div class="split">
+ <aside class="card master"><div class="hdr"><h3>Clauses</h3><span class="badge good">424 parsed</span></div>
+ <input class="search" style="width:100%;min-width:0;margin-bottom:8px" placeholder="Clause 검색" oninput="filterSpec(this.value)">
+ <div id="clauseList">${clauses.map(c=>`<div class="item ${selected.id===c.id?'active':''}" data-clause="${c.id}"><b>${c.id}</b> · ${c.title}<br><span class="muted">${c.refs.length} req · ${c.images} images</span></div>`).join('')}</div></aside>
+ <section class="card detail">
+  <div class="hdr"><div><span class="tag">${selected.id}</span><h2 style="margin-top:6px">${selected.title}</h2></div><div class="pillrow"><span class="badge good">Parsed</span><span class="badge neutral">ECSS-E-ST-50-12C</span></div></div>
+  <div class="callout">${selected.text}</div>
+  <div class="grid2" style="margin-top:10px">
+   <div class="card panel"><h3>Linked Requirements</h3>${selected.refs.map(r=>`<div class="item" onclick="state.selectedReq='${r}';go('req')"><b>${r}</b><br><span class="muted">${(requirements.find(x=>x.id===r)||{}).title||''}</span></div>`).join('')||'<span class="muted">없음</span>'}</div>
+   <div class="card panel"><h3>Clause Metadata</h3><div class="row"><span>References</span><b>${selected.refs.length}</b></div><div class="row"><span>Images</span><b>${selected.images}</b></div><div class="row"><span>Atomic split</span><b>${selected.refs.length+1}</b></div><div class="row"><span>Parser confidence</span><b>0.96</b></div></div>
+  </div>
+  <div class="hdr" style="margin-top:12px"><h3>Extracted SHALL-like statements</h3><button class="btn" onclick="toast('Atomic requirement extraction queued')">Re-run extraction</button></div>
+  <table class="table"><tr><th>ID</th><th>Statement</th><th>Status</th></tr>
+   <tr><td>ATOM-${selected.id.replace(/[^0-9]/g,'')}-01</td><td>${selected.text.split('. ')[0]}.</td><td><span class="badge good">Mapped</span></td></tr>
+   <tr><td>ATOM-${selected.id.replace(/[^0-9]/g,'')}-02</td><td>${selected.text.split('. ')[1]||'Related control condition extracted.'}</td><td><span class="badge warnbg">Review</span></td></tr>
+  </table>
+ </section></div>`;
+ document.querySelectorAll('[data-clause]').forEach(x=>x.onclick=()=>{state.selectedClause=x.dataset.clause;renderSpec()});
+}
+window.filterSpec=q=>{
+ document.querySelectorAll('[data-clause]').forEach(x=>x.style.display=x.textContent.toLowerCase().includes(q.toLowerCase())?'block':'none');
+};
+
+function renderReq(){
+ setTitle('Requirements','Atomic Requirement, 검증 상태, trace, 관련 Golden Model 관리');
+ const req=requirements.find(r=>r.id===state.selectedReq)||requirements[1];
+ document.getElementById('content').innerHTML=`<div class="split">
+ <aside class="card master"><div class="hdr"><h3>Requirements</h3><span class="badge neutral">128 total</span></div>
+ <div class="pillrow" style="margin-bottom:8px"><span class="chip">Encoding 83</span><span class="chip">Data Link 76</span><span class="chip">Network 180</span></div>
+ <div>${requirements.map(r=>`<div class="item ${req.id===r.id?'active':''}" data-req="${r.id}"><div class="row"><b>${r.id}</b>${badgeStatus(r.status)}</div><span>${r.title}</span><br><span class="muted">${r.clause} · coverage ${r.coverage}%</span></div>`).join('')}</div></aside>
+ <section class="card detail">
+  <div class="hdr"><div><span class="tag">${req.id}</span><h2 style="margin-top:6px">${req.title}</h2></div>${badgeStatus(req.status)}</div>
+  <div class="meta">
+   <div class="metabox"><span class="muted">Source</span><b>${req.clause}</b></div>
+   <div class="metabox"><span class="muted">Priority</span><b>${req.prio}</b></div>
+   <div class="metabox"><span class="muted">Coverage</span><b>${req.coverage}%</b></div>
+   <div class="metabox"><span class="muted">Decision</span><b>${req.id==='REQ-ENC-024'?'DEC-012':'—'}</b></div>
+  </div>
+  <div class="grid2" style="margin-top:11px">
+   <div><h3>Atomic Requirement</h3><div class="callout">${req.id==='REQ-ENC-024'?'When an FCT is received, transmit credit shall increase by 8 up to MAX_CREDIT=56. If transmit credit is zero, a normal character shall not be transmitted.':'Requirement decomposed from '+req.clause+' and normalized into testable behavior.'}</div></div>
+   <div><h3>Invariant / Assertion Intent</h3><div class="code">${req.id==='REQ-ENC-024'?'INV-1: 0 <= tx_credit <= 56\nINV-2: credit==0 -> !normal_char_send\nINV-3: fct_event -> credit_next=min(credit+8,56)':'INV-1: legal state transition only\nINV-2: output event implies valid precondition\nINV-3: recovery reaches defined state'}</div></div>
+  </div>
+  <div class="hdr" style="margin-top:12px"><h3>Verification Mapping</h3><button class="btn" onclick="go('golden')">Open Golden</button></div>
+  <table class="table"><tr><th>Layer</th><th>Artifact</th><th>Status</th></tr>
+   <tr><td>Golden</td><td>GM-${req.id.split('-').pop()}</td><td><span class="badge good">Ready</span></td></tr>
+   <tr><td>Architecture</td><td>${req.id==='REQ-ENC-024'?'Option B / DEC-012':'Pending'}</td><td>${req.id==='REQ-ENC-024'?'<span class="badge good">Mapped</span>':'<span class="badge neutral">Pending</span>'}</td></tr>
+   <tr><td>RTL</td><td>${state.rtl&&req.id==='REQ-ENC-024'?'credit_manager.sv':'—'}</td><td>${state.rtl&&req.id==='REQ-ENC-024'?'<span class="badge good">Generated</span>':'<span class="badge neutral">Pending</span>'}</td></tr>
+   <tr><td>Tests</td><td>test_credit_increase / saturation / zero_block</td><td><span class="badge good">3/3</span></td></tr>
+  </table>
+ </section></div>`;
+ document.querySelectorAll('[data-req]').forEach(x=>x.onclick=()=>{state.selectedReq=x.dataset.req;renderReq()});
+}
+
+
+const behaviorModel={
+  root:{id:'root',name:'SpaceWire Behavioral Model',kind:'root',parent:null,path:['SpaceWire'],summary:'Protocol-visible behavior hierarchy. Hardware clock/FSM encoding은 포함하지 않습니다.',inputs:['Link events','Characters','Packets'],outputs:['Protocol state','Characters','Packets'],reqs:['ECSS §5.4','§5.5','§5.6'],tests:['layer regression']},
+  encoding:{id:'encoding',name:'Encoding Layer',kind:'layer',parent:'root',path:['SpaceWire','Encoding Layer'],summary:'Character encoding, link startup, flow control, disconnect behavior.',inputs:['Din/Sin transitions','Control characters'],outputs:['Decoded characters','Link events'],reqs:['§5.4'],tests:['encoding regression']},
+  startup:{id:'startup',name:'Link Startup / State Behavior',kind:'behavior',parent:'encoding',path:['SpaceWire','Encoding Layer','Link Startup'],summary:'ErrorReset → ErrorWait → Ready → Started → Connecting → Run의 protocol behavior.',inputs:['NULL/FCT','timeout','link events'],outputs:['link state','transmit permission'],reqs:['REQ-ENC-018','§5.4'],tests:['test_fsm_smoke']},
+  flow:{id:'flow',name:'Flow Control',kind:'group',parent:'encoding',path:['SpaceWire','Encoding Layer','Flow Control'],summary:'FCT, transmit credit, receive buffer capacity의 protocol rules.',inputs:['FCT','Normal Character','RX capacity'],outputs:['tx_credit','FCT request','send permission'],reqs:['REQ-ENC-024','REQ-ENC-025'],tests:['test_credit','test_rx_credit']},
+  credit_mgr:{id:'credit_mgr',name:'Transmit Credit',kind:'behavior',parent:'flow',path:['SpaceWire','Encoding Layer','Flow Control','Transmit Credit'],summary:'FCT 수신 시 transmit credit이 8 증가하며 최대 credit을 넘지 않고, credit이 0이면 normal character를 송신하지 않습니다.',inputs:['FCT event','Normal-char send event'],outputs:['tx_credit','can_send'],reqs:['REQ-ENC-024','§5.4.8'],tests:['credit_increase','credit_saturation','zero_block'],function:'CreditModel.on_fct_received / can_send_normal_char'},
+  null_fct:{id:'null_fct',name:'NULL / FCT Handling',kind:'behavior',parent:'flow',path:['SpaceWire','Encoding Layer','Flow Control','NULL / FCT'],summary:'NULL과 FCT control character의 수신/송신 behavior 및 link keep-alive 의미.',inputs:['NULL','FCT'],outputs:['link activity','credit event'],reqs:['REQ-ENC-025','§5.4.8'],tests:['test_null_seen','test_fct_handshake'],function:'LinkModel.on_null / on_fct'},
+  disconnect:{id:'disconnect',name:'Disconnect Recovery',kind:'behavior',parent:'encoding',path:['SpaceWire','Encoding Layer','Disconnect Recovery'],summary:'정해진 시간 동안 transition이 없으면 disconnect를 검출하고 recovery path로 이동합니다.',inputs:['transition timestamp','timeout'],outputs:['disconnect event','recovery state'],reqs:['REQ-ENC-031','§5.4.9'],tests:['test_disconnect','test_err_reset'],function:'LinkModel.check_disconnect'},
+  datalink:{id:'datalink',name:'Data Link Layer',kind:'layer',parent:'root',path:['SpaceWire','Data Link Layer'],summary:'Packet framing, EOP/EEP termination, time-code delivery.',inputs:['Characters','EOP/EEP','Time-code'],outputs:['Packet events','Delivered packet'],reqs:['§5.5'],tests:['data-link regression']},
+  packet:{id:'packet',name:'Packet Framing',kind:'behavior',parent:'datalink',path:['SpaceWire','Data Link Layer','Packet Framing'],summary:'Data characters를 packet으로 묶고 EOP/EEP에서 packet을 종료합니다.',inputs:['Data chars','EOP','EEP'],outputs:['Packet','termination type'],reqs:['REQ-DL-012','§5.5.3'],tests:['test_tx_packet','test_eep_recovery'],function:'PacketModel.push_char / terminate'},
+  timecode:{id:'timecode',name:'Time-code Behavior',kind:'behavior',parent:'datalink',path:['SpaceWire','Data Link Layer','Time-code'],summary:'Time-code를 packet path와 분리하여 처리하는 protocol behavior.',inputs:['time-code'],outputs:['time-code indication'],reqs:['§5.5'],tests:['test_timecode'],function:'TimeCodeModel.receive'},
+  network:{id:'network',name:'Network / Router Behavior',kind:'layer',parent:'root',path:['SpaceWire','Network / Router'],summary:'Path/logical addressing, output arbitration, packet ownership.',inputs:['packet header','routing table'],outputs:['output selection','grant'],reqs:['§5.6'],tests:['router regression']},
+  routing:{id:'routing',name:'Routing / Arbitration',kind:'behavior',parent:'network',path:['SpaceWire','Network / Router','Routing / Arbitration'],summary:'Output이 free일 때 request를 중재하고 packet 동안 ownership을 유지합니다.',inputs:['port requests','address'],outputs:['grant','output owner'],reqs:['REQ-NET-008','§5.6.8'],tests:['test_router_arbiter'],function:'RouterModel.route / arbitrate'}
+};
+
+const behaviorTreeGroups=[
+ {id:'encoding',label:'Encoding Layer',children:['startup','flow','disconnect']},
+ {id:'flow',label:'↳ Flow Control',children:['credit_mgr','null_fct'],nested:true},
+ {id:'datalink',label:'Data Link Layer',children:['packet','timecode']},
+ {id:'network',label:'Network / Router',children:['routing']}
+];
+
+function toggleBehaviorGroup(id){
+ state.expandedBehaviorGroups[id]=!state.expandedBehaviorGroups[id];
+ renderGolden();
+}
+function selectBehavior(id){state.selectedBehavior=id;renderGolden()}
+function behaviorTreeHTML(){
+  return `<div class="behTree">
+    <div class="hdr"><h4>Behavior Hierarchy</h4><span class="badge neutral">WHAT</span></div>
+    <div class="treeNode ${state.selectedBehavior==='root'?'active':''}" onclick="selectBehavior('root')"><b>SpaceWire</b><span class="kind">root</span></div>
+    <div class="treeGroup">
+      <div class="treeGroupHead" onclick="toggleBehaviorGroup('encoding')">${state.expandedBehaviorGroups.encoding?'▾':'▸'} Encoding Layer</div>
+      ${state.expandedBehaviorGroups.encoding?`<div class="treeChildren">
+        <div class="treeNode ${state.selectedBehavior==='startup'?'active':''}" onclick="selectBehavior('startup')">Link Startup<span class="kind">behavior</span></div>
+        <div class="treeGroupHead" style="padding-left:6px" onclick="toggleBehaviorGroup('flow')">${state.expandedBehaviorGroups.flow?'▾':'▸'} Flow Control</div>
+        ${state.expandedBehaviorGroups.flow?`<div class="treeChildren">
+          <div class="treeNode ${state.selectedBehavior==='credit_mgr'?'active':''}" onclick="selectBehavior('credit_mgr')">Transmit Credit<span class="kind">behavior</span></div>
+          <div class="treeNode ${state.selectedBehavior==='null_fct'?'active':''}" onclick="selectBehavior('null_fct')">NULL / FCT<span class="kind">behavior</span></div>
+        </div>`:''}
+        <div class="treeNode ${state.selectedBehavior==='disconnect'?'active':''}" onclick="selectBehavior('disconnect')">Disconnect Recovery<span class="kind">behavior</span></div>
+      </div>`:''}
+    </div>
+    <div class="treeGroup">
+      <div class="treeGroupHead" onclick="toggleBehaviorGroup('datalink')">${state.expandedBehaviorGroups.datalink?'▾':'▸'} Data Link Layer</div>
+      ${state.expandedBehaviorGroups.datalink?`<div class="treeChildren">
+        <div class="treeNode ${state.selectedBehavior==='packet'?'active':''}" onclick="selectBehavior('packet')">Packet Framing<span class="kind">behavior</span></div>
+        <div class="treeNode ${state.selectedBehavior==='timecode'?'active':''}" onclick="selectBehavior('timecode')">Time-code<span class="kind">behavior</span></div>
+      </div>`:''}
+    </div>
+    <div class="treeGroup">
+      <div class="treeGroupHead" onclick="toggleBehaviorGroup('network')">${state.expandedBehaviorGroups.network?'▾':'▸'} Network / Router</div>
+      ${state.expandedBehaviorGroups.network?`<div class="treeChildren">
+        <div class="treeNode ${state.selectedBehavior==='routing'?'active':''}" onclick="selectBehavior('routing')">Routing / Arbitration<span class="kind">behavior</span></div>
+      </div>`:''}
+    </div>
+  </div>`;
+}
+
+function behaviorDetailHTML(){
+ const b=behaviorModel[state.selectedBehavior]||behaviorModel.credit_mgr;
+ const breadcrumb=b.path.map((x,i)=>`${i?'<span>›</span>':''}<b>${x}</b>`).join('');
+ let flowNodes=[];
+ if(b.id==='credit_mgr') flowNodes=['FCT event','Credit Rule +8 / max56','can_send','Normal Char'];
+ else if(b.id==='packet') flowNodes=['Data chars','Packet accumulation','EOP / EEP','Packet result'];
+ else if(b.id==='disconnect') flowNodes=['No transition','Timeout rule','Disconnect event','Recovery'];
+ else if(b.id==='routing') flowNodes=['Header / Request','Route lookup','Arbiter','Output owner'];
+ else flowNodes=[...(b.inputs||[]).slice(0,2),b.name,...(b.outputs||[]).slice(0,1)];
+ return `<div class="behCanvas">
+   <div class="breadcrumb">${breadcrumb}</div>
+   <div class="behHero">
+     <div class="hdr"><div><span class="tag">${b.kind}</span><h3 style="margin-top:5px">${b.name}</h3></div><span class="badge good">Behavior Contract</span></div>
+     <div class="muted" style="font-size:10.5px;line-height:1.55">${b.summary}</div>
+   </div>
+   <div class="behFlow">${flowNodes.map((n,i)=>`<div class="behFlowNode ${n===b.name||i===1?'focus':''}">${n}</div>${i<flowNodes.length-1?'<span class="behArrow">→</span>':''}`).join('')}</div>
+   <div class="contractGrid">
+     <div class="contractBox"><b>Inputs / Events</b>${(b.inputs||[]).map(x=>'• '+x).join('<br>')}</div>
+     <div class="contractBox"><b>Outputs / Observable State</b>${(b.outputs||[]).map(x=>'• '+x).join('<br>')}</div>
+     <div class="contractBox"><b>Golden Function</b>${b.function||'Layer-level orchestration / composed behavior'}</div>
+     <div class="contractBox"><b>Tests</b>${(b.tests||[]).map(x=>'• '+x).join('<br>')}</div>
+   </div>
+ </div>`;
+}
+
+function behaviorInspectorHTML(){
+ const b=behaviorModel[state.selectedBehavior]||behaviorModel.credit_mgr;
+ return `<aside class="behInspector">
+   <h4>Selected Behavior</h4>
+   <div class="linkMini"><b>Behavior ID</b>${b.id}</div>
+   <div class="linkMini"><b>Spec / Requirement</b>${(b.reqs||[]).join('<br>')}</div>
+   <div class="linkMini"><b>Model Function</b>${b.function||'composed behavior'}</div>
+   <h4 style="margin-top:10px">Design Handoff</h4>
+   <div class="test"><span>Golden defined</span><span class="badge good">Yes</span></div>
+   <div class="test"><span>Atomic Req linked</span><span class="badge good">${b.reqs&&b.reqs.length?'Yes':'—'}</span></div>
+   <div class="test"><span>Architecture</span><span class="badge ${b.id==='credit_mgr'?'warnbg':'neutral'}">${b.id==='credit_mgr'?'Explore':'Not selected'}</span></div>
+   <button class="btn" style="width:100%;margin-top:8px" onclick="openSelectedBehaviorRequirement()">Open Requirement</button>
+   <button class="btn" style="width:100%;margin-top:6px" onclick="openSelectedBehaviorDiagram()">Show Diagram</button>
+   <button class="btn primary" style="width:100%;margin-top:6px" onclick="handoffBehaviorToArchitecture()">Explore Architecture</button>
+   <div class="designHint"><b>Hierarchy의 목적</b><br>파일 구조가 아니라 protocol behavior를 Layer → Behavior → Rule 수준으로 탐색합니다.</div>
+ </aside>`;
+}
+function openSelectedBehaviorRequirement(){
+ const b=behaviorModel[state.selectedBehavior]||behaviorModel.credit_mgr;
+ const req=(b.reqs||[]).find(x=>x.startsWith('REQ-'));
+ if(req){state.selectedReq=req;go('req');}else toast('이 노드는 layer-level behavior입니다.');
+}
+
+function openSelectedBehaviorDiagram(){
+ state.diagramTab='Service Architecture';
+ state.diagramLevel='Behavioral';
+ state.diagramGenerated=true;
+ state.diagramCacheStatus=['credit_mgr','packet','disconnect','routing'].includes(state.selectedBehavior)?'hit':'miss';
+ go('diagram');
+}
+
+function handoffBehaviorToArchitecture(){
+ const b=behaviorModel[state.selectedBehavior]||behaviorModel.credit_mgr;
+ if(b.id!=='credit_mgr') toast(b.name+' architecture handoff context loaded (demo)');
+ state.archMode='Engineer Design';
+ go('arch');
+}
+function behaviorHierarchyHTML(){
+ return `<div class="behaviorLayout">${behaviorTreeHTML()}${behaviorDetailHTML()}${behaviorInspectorHTML()}</div>`;
+}
+
+function renderGolden(){
+ setTitle('Golden Model','Behavior hierarchy를 탐색하고, 선택한 behavior의 reference/test를 확인');
+ const tabs=['Behavior Hierarchy','Reference & Tests'];
+ let body='';
+ if(state.goldenMode==='Behavior Hierarchy'){
+   body=behaviorHierarchyHTML();
+ } else {
+   body=`<div class="grid2">
+ <section class="card panel">
+  <div class="hdr"><h3>Reference Model · spw_ref_model.py</h3><span class="badge good">Regression clean</span></div>
+  <div class="code">class CreditModel:
+    MAX_CREDIT = 56
+
+    def on_fct_received(self):
+        self.tx_credit = min(self.tx_credit + 8, self.MAX_CREDIT)
+
+    def can_send_normal_char(self):
+        return self.tx_credit > 0
+
+    def send_normal_char(self):
+        if not self.can_send_normal_char():
+            raise ProtocolViolation("credit exhausted")
+        self.tx_credit -= 1</div>
+  <div class="row"><button class="btn primary" onclick="runGolden()">Run Golden Regression</button><button class="btn" onclick="openModal('Golden Model Rule','<div class=&quot;callout&quot;>Golden Model은 cycle/FIFO pointer/FSM encoding을 포함하지 않습니다. protocol behavior만 표현합니다.</div>')">Design Rule</button></div>
+ </section>
+ <section class="card panel">
+  <div class="hdr"><h3>Behavior Test Cases</h3><span class="badge neutral">REQ-ENC-024</span></div>
+  <table class="table"><tr><th>Test</th><th>Input</th><th>Expected</th><th>Status</th></tr>
+   <tr><td>credit_increase</td><td>credit=8 + FCT</td><td>16</td><td><span class="badge good">PASS</span></td></tr>
+   <tr><td>credit_saturation</td><td>credit=56 + FCT</td><td>56</td><td><span class="badge good">PASS</span></td></tr>
+   <tr><td>zero_block</td><td>credit=0 + N-Char</td><td>blocked</td><td><span class="badge good">PASS</span></td></tr>
+   <tr><td>multi_fct</td><td>credit=0 + 7×FCT</td><td>56</td><td><span class="badge good">PASS</span></td></tr>
+  </table>
+  <div class="callout warn" style="margin-top:10px"><b>독립성 체크:</b> RTL의 cycle latency나 internal state name은 Golden Model에 복사하지 않음.</div>
+ </section>
+ </div>
+ <div class="grid3" style="margin-top:11px">
+  <section class="card panel"><h3>Coverage</h3><div class="row"><span>Requirements</span><b>92.1%</b></div><div class="progress"><div style="width:92.1%"></div></div><div class="row"><span>Boundary scenarios</span><b>81%</b></div><div class="progress"><div style="width:81%"></div></div></section>
+  <section class="card panel"><h3>Spec Gap Finder</h3><div class="test"><span>§5.4.9 simultaneous transition</span><span class="badge warnbg">Open</span></div><div class="test"><span>§5.5.3 EEP recovery</span><span class="badge neutral">Candidate</span></div><button class="btn" onclick="toast('spec-gap-finder가 3개 후보를 생성했습니다.')">Find Next Gap</button></section>
+  <section class="card panel"><h3>Arbiter Cache</h3><div class="test"><span>credit saturation semantics</span><span class="badge good">Cached</span></div><div class="test"><span>NULL/FCT precedence</span><span class="badge good">Cached</span></div><div class="test"><span>disconnect ambiguity</span><span class="badge warnbg">Escalate</span></div></section>
+ </div>`;
+ }
+ document.getElementById('content').innerHTML=`<div class="behaviorTabs">${tabs.map(t=>`<button class="${state.goldenMode===t?'active':''}" data-gmode="${t}">${t}</button>`).join('')}</div>${body}`;
+ document.querySelectorAll('[data-gmode]').forEach(b=>b.onclick=()=>{state.goldenMode=b.dataset.gmode;renderGolden()});
+}
+
+function runGolden(){runJob('golden_regression');toast('Golden regression queued');}
+
+
+
+const diagramLibrary=[
+ {key:'credit_mgr|Behavioral|engineering',behavior:'Transmit Credit',level:'Behavioral',format:'JSON + SVG',status:'Cached'},
+ {key:'credit_mgr|Micro-architecture|engineering',behavior:'Transmit Credit',level:'Micro-architecture',format:'JSON + SVG',status:'Cached'},
+ {key:'packet|Behavioral|engineering',behavior:'Packet Framing',level:'Behavioral',format:'JSON + SVG',status:'Cached'},
+ {key:'disconnect|Behavioral|engineering',behavior:'Disconnect Recovery',level:'Behavioral',format:'JSON + SVG',status:'Cached'},
+ {key:'routing|Architecture|engineering',behavior:'Routing / Arbitration',level:'Architecture',format:'JSON + SVG',status:'Cached'}
+];
+
+function diagramTabs(){
+ const tabs=['Service Architecture','JSON + React Flow'];
+ return `<div class="diagramSvcTabs">${tabs.map(t=>`<button class="${state.diagramTab===t?'active':''}" data-dtab="${t}">${t}</button>`).join('')}</div>`;
+}
+function bindDiagramTabs(){
+ document.querySelectorAll('[data-dtab]').forEach(b=>b.onclick=()=>{state.diagramTab=b.dataset.dtab;renderDiagram()});
+}
+function diagramSelectedBehavior(){
+ return behaviorModel[state.selectedBehavior]||behaviorModel.credit_mgr;
+}
+function diagramNodesForBehavior(){
+ const b=diagramSelectedBehavior();
+ if(state.diagramLevel==='Architecture'){
+   if(b.id==='routing')return ['Input Ports','Route Lookup','Output Arbiter','Switch Matrix','Output Ports'];
+   if(b.id==='packet')return ['RX Character Path','Packet Engine','Delivery Interface'];
+   if(b.id==='disconnect')return ['PHY Monitor','Link Controller','Recovery Path'];
+   return ['RX Decoder','Credit Manager','TX Controller','Encoder','PHY'];
+ }
+ if(state.diagramLevel==='Micro-architecture'){
+   if(b.id==='routing')return ['Req Capture','Lookup Table','Grant FSM','Owner Reg','Crossbar'];
+   if(b.id==='packet')return ['Char FIFO','Packet FSM','EOP/EEP Detector','Packet Buffer','Deliver'];
+   if(b.id==='disconnect')return ['Transition Timer','Threshold Compare','Disconnect FSM','Reset/Recovery'];
+   return ['FCT Event Reg','Credit Counter','Saturation Logic','Send Enable','TX FSM'];
+ }
+ if(b.id==='packet')return ['Data Character','Packet Accumulate','EOP / EEP','Packet Result'];
+ if(b.id==='disconnect')return ['No Transition','Timeout Rule','Disconnect Event','Recovery'];
+ if(b.id==='routing')return ['Header / Request','Route Rule','Arbitration','Output Owner'];
+ return ['FCT Event','Credit +8 / max56','can_send','Normal Character'];
+}
+function diagramJSON(){
+ const b=diagramSelectedBehavior(), nodes=diagramNodesForBehavior();
+ return {
+   schema_version:'1.0',
+   diagram_id:`${b.id}_${state.diagramLevel.toLowerCase().replaceAll(' ','_')}`,
+   behavior_id:b.id,
+   abstraction_level:state.diagramLevel,
+   style:state.diagramStyle,
+   source_trace:{requirements:b.reqs||[], model_function:b.function||'composed behavior'},
+   nodes:nodes.map((label,i)=>({id:`n${i+1}`,label,type:i===1?'rule':'block',position:{x:80+i*180,y:120},trace_ref:i===1?(b.reqs||[])[0]||null:null})),
+   edges:nodes.slice(0,-1).map((_,i)=>({id:`e${i+1}`,source:`n${i+1}`,target:`n${i+2}`,label:i===0?'event':''})),
+   artifacts:{svg:true,png_thumbnail:true,json:true}
+ };
+}
+function requestDiagram(){
+ const b=diagramSelectedBehavior();
+ const key=`${b.id}|${state.diagramLevel}|${state.diagramStyle}`;
+ const hit=diagramLibrary.some(x=>x.key===key);
+
+ if(hit){
+   state.diagramCacheStatus='hit';
+   state.diagramGenerated=true;
+   toast('Cache HIT · 저장된 diagram 반환');
+   renderDiagram();
+ }else{
+   // Demo: a real service would enqueue the planner/renderer job.
+   // Here we simulate that completed result so "Show Diagram" always shows a diagram.
+   state.diagramCacheStatus='generated';
+   state.diagramGenerated=true;
+   toast('Cache MISS · mock 생성 후 cache 저장');
+   renderDiagram();
+ }
+}
+function generateDiagram(){
+ state.diagramGenerated=true;
+ state.diagramCacheStatus='generated';
+ toast('Diagram JSON 생성 → render → cache 저장');
+ renderDiagram();
+}
+function diagramRequestBar(){
+ const b=diagramSelectedBehavior();
+ return `<div class="card panel">
+   <div class="reqbar">
+     <div><span class="smallLabel">Behavior</span><select onchange="state.selectedBehavior=this.value;state.diagramGenerated=false">
+       ${Object.values(behaviorModel).filter(x=>x.kind==='behavior').map(x=>`<option value="${x.id}" ${x.id===b.id?'selected':''}>${x.name}</option>`).join('')}
+     </select></div>
+     <div><span class="smallLabel">Abstraction</span><select onchange="state.diagramLevel=this.value;state.diagramGenerated=false">
+       ${['Behavioral','Architecture','Micro-architecture'].map(x=>`<option ${x===state.diagramLevel?'selected':''}>${x}</option>`).join('')}
+     </select></div>
+     <div><span class="smallLabel">Style</span><select onchange="state.diagramStyle=this.value;state.diagramGenerated=false">
+       <option value="engineering" ${state.diagramStyle==='engineering'?'selected':''}>Engineering</option>
+       <option value="presentation" ${state.diagramStyle==='presentation'?'selected':''}>Presentation</option>
+     </select></div>
+     <button class="btn primary" onclick="requestDiagram()">Show Diagram</button>
+   </div>
+ </div>`;
+}
+
+function diagramPreviewHTML(){
+ const b=diagramSelectedBehavior();
+ if(!state.diagramGenerated){
+   return `<div class="diagramPreviewCard">
+     <div class="genPulse"><span class="genDot"></span>Diagram 준비 중 · cache 또는 planner result를 기다립니다.</div>
+   </div>`;
+ }
+ const nodes=diagramNodesForBehavior();
+ const source=(b.reqs||[]).join(' · ') || 'behavior-level trace';
+ return `<div class="diagramPreviewCard">
+   <div class="diagramPreviewHead">
+     <div>
+       <h3>${b.name} · ${state.diagramLevel} Diagram</h3>
+       <div class="sub">${state.diagramCacheStatus==='hit'?'Cached asset':'Generated mock asset'} · ${state.diagramStyle} style</div>
+     </div>
+     <span class="badge ${state.diagramCacheStatus==='hit'?'good':'purple'}">${state.diagramCacheStatus==='hit'?'CACHE HIT':'NEWLY GENERATED'}</span>
+   </div>
+
+   <div class="diagramStage">
+     <div class="diagramStageInner">
+       ${nodes.map((n,i)=>`
+         <button class="liveNode ${i===1?'rule':''}" onclick="toast('${n} · trace context opened')">
+           ${n}
+           <small>${i===1?'behavior / rule':'block / event'}</small>
+         </button>
+         ${i<nodes.length-1?`<span class="liveEdge"><small>${i===0?'event':''}</small>→</span>`:''}
+       `).join('')}
+     </div>
+   </div>
+
+   <div class="previewMeta">
+     <span class="chip">Behavior: ${b.id}</span>
+     <span class="chip">Level: ${state.diagramLevel}</span>
+     <span class="chip">Trace: ${source}</span>
+     <span class="chip">Artifacts: JSON · SVG · PNG</span>
+   </div>
+
+   <div class="previewActions">
+     <button class="btn primary" onclick="state.diagramTab='JSON + React Flow';renderDiagram()">Open Interactive View</button>
+     <button class="btn" onclick="openModal('Diagram JSON','<div class=&quot;code&quot;>'+escapeHtml(JSON.stringify(diagramJSON(),null,2))+'</div>')">View JSON</button>
+     <button class="btn" onclick="toast('SVG export 준비 완료 (mock)')">Export SVG</button>
+   </div>
+ </div>`;
+}
+function escapeHtml(s){
+ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function serviceArchitectureHTML(){
+ const b=diagramSelectedBehavior();
+ const status=state.diagramCacheStatus;
+ return `${diagramRequestBar()}
+ ${diagramPreviewHTML()}
+ <div class="card panel" style="margin-top:10px">
+   <div class="hdr"><div><h3>1. Diagram Service Architecture</h3><span class="sub">먼저 생성·캐시·재사용 정책을 고정</span></div>
+     <span class="badge ${status==='hit'?'good':status==='miss'?'warnbg':'purple'}">${status==='hit'?'CACHE HIT':status==='miss'?'CACHE MISS':'NEWLY CACHED'}</span>
+   </div>
+
+   <div class="svcPipeline">
+     <div class="svcNode active"><b>User / Behavior Navigator</b>${b.name}<br>${state.diagramLevel}<br><span class="muted">“이 block diagram 보여줘”</span></div>
+     <div class="svcNode"><b>React UI</b>diagram request<br>behavior_id + level + style</div>
+     <div class="svcNode"><b>FastAPI /diagram</b>request normalize<br>trace context resolve</div>
+     <div class="svcNode cache"><b>Diagram Cache</b>key = behavior + level + style<br><span class="${status==='hit'?'hit':'miss'}">${status==='hit'?'HIT → 즉시 반환':'MISS → planner'}</span></div>
+     <div class="svcNode ai"><b>LLM Diagram Planner</b>Cache miss에서만 사용<br>Diagram JSON 생성</div>
+     <div class="svcNode"><b>Renderer</b>React Flow / SVG<br>interactive rendering</div>
+     <div class="svcNode artifact"><b>Artifact Store</b>JSON + SVG + PNG thumbnail<br>다음 요청 재사용</div>
+   </div>
+
+   <div class="costGrid">
+    <div class="costBox"><b>① Cached common diagram</b>LLM 호출 없음<br>가장 빠르고 가장 저렴</div>
+    <div class="costBox"><b>② Structured new diagram</b>LLM은 JSON plan만 생성<br>React Flow가 실시간 렌더링</div>
+    <div class="costBox"><b>③ Presentation image</b>정말 필요할 때만 image generation<br>결과는 다시 cache</div>
+   </div>
+
+   ${status==='miss'&&!state.diagramGenerated?`<div class="callout warn" style="margin-top:10px"><b>Cache miss:</b> 아직 이 조합의 diagram이 없습니다. LLM은 그림 자체보다 먼저 structured Diagram JSON을 생성합니다.<div style="margin-top:7px"><button class="btn primary" onclick="generateDiagram()">Generate + Cache</button></div></div>`:''}
+   ${state.diagramGenerated?`<div class="callout" style="margin-top:10px"><b>Result:</b> 위 Preview가 실제 diagram surface의 mock입니다. 실제 서비스에서는 동일 JSON을 React Flow/SVG로 렌더링하고, node click으로 Spec/Requirement/Golden/uArch trace를 엽니다.</div>`:''}
+ </div>
+
+ <div class="grid2" style="margin-top:10px">
+  <section class="card panel">
+   <div class="hdr"><h3>Cache Library</h3><span class="badge neutral">${diagramLibrary.length} common diagrams</span></div>
+   <table class="cacheTable"><tr><th>Behavior</th><th>Level</th><th>Stored</th></tr>
+    ${diagramLibrary.map(x=>`<tr><td>${x.behavior}</td><td>${x.level}</td><td><span class="badge good">${x.status}</span></td></tr>`).join('')}
+   </table>
+  </section>
+  <section class="card panel">
+   <div class="hdr"><h3>Recommended Storage</h3></div>
+   <div class="linkMini"><b>PostgreSQL</b>diagram metadata / behavior_id / version / trace</div>
+   <div class="linkMini"><b>Object Storage</b>SVG / PNG / exported artifacts</div>
+   <div class="linkMini"><b>Redis</b>hot cache / generation job status</div>
+   <div class="linkMini"><b>Git</b>approved JSON templates that should be version controlled</div>
+  </section>
+ </div>`;
+}
+function reactFlowHTML(){
+ const data=diagramJSON(), nodes=data.nodes;
+ const json=JSON.stringify(data,null,2).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+ const reactCode=`const rfNodes = diagram.nodes.map(n => ({
+  id: n.id,
+  data: { label: n.label, traceRef: n.trace_ref },
+  position: n.position,
+  type: n.type
+}));
+
+const rfEdges = diagram.edges.map(e => ({
+  id: e.id,
+  source: e.source,
+  target: e.target,
+  label: e.label
+}));
+
+<ReactFlow nodes={rfNodes} edges={rfEdges}
+  onNodeClick={openTraceDrawer}
+  fitView />`;
+ return `${diagramRequestBar()}
+ <div class="card panel" style="margin-top:10px">
+  <div class="hdr"><div><h3>2. JSON Schema → React Flow</h3><span class="sub">서비스 정책이 정해진 뒤 renderer contract를 고정</span></div><span class="badge purple">Implementation Contract</span></div>
+  <div class="schemaGrid">
+   <div>
+    <h4 style="font-size:11px;margin:0 0 6px">Diagram JSON</h4>
+    <div class="jsonBox">${json}</div>
+   </div>
+   <div class="rfPreview">
+    <div class="hdr"><h4 style="margin:0">React Flow Preview</h4><span class="badge good">Interactive target</span></div>
+    <div class="rfCanvas">
+      ${nodes.map((n,i)=>`<div class="rfNode ${i===1?'focus':''}" onclick="toast('${n.label} → trace drawer')">${n.label}</div>${i<nodes.length-1?'<span class="rfEdge">→</span>':''}`).join('')}
+    </div>
+    <div class="designHint"><b>중요:</b> 실제 React Flow에서는 node click → Requirement / Golden / uArch / RTL trace drawer를 열 수 있습니다. PNG 이미지보다 이 점이 핵심 이점입니다.</div>
+   </div>
+  </div>
+ </div>
+ <div class="grid2" style="margin-top:10px">
+  <section class="card panel"><div class="hdr"><h3>React Flow Mapping</h3></div><div class="code">${reactCode.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div></section>
+  <section class="card panel">
+   <div class="hdr"><h3>Schema Rules</h3></div>
+   <div class="test"><span>node.id</span><b>stable semantic ID</b></div>
+   <div class="test"><span>node.trace_ref</span><b>REQ / behavior linkage</b></div>
+   <div class="test"><span>abstraction_level</span><b>Behavioral / Architecture / uArch</b></div>
+   <div class="test"><span>source_trace</span><b>Spec evidence</b></div>
+   <div class="test"><span>artifacts</span><b>JSON / SVG / PNG</b></div>
+   <div class="callout" style="margin-top:9px"><b>설계 원칙:</b> layout 좌표는 view 정보이고, block/edge 의미와 trace ID가 진짜 source of truth입니다.</div>
+  </section>
+ </div>`;
+}
+function renderDiagram(){
+ setTitle('Diagram Service','① Service Architecture를 먼저 고정 → ② JSON Schema + React Flow 구현');
+ const body=state.diagramTab==='Service Architecture'?serviceArchitectureHTML():reactFlowHTML();
+ document.getElementById('content').innerHTML=`${diagramTabs()}${body}`;
+ bindDiagramTabs();
+}
+
+function archModeTabs(){
+  const tabs=['AI Options','Engineer Design','Compare'];
+  return `<div class="designTabs">${tabs.map(t=>`<button class="${state.archMode===t?'active':''}" data-amode="${t}">${t}</button>`).join('')}</div>`;
+}
+function bindArchModeTabs(){
+  document.querySelectorAll('[data-amode]').forEach(b=>b.onclick=()=>{state.archMode=b.dataset.amode;renderArch()});
+}
+function addDesignBlock(name){
+  if(state.myDesign.includes(name)){toast(name+' already exists');return;}
+  state.myDesign.push(name);state.myDesignSaved=false;renderArch();
+}
+function removeDesignBlock(name){
+  if(['RX Decoder','PHY'].includes(name)){toast(name+' is fixed in this demo');return;}
+  state.myDesign=state.myDesign.filter(x=>x!==name);state.myDesignSaved=false;renderArch();
+}
+function moveDesignBlock(name,dir){
+  const i=state.myDesign.indexOf(name),j=i+dir;
+  if(i<0||j<0||j>=state.myDesign.length)return;
+  const a=[...state.myDesign];[a[i],a[j]]=[a[j],a[i]];
+  state.myDesign=a;state.myDesignSaved=false;renderArch();
+}
+function saveMyDesign(){
+  state.myDesignSaved=true;toast('My Design saved as Option D');renderArch();
+}
+function adoptMyDesign(){
+  if(!state.myDesignSaved){toast('먼저 My Design을 Save 하세요.');return;}
+  state.useMyDesign=true;state.approved=true;state.openDecisions=Math.max(0,state.openDecisions-1);
+  toast('Option D · My Design adopted / human approved');renderArch();
+}
+function engineerDesignHTML(){
+  const palette=['RX FIFO','Credit Manager','TX FSM','Arbiter','Encoder','CDC Bridge','Error Monitor'];
+  return `<div class="designWorkspace">
+    <aside class="palette">
+      <h4>Block Palette</h4>
+      ${palette.map(x=>`<button onclick="addDesignBlock('${x}')">+ ${x}</button>`).join('')}
+      <div class="designHint"><b>Engineer-first</b><br>엔지니어가 block을 직접 구성합니다. AI는 구조를 대신 결정하지 않고 trade-off와 누락만 검토합니다.</div>
+    </aside>
+
+    <section class="canvas">
+      <div class="canvasTitle">MY ARCHITECTURE CANVAS · OPTION D</div>
+      <div class="designFlow">
+        ${state.myDesign.map((b,i)=>`<div>
+          <div class="designNode user">${b}</div>
+          <div class="designControls">
+            <button onclick="moveDesignBlock('${b}',-1)">←</button>
+            <button onclick="moveDesignBlock('${b}',1)">→</button>
+            <button onclick="removeDesignBlock('${b}')">×</button>
+          </div>
+        </div>${i<state.myDesign.length-1?'<div class="designArrow">→</div>':''}`).join('')}
+      </div>
+      <div class="row">
+        <span class="muted">${state.myDesign.length} blocks · user authored</span>
+        <div class="pillrow">
+          <button class="btn" onclick="saveMyDesign()">${state.myDesignSaved?'Saved ✓':'Save as Option D'}</button>
+          <button class="btn success" onclick="adoptMyDesign()" ${state.myDesignSaved&&!state.useMyDesign?'':'disabled'}>${state.useMyDesign?'Adopted ✓':'Adopt My Design'}</button>
+        </div>
+      </div>
+    </section>
+
+    <aside class="inspector">
+      <h4>Design Constraints</h4>
+      <label class="muted" style="font-size:9px">Timing model</label>
+      <select onchange="state.myTiming=this.value;state.myDesignSaved=false">
+        <option ${state.myTiming==='Registered 1-cycle'?'selected':''}>Registered 1-cycle</option>
+        <option ${state.myTiming==='Combinational'?'selected':''}>Combinational</option>
+        <option ${state.myTiming==='2-stage pipeline'?'selected':''}>2-stage pipeline</option>
+      </select>
+
+      <label class="muted" style="font-size:9px">Interface style</label>
+      <select onchange="state.myInterface=this.value;state.myDesignSaved=false">
+        <option ${state.myInterface==='Decoupled handshake'?'selected':''}>Decoupled handshake</option>
+        <option ${state.myInterface==='Direct control'?'selected':''}>Direct control</option>
+        <option ${state.myInterface==='Event pulse'?'selected':''}>Event pulse</option>
+      </select>
+
+      <h4 style="margin-top:8px">AI Review of My Design</h4>
+      <div class="test"><span>Verification</span><b>${state.myDesign.includes('Credit Manager')?'High':'Medium'}</b></div>
+      <div class="test"><span>Coupling</span><b>${state.myDesign.includes('Credit Manager')?'Low':'Medium'}</b></div>
+      <div class="test"><span>Area</span><b>${state.myDesign.length>6?'High':'Medium'}</b></div>
+      <div class="test"><span>Traceability</span><b>High</b></div>
+      <button class="btn" style="width:100%;margin-top:8px" onclick="toast('AI review refreshed')">Re-evaluate</button>
+    </aside>
+  </div>`;
+}
+function archCompareHTML(){
+  return `<div class="card panel">
+    <div class="hdr">
+      <h3>AI Options vs My Design</h3>
+      <span class="badge ${state.myDesignSaved?'good':'warnbg'}">${state.myDesignSaved?'Option D available':'Save My Design first'}</span>
+    </div>
+    <table class="table">
+      <tr><th>Metric</th><th>A</th><th>B</th><th>C</th><th>D · My Design</th></tr>
+      <tr><td>Area</td><td>낮음</td><td>보통</td><td>높음</td><td>${state.myDesign.length>6?'높음':'보통'}</td></tr>
+      <tr><td>Verification</td><td>보통</td><td>높음</td><td>낮음</td><td>${state.myDesign.includes('Credit Manager')?'높음':'보통'}</td></tr>
+      <tr><td>Reuse</td><td>낮음</td><td>높음</td><td>보통</td><td>${state.myDesign.includes('Credit Manager')?'높음':'보통'}</td></tr>
+      <tr><td>Engineer intent</td><td>AI</td><td>AI</td><td>AI</td><td><b style="color:#1769e0">User-authored</b></td></tr>
+    </table>
+    <div class="designHint"><b>역할 분리</b><br>엔지니어가 구조를 설계하고 AI가 누락·trade-off·verification complexity를 검토합니다. 최종 구조는 사람의 승인으로 확정됩니다.</div>
+    <div class="row"><span>${state.useMyDesign?'<span class="userDesignBadge">Option D adopted</span>':''}</span><button class="btn success" onclick="adoptMyDesign()" ${state.myDesignSaved&&!state.useMyDesign?'':'disabled'}>Adopt My Design</button></div>
+  </div>`;
+}
+
+function renderArch(){
+ setTitle('Architecture Exploration','AI 후보 비교 + 엔지니어가 직접 만드는 Architecture Elaboration');
+ let body='';
+ if(state.archMode==='AI Options'){
+   body=`${flow()}<div class="grid2">
+   <section class="card panel">
+    <div class="hdr"><h3>AI-generated Candidates</h3><span class="badge purple">REQ-ENC-024</span></div>
+    ${archOptions()}
+    <div class="grid3" style="grid-template-columns:repeat(3,1fr);margin-top:8px">
+     ${['A','B','C'].map(x=>`<div class="reqbox"><b>Option ${x}</b><p style="font-size:10px">${architecture[x].summary}</p><div class="pillrow">${architecture[x].pros.map(p=>`<span class="chip">${p}</span>`).join('')}</div></div>`).join('')}
+    </div>
+    <div class="hdr" style="margin-top:12px"><h3>Trade-off Matrix</h3><button class="btn" onclick="toast('AI가 새로운 대안 2개를 생성했습니다.')">Generate Alternatives</button></div>
+    <table class="table"><tr><th>Metric</th><th>A</th><th>B</th><th>C</th></tr>
+     ${['Area','Latency','Verify','Reuse','Risk'].map(m=>`<tr><td>${m}</td><td>${architecture.A.score[m]}</td><td><b ${m==='Verify'||m==='Reuse'?'style="color:#0a8c61"':''}>${architecture.B.score[m]}</b></td><td>${architecture.C.score[m]}</td></tr>`).join('')}
+    </table>
+   </section>
+   <section class="card panel">
+    <div class="hdr"><h3>Selected Architecture Preview</h3><span class="tag">Option ${state.option}</span></div>
+    ${diagram(architecture[state.option].blocks)}
+    <h3 style="font-size:13px;margin-top:12px">Rationale</h3>
+    <div class="callout">${architecture[state.option].summary}<br><br><b>장점:</b> ${architecture[state.option].pros.join(', ')}<br><b>주의:</b> ${architecture[state.option].cons.join(', ')}</div>
+    <div class="row"><span class="muted">Human gate required</span><button class="btn success" onclick="approveArchitecture()" ${state.approved?'disabled':''}>${state.approved?'Approved ✓':'Approve Option '+state.option}</button></div>
+    <div class="callout warn"><b>Rule:</b> AI는 후보를 생성/비교하지만 최종 uArch 선택은 사람 승인 후 확정됩니다.</div>
+   </section></div>`;
+ } else if(state.archMode==='Engineer Design'){
+   body=engineerDesignHTML();
+ } else {
+   body=archCompareHTML();
+ }
+ document.getElementById('content').innerHTML=`${archModeTabs()}${body}`;
+ bindArchModeTabs();
+ if(state.archMode==='AI Options') bindArchOptions();
+}
+
+function renderUarch(){
+ setTitle('Micro-architecture','선택한 Architecture를 FSM, interface, timing, resource contract로 구체화');
+ const tabs=['Design Canvas','Block Diagram','FSM','Interface','Timing','Resource','Spec Trace'];
+ document.getElementById('content').innerHTML=`<div class="card panel">
+ <div class="hdr"><h3>uArch Contract · ${state.approved?'DEC-012 / Option '+state.option:'Not locked'}</h3><div class="pillrow">${state.approved?'<span class="badge good">Approved</span>':'<span class="badge warnbg">Draft</span>'}<button class="btn" onclick="showUarchContract()">Export Contract</button></div></div>
+ <div class="tabs">${tabs.map(t=>`<button class="${state.uarchTab===t?'active':''}" data-utab="${t}">${t}</button>`).join('')}</div>
+ <div id="uarchBody">${uarchBody()}</div></div>`;
+ document.querySelectorAll('[data-utab]').forEach(b=>b.onclick=()=>{state.uarchTab=b.dataset.utab;renderUarch()});
+}
+function uarchBody(){
+ if(state.uarchTab==='Design Canvas')return `<div class="designWorkspace">
+   <aside class="palette">
+     <h4>Architecture Source</h4>
+     <div class="callout"><b>${state.useMyDesign?'Option D · My Design':'Option '+state.option}</b><br>${state.useMyDesign?'Engineer-authored / human approved':'AI candidate / human selected'}</div>
+     <div class="designHint">이 단계는 Architecture를 다시 고르는 곳이 아니라, 선택한 구조를 실제 RTL contract로 상세화하는 공간입니다.</div>
+   </aside>
+
+   <section class="canvas">
+     <div class="canvasTitle">MICRO-ARCHITECTURE ELABORATION</div>
+     <div class="designFlow">
+       ${(state.useMyDesign?state.myDesign:architecture[state.option].blocks).map((b,i,a)=>`<div class="designNode ${state.useMyDesign?'user':''}">${b}</div>${i<a.length-1?'<div class="designArrow">→</div>':''}`).join('')}
+     </div>
+     <div class="miniCompare">
+       <div class="mc"><b>FSM</b><br>state split / recovery</div>
+       <div class="mc"><b>Interface</b><br>${state.useMyDesign?state.myInterface:'event + control signals'}</div>
+       <div class="mc"><b>Timing</b><br>${state.useMyDesign?state.myTiming:'registered 1-cycle'}</div>
+       <div class="mc"><b>Spec Trace</b><br>REQ-ENC-024 / §5.4.8</div>
+     </div>
+   </section>
+
+   <aside class="inspector">
+     <h4>Elaboration Checklist</h4>
+     <div class="test"><span>Block responsibility</span><span class="badge good">Defined</span></div>
+     <div class="test"><span>Interface</span><span class="badge good">Defined</span></div>
+     <div class="test"><span>Timing</span><span class="badge warnbg">Review</span></div>
+     <div class="test"><span>Resource</span><span class="badge neutral">Estimate</span></div>
+     <div class="test"><span>Spec trace</span><span class="badge good">Linked</span></div>
+   </aside>
+ </div>`;
+ if(state.uarchTab==='Block Diagram')return `<div class="grid2"><div>${diagram(architecture[state.option].blocks)}<div class="callout" style="margin-top:9px">Credit Manager가 protocol credit state를 소유하고 TX FSM에는 send_enable / tx_credit만 제공합니다.</div></div><div class="card panel"><h3>Module responsibilities</h3><table class="table"><tr><th>Module</th><th>Responsibility</th></tr><tr><td>RX Decoder</td><td>FCT 이벤트 추출</td></tr><tr><td>Credit Manager</td><td>credit 증가/감소/saturation</td></tr><tr><td>TX FSM</td><td>전송 순서와 enable 판단</td></tr><tr><td>Encoder</td><td>character encoding</td></tr></table></div></div>`;
+ if(state.uarchTab==='FSM')return `<div class="grid2"><div class="diagram"><div class="block">RESET</div><div class="conn">→</div><div class="block green">READY</div><div class="conn">↔</div><div class="block">SEND</div><div class="conn">→</div><div class="block red">ERROR</div></div><div class="code">READY:
+  if send_req && tx_credit>0 -> SEND
+  if error -> ERROR
+
+SEND:
+  consume_credit
+  if done -> READY
+
+ERROR:
+  wait recovery -> READY</div></div>`;
+ if(state.uarchTab==='Interface')return `<table class="table"><tr><th>Signal</th><th>Dir</th><th>Width</th><th>Meaning</th></tr><tr><td>fct_pulse</td><td>in</td><td>1</td><td>decoded FCT event</td></tr><tr><td>consume_char</td><td>in</td><td>1</td><td>normal char accepted</td></tr><tr><td>tx_credit</td><td>out</td><td>6</td><td>0..56</td></tr><tr><td>send_enable</td><td>out</td><td>1</td><td>credit > 0</td></tr><tr><td>credit_overflow</td><td>out</td><td>1</td><td>diagnostic only</td></tr></table>`;
+ if(state.uarchTab==='Timing')return `<div class="grid2"><div class="callout"><b>Clock:</b> 100 MHz<br><b>Update rule:</b> fct_pulse sampled on rising edge<br><b>Visibility:</b> tx_credit updated after same edge; TX FSM uses registered value on next decision cycle.<br><b>Reset:</b> synchronous active-high (demo choice)</div>${wave()}</div>`;
+ if(state.uarchTab==='Resource')return `<div class="grid4"><div class="metabox"><span class="muted">Registers</span><b>~12 FF</b></div><div class="metabox"><span class="muted">LUTs</span><b>~35</b></div><div class="metabox"><span class="muted">Latency</span><b>1 cycle</b></div><div class="metabox"><span class="muted">Critical path</span><b>credit compare</b></div></div><div class="callout warn" style="margin-top:10px">수치는 mock estimate이며 실제 synthesis에서 갱신됩니다.</div>`;
+ return `<table class="table"><tr><th>uArch item</th><th>Source</th><th>Verification</th></tr><tr><td>MAX_CREDIT=56</td><td>REQ-ENC-024 / §5.4.8</td><td>B1 + B2</td></tr><tr><td>FCT +8 saturation</td><td>REQ-ENC-024</td><td>Golden + RTL scoreboard</td></tr><tr><td>send_enable</td><td>INV-2</td><td>SVA / cocotb</td></tr><tr><td>1-cycle registered update</td><td>DEC-012 implementation choice</td><td>B2 timing</td></tr></table>`;
+}
+
+
+const rtlSources = {
+"credit_manager.sv": `module credit_manager #(
+  parameter int MAX_CREDIT = 56
+)(
+  input  logic       clk,
+  input  logic       reset,
+  input  logic       fct_pulse,
+  input  logic       consume_char,
+  output logic [5:0] tx_credit,
+  output logic       send_enable
+);
+
+always_ff @(posedge clk) begin
+  if (reset) begin
+    tx_credit <= '0;
+  end else begin
+    unique case ({fct_pulse, consume_char})
+      2'b10:
+        tx_credit <= (tx_credit > 48) ? 56 : tx_credit + 8;
+      2'b01:
+        if (tx_credit != 0) tx_credit <= tx_credit - 1;
+      default:
+        tx_credit <= tx_credit;
+    endcase
+  end
+end
+
+assign send_enable = (tx_credit != 0);
+
+endmodule`,
+"tx_fsm.sv": `module tx_fsm (
+  input  logic clk,
+  input  logic reset,
+  input  logic send_req,
+  input  logic send_enable,
+  output logic consume_char,
+  output logic tx_valid
+);
+
+typedef enum logic [1:0] {IDLE, SEND, WAIT} tx_state_t;
+tx_state_t state, next_state;
+
+always_comb begin
+  next_state = state;
+  consume_char = 1'b0;
+  tx_valid = 1'b0;
+
+  case (state)
+    IDLE:
+      if (send_req && send_enable) next_state = SEND;
+    SEND: begin
+      tx_valid = 1'b1;
+      consume_char = 1'b1;
+      next_state = WAIT;
+    end
+    WAIT:
+      next_state = IDLE;
+  endcase
+end
+endmodule`,
+"encoder.sv": `module encoder(
+  input logic clk,
+  input logic tx_valid,
+  input logic [7:0] tx_data,
+  output logic dout,
+  output logic sout
+);
+// demo placeholder: SpaceWire character encoder
+endmodule`,
+"spw_top.sv": `module spw_top(...);
+// RX Decoder -> Credit Manager -> TX FSM -> Encoder -> PHY
+endmodule`
+};
+
+const rtlDiffs = {
+"credit_manager.sv": `@@ generated from DEC-012 / REQ-ENC-024 @@
++ module credit_manager #(
++   parameter int MAX_CREDIT = 56
++ );
++ if (fct_pulse)
++   tx_credit <= (tx_credit > 48) ? 56 : tx_credit + 8;
++ if (consume_char && tx_credit != 0)
++   tx_credit <= tx_credit - 1;
++ assign send_enable = (tx_credit != 0);`,
+"tx_fsm.sv": `@@ interface change @@
++ input logic send_enable;
++ output logic consume_char;
++ if (send_req && send_enable) next_state = SEND;`,
+"encoder.sv": `No generated diff in this demo.`,
+"spw_top.sv": `@@ wiring @@
++ .fct_pulse(fct_pulse)
++ .consume_char(consume_char)
++ .tx_credit(tx_credit)
++ .send_enable(send_enable)`
+};
+
+function codeWithLines(src){
+  const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const lines = src.split('\n');
+  const nums = lines.map((_,i)=>i+1).join('\n');
+  const code = lines.map((line,i)=>{
+    let x=esc(line)
+      .replace(/\b(module|endmodule|input|output|logic|parameter|int|always_ff|always_comb|if|else|begin|end|unique|case|endcase|assign|typedef|enum)\b/g,'<span class="kw">$1</span>')
+      .replace(/\b(56|48|8|0|1)\b/g,'<span class="num">$1</span>')
+      .replace(/\b(tx_credit|send_enable|fct_pulse|consume_char|send_req|tx_valid)\b/g,'<span class="sig">$1</span>');
+    if(line.trim().startsWith('//')) x='<span class="com">'+esc(line)+'</span>';
+    if(state.rtlFile==='credit_manager.sv' && [16,18,19,27].includes(i+1)) x='<span class="hl">'+x+'</span>';
+    return x;
+  }).join('\n');
+  return `<div class="editorBody"><div class="lineNums">${nums}</div><div class="codeLines">${code}</div></div>`;
+}
+
+function rtlTracePanel(){
+  if(state.rtlFile==='credit_manager.sv') return `
+    <h4>Source Trace</h4>
+    <div class="traceCard"><b>Spec</b>§5.4.8 Flow Control Token / credit behavior</div>
+    <div class="traceCard"><b>Requirement</b>REQ-ENC-024 · FCT +8 / MAX_CREDIT=56 / zero-credit block</div>
+    <div class="traceCard"><b>Decision</b>${state.approved?'DEC-012 · Standalone Credit Manager':'Pending'}</div>
+    <div class="traceCard"><b>uArch Contract</b>6-bit register · registered update · send_enable output</div>
+    <div class="traceCard"><b>Verification</b>B1: behavior equivalence<br>B2: cycle/interface/structure</div>
+    <h4 style="margin-top:10px">Assertion Intent</h4>
+    <div class="assertbox">A1: tx_credit <= 56
+A2: tx_credit==0 |-> !send_enable
+A3: fct_pulse && credit<=48 |=> credit==$past(credit)+8
+A4: consume_char && credit>0 |=> credit==$past(credit)-1</div>`;
+  return `<h4>Source Trace</h4><div class="traceCard">이 파일은 데모용 하위 블록입니다.</div>`;
+}
+
+
+function resetCompilePipeline(){
+  state.compileRunning=false;
+  state.compileResult='idle';
+  state.compileLog='';
+  state.compilePipeline={queue:'idle',worker:'idle',docker:'idle',verilator:'idle',iverilog:'idle',cocotb:'idle',artifacts:'idle'};
+}
+
+function pipeClass(v){ return v==='running'?'running':v==='pass'?'pass':v==='fail'?'fail':''; }
+function pipeLabel(v){ return v==='running'?'RUNNING':v==='pass'?'PASS':v==='fail'?'FAIL':'WAIT'; }
+
+function compilePipelineHTML(){
+  const p=state.compilePipeline;
+  const steps=[
+    ['queue','①','Job Queue'],
+    ['worker','②','Worker'],
+    ['docker','③','Docker'],
+    ['verilator','④','Verilator'],
+    ['iverilog','⑤','Icarus'],
+    ['cocotb','⑥','cocotb'],
+    ['artifacts','⑦','Artifacts']
+  ];
+  return `<div class="pipeline">${steps.map(([k,ico,name])=>`
+    <div class="pipeStep ${pipeClass(p[k])}">
+      <div class="ico">${ico}</div><div class="name">${name}</div>
+      <div class="st">${pipeLabel(p[k])}</div>
+    </div>`).join('')}</div>`;
+}
+
+function appendCompileLog(line){
+  state.compileLog += (state.compileLog ? '\n' : '') + line;
+}
+
+function runCompilePipeline(forceFail=false){
+  if(!state.rtl){toast('먼저 RTL을 Generate 하세요.');return;}
+  if(state.compileRunning){toast('Compile job이 이미 실행 중입니다.');return;}
+  resetCompilePipeline();
+  state.compileRunning=true;
+  state.compileResult='running';
+  renderRTL();
+
+  const stages=[
+    ['queue','[API] POST /jobs/compile -> job-842 queued'],
+    ['worker','[RQ] simulation-worker-01 picked job-842'],
+    ['docker','[Docker] sandbox spec2rtl-job-842 started (cpu=1, mem=512MB)'],
+    ['verilator','[Verilator 5.038] --lint-only rtl/credit_manager.sv rtl/tx_fsm.sv'],
+    ['iverilog','[Icarus 12.0] -g2012 -o sim.out rtl/*.sv tb/tb_credit.sv'],
+    ['cocotb','[pytest/cocotb] test_credit.py::test_credit_increase ... PASS'],
+    ['artifacts','[Artifacts] compile.log, junit.xml, waveform.fst stored']
+  ];
+
+  stages.forEach((item,idx)=>{
+    setTimeout(()=>{
+      const [key,msg]=item;
+      state.compilePipeline[key]='running';
+      appendCompileLog(msg);
+      if(key==='verilator') appendCompileLog('%Warning-demo: no fatal lint issues');
+      if(key==='iverilog') appendCompileLog('Compilation finished with 0 errors');
+      renderRTL();
+
+      setTimeout(()=>{
+        if(forceFail && key==='iverilog'){
+          state.compilePipeline[key]='fail';
+          appendCompileLog('rtl/credit_manager.sv:19: syntax error (simulated)');
+          appendCompileLog('[Worker] job-842 FAILED; container cleanup complete');
+          state.compileRunning=false; state.compileResult='fail'; state.failureKind='compile_syntax';
+          renderRTL(); toast('Simulated compile failure · Verification > Failure Analysis에서 추적 가능');
+          return;
+        }
+        if(!state.compileRunning) return;
+        state.compilePipeline[key]='pass';
+        if(key==='artifacts'){
+          appendCompileLog('[Docker] container removed --rm');
+          appendCompileLog('[API] job-842 status=PASS');
+          state.compileRunning=false; state.compileResult='pass';
+          state.jobs++;
+          toast('Docker compile pipeline PASS');
+        }
+        renderRTL();
+      },380);
+    },idx*900);
+  });
+}
+
+function renderRTL(){
+ setTitle('RTL','RTL 코드 + Assertions + Docker/Verilator Compile Pipeline 데모');
+ const files=['credit_manager.sv','tx_fsm.sv','encoder.sv','spw_top.sv'];
+ const src = rtlSources[state.rtlFile] || '// no source';
+ const resultBadge = state.compileResult==='pass'
+   ? '<span class="badge good">Docker Compile PASS</span>'
+   : state.compileResult==='fail'
+     ? '<span class="badge badbg">Compile FAIL</span>'
+     : state.compileRunning
+       ? '<span class="badge warnbg">Compile RUNNING</span>'
+       : `<span class="badge ${state.rtl?'good':'neutral'}">${state.rtl?'RTL Ready':'Demo source preview'}</span>`;
+
+ document.getElementById('content').innerHTML=`<div class="card panel">
+  <div class="hdr">
+    <div><span class="tag">${state.rtlFile}</span><h2 style="margin-top:6px">RTL Code Explorer</h2></div>
+    <div class="pillrow">
+      ${resultBadge}
+      <button class="btn" onclick="state.rtlCodeTab='code';renderRTL()">Code</button>
+      <button class="btn" onclick="state.rtlCodeTab='diff';renderRTL()">Diff</button>
+      <button class="btn" onclick="state.rtlCodeTab='assert';renderRTL()">Assertions</button>
+    </div>
+  </div>
+
+  <div class="codeExplorer">
+    <aside class="filetree">
+      <b style="font-size:11px">rtl/</b>
+      ${files.map(f=>`<div class="file ${state.rtlFile===f?'active':''}" data-rtlfile="${f}">▣ ${f}</div>`).join('')}
+      <div style="margin-top:10px" class="callout ${state.rtl?'':'warn'}">${state.rtl?'Generated RTL is linked to the selected uArch contract.':'Architecture 승인 후 Generate RTL을 눌러 실제 검증 흐름을 시작합니다.'}</div>
+      <button class="btn primary" style="width:100%;margin-top:9px" onclick="generateRTL()" ${state.approved&&!state.rtl?'':'disabled'}>${state.rtl?'RTL Generated':'Generate RTL'}</button>
+    </aside>
+
+    <section>
+      <div class="editor">
+        <div class="editorTop">
+          <span>${state.rtlFile} · SystemVerilog</span>
+          <div class="codeTabs">
+            <button class="${(state.rtlCodeTab||'code')==='code'?'active':''}" onclick="state.rtlCodeTab='code';renderRTL()">Code</button>
+            <button class="${state.rtlCodeTab==='diff'?'active':''}" onclick="state.rtlCodeTab='diff';renderRTL()">Diff</button>
+            <button class="${state.rtlCodeTab==='assert'?'active':''}" onclick="state.rtlCodeTab='assert';renderRTL()">Assertions</button>
+          </div>
+        </div>
+        ${(state.rtlCodeTab||'code')==='code'
+          ? codeWithLines(src)
+          : state.rtlCodeTab==='diff'
+            ? `<div class="codeLines" style="min-height:340px">${(rtlDiffs[state.rtlFile]||'').split('\n').map(l=>{
+                const e=l.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+                return l.startsWith('+')?'<span class="diffadd">'+e+'</span>':l.startsWith('-')?'<span class="diffdel">'+e+'</span>':'<span class="diffctx">'+e+'</span>';
+              }).join('\n')}</div>`
+            : `<div class="codeLines" style="min-height:340px">${state.rtlFile==='credit_manager.sv'
+                ? `property p_credit_range;
+  @(posedge clk) disable iff (reset)
+  tx_credit <= MAX_CREDIT;
+endproperty
+
+property p_zero_credit_blocks_send;
+  @(posedge clk) disable iff (reset)
+  (tx_credit == 0) |-> !send_enable;
+endproperty
+
+property p_fct_adds_eight;
+  @(posedge clk) disable iff (reset)
+  (fct_pulse && tx_credit <= 48) |=>
+    tx_credit == $past(tx_credit) + 8;
+endproperty`
+                : '// no assertion demo for this file yet'}</div>`}
+      </div>
+
+      <div class="grid2" style="margin-top:10px">
+        <div class="card panel">
+          <h3>Static Checks</h3>
+          <div class="test"><span>Verilator lint</span><span class="badge ${state.compilePipeline.verilator==='pass'?'good':state.compilePipeline.verilator==='running'?'warnbg':'neutral'}">${pipeLabel(state.compilePipeline.verilator)}</span></div>
+          <div class="test"><span>Icarus compile</span><span class="badge ${state.compilePipeline.iverilog==='pass'?'good':state.compilePipeline.iverilog==='fail'?'badbg':state.compilePipeline.iverilog==='running'?'warnbg':'neutral'}">${pipeLabel(state.compilePipeline.iverilog)}</span></div>
+          <div class="test"><span>SVA intent mapped</span><span class="badge good">4</span></div>
+        </div>
+        <div class="card panel">
+          <h3>Generated from</h3>
+          <div class="test"><span>Requirement</span><b>REQ-ENC-024</b></div>
+          <div class="test"><span>Architecture</span><b>Option ${state.option}</b></div>
+          <div class="test"><span>Decision</span><b>${state.approved?'DEC-012':'Pending'}</b></div>
+          <div class="test"><span>uArch</span><b>Credit Manager Contract</b></div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="sourcepanel">${rtlTracePanel()}</aside>
+  </div>
+
+  <div class="compileWrap">
+    <div class="hdr">
+      <div>
+        <h3>Compile / Simulation Execution Plane</h3>
+        <div class="muted" style="font-size:10px;margin-top:3px">Demo: FastAPI → Queue → Worker → isolated Docker → Verilator/Icarus/cocotb → Artifacts</div>
+      </div>
+      <div class="pillrow">
+        <button class="btn primary" onclick="runCompilePipeline(false)" ${state.rtl&&!state.compileRunning?'':'disabled'}>▶ Run in Docker</button>
+        <button class="btn danger" onclick="runCompilePipeline(true)" ${state.rtl&&!state.compileRunning?'':'disabled'}>Simulate Fail</button>
+        <button class="btn" onclick="resetCompilePipeline();renderRTL()" ${state.compileRunning?'disabled':''}>Clear</button>
+      </div>
+    </div>
+
+    ${compilePipelineHTML()}
+
+    <div class="execMeta">
+      <div class="metabox"><span class="muted">Job ID</span><b>job-842</b></div>
+      <div class="metabox"><span class="muted">Worker</span><b>simulation-worker-01</b></div>
+      <div class="metabox"><span class="muted">Sandbox</span><b>Docker --rm</b></div>
+      <div class="metabox"><span class="muted">Limits</span><b>1 CPU / 512 MB / 30 s</b></div>
+    </div>
+
+    <div class="grid2" style="margin-top:10px">
+      <div>
+        <div class="hdr"><h3>Live Job Log</h3><span class="badge neutral">mock execution</span></div>
+        <div class="logConsole">${state.compileLog || `[READY] RTL generated.
+Press "Run in Docker" to simulate:
+1) queue
+2) worker pickup
+3) isolated Docker start
+4) Verilator lint
+5) Icarus compile
+6) cocotb test
+7) artifact collection`}</div>
+      </div>
+      <div>
+        <div class="hdr"><h3>Artifacts</h3><span class="badge ${state.compileResult==='pass'?'good':'neutral'}">${state.compileResult==='pass'?'Available':'Waiting'}</span></div>
+        <table class="table">
+          <tr><th>Artifact</th><th>Purpose</th><th>Status</th></tr>
+          <tr><td>compile.log</td><td>Verilator/Icarus stdout</td><td>${state.compileResult==='pass'?'<span class="badge good">Ready</span>':'—'}</td></tr>
+          <tr><td>junit.xml</td><td>pytest/cocotb results</td><td>${state.compileResult==='pass'?'<span class="badge good">Ready</span>':'—'}</td></tr>
+          <tr><td>waveform.fst</td><td>signal debug</td><td>${state.compileResult==='pass'?'<span class="badge good">Ready</span>':'—'}</td></tr>
+          <tr><td>job.json</td><td>tool versions / command / exit code</td><td>${state.compileResult==='pass'?'<span class="badge good">Ready</span>':'—'}</td></tr>
+        </table>
+        <div class="callout warn" style="margin-top:9px"><b>중요:</b> 이 HTML은 Docker를 실제 실행하지 않습니다. 실제 서비스에서는 FastAPI가 job만 생성하고 Worker가 Docker를 실행합니다.</div>
+      </div>
+    </div>
+  </div>
+ </div>`;
+
+ document.querySelectorAll('[data-rtlfile]').forEach(x=>x.onclick=()=>{state.rtlFile=x.dataset.rtlfile;state.rtlCodeTab='code';renderRTL()});
+}
+
+
+function failureWaveHTML(){
+  const c=state.selectedFailCycle;
+  const left=Math.max(2,Math.min(98,(c-100)/100*100));
+  const sigs=[
+    ['clk',[0,12,24,36,48,60,72,84], 'blue',8],
+    ['fct_pulse',[24], 'orange',10],
+    ['consume_char',[45], 'blue',12],
+    ['tx_credit',[0], '',100],
+    ['send_enable',[0], '',100],
+    ['assert_fail',[50], 'red',8]
+  ];
+  return `<div class="waveInteractive">
+    <div class="waveHead"><span>Fail window: 100–200 ns</span><span>cursor = <b>${c} ns</b></span></div>
+    <div class="waveRows">
+      ${sigs.map(([name,starts,cls,w])=>`<div class="signalRow">
+        <div class="signalName">${name}</div>
+        <div class="track">
+          ${starts.map(s=>`<div class="pulse ${cls}" style="left:${s}%;width:${w}%"></div>`).join('')}
+          <div class="cursorLine" style="left:${left}%"></div><div class="cursorLabel" style="left:${left}%">${c}</div>
+        </div>
+      </div>`).join('')}
+    </div>
+    <div class="pillrow" style="margin-top:9px">
+      ${[120,140,150,160,180].map(x=>`<button class="cycleBtn ${c===x?'active':''}" onclick="state.selectedFailCycle=${x};state.cycleAnalyzed=false;state.arbiterResult=null;renderVerify()">${x} ns</button>`).join('')}
+    </div>
+  </div>`;
+}
+
+
+function analyzeSelectedCycle(){
+  state.cycleAnalyzed=true;
+  renderVerify();
+  toast('Waveform slice + assertion + trace context 분석 완료 (mock)');
+}
+
+function cycleAnalysisHTML(){
+  const t=state.selectedFailCycle;
+  const start=Math.max(0,t-30), end=t+30;
+
+  if(!state.cycleAnalyzed) return `<div class="evidenceContext">
+    <div class="evidenceHeader">
+      <div>
+        <h3>Evidence Context @ ${t} ns</h3>
+        <div class="muted" style="font-size:10px;margin-top:3px">선택 시점을 중심으로 causal evidence window를 자동 구성합니다.</div>
+      </div>
+      <div class="windowLabel">Analysis Window: ${start}–${end} ns</div>
+    </div>
+    <div class="row">
+      <div class="smallmono" style="flex:1">POST /analysis/evidence-context
+{ job_id:"job-842", t_ns:${t}, window_ns:30,
+  signals:["fct_pulse","consume_char","tx_credit","send_enable"],
+  assertion_id:"A3" }</div>
+      <button class="btn primary" onclick="analyzeSelectedCycle()">Build Evidence Context</button>
+    </div>
+  </div>`;
+
+  const eventRows = t===150
+    ? [
+        ['120 ns','fct_pulse ↑','FCT event captured',''],
+        ['140 ns','consume_char ↑','normal character consumed','warn'],
+        ['150 ns','tx_credit = 55','expected 56','fail'],
+        ['150 ns','Assertion A3 FAIL','credit update mismatch','fail']
+      ]
+    : t<150
+      ? [
+          [start+' ns','window start','pre-failure state',''],
+          [t+' ns','selected cursor','causal precursor inspection','warn'],
+          ['150 ns','known failure','A3 mismatch downstream','fail']
+        ]
+      : [
+          ['150 ns','Assertion A3 FAIL','known failure','fail'],
+          [t+' ns','selected cursor','post-failure propagation','warn'],
+          [end+' ns','window end','recovery/cleanup check','']
+        ];
+
+  const sourceMap = t===150
+    ? `credit_manager.sv:16-22
+case ({fct_pulse, consume_char})
+  2'b10: credit += 8;
+  2'b01: credit -= 1;
+  2'b11: <undefined in contract>`
+    : `credit_manager.sv
+selected window maps to:
+- credit update logic
+- send_enable derivation
+- assertion A3 source`;
+
+  return `<div class="evidenceContext">
+    <div class="evidenceHeader">
+      <div>
+        <h3>Evidence Context @ ${t} ns</h3>
+        <div class="muted" style="font-size:10px;margin-top:3px">한 cycle 자체가 아니라, 이 시점을 중심으로 원인과 결과의 연결을 묶은 evidence bundle입니다.</div>
+      </div>
+      <div class="windowLabel">Analysis Window: ${start}–${end} ns</div>
+    </div>
+
+    <div class="evidenceSections">
+      <div class="eSection">
+        <h4>1. Event Timeline</h4>
+        <div class="eventTimeline">
+          ${eventRows.map(([tm,ev,desc,cls])=>`<div class="ev ${cls}"><b>${tm}</b> · ${ev}<br><span class="muted">${desc}</span></div>`).join('')}
+        </div>
+      </div>
+
+      <div class="eSection">
+        <h4>2. Assertion Trigger</h4>
+        <div class="triggerBox">
+          <b>A3 · p_fct_adds_eight</b><br>
+          Antecedent: fct_pulse && tx_credit <= 48<br>
+          Consequent: next credit == past credit + 8<br><br>
+          ${t===150?'<b>Observed:</b> consequent mismatch at 150 ns':'현재 선택 시점은 A3 failure의 causal context를 관찰하는 위치'}
+        </div>
+      </div>
+
+      <div class="eSection">
+        <h4>3. Source Mapping</h4>
+        <div class="srcMap">${sourceMap}</div>
+        <div class="pillrow" style="margin-top:7px">
+          <span class="chip">credit_manager.sv</span>
+          <span class="chip">Assertion A3</span>
+          <span class="chip">tb_credit_boundary</span>
+        </div>
+      </div>
+
+      <div class="eSection">
+        <h4>4. Spec Trace</h4>
+        <div class="traceMini">
+          <div class="tm"><b>Spec</b>ECSS §5.4.8</div>
+          <div class="tm"><b>Requirement</b>REQ-ENC-024</div>
+          <div class="tm"><b>Golden</b>GM-024 · simultaneous test missing</div>
+          <div class="tm"><b>uArch</b>Credit Manager timing contract</div>
+          <div class="tm"><b>Decision</b>${state.decision013?'DEC-013':'DEC-012 + open gap'}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="causalNote"><b>Causal interpretation:</b> ${t===150
+      ? 'FCT와 consume event가 같은 causal window에서 겹치고, RTL/uArch/Golden 중 simultaneous semantics가 완전히 정의되지 않아 failure가 발생한 것으로 보입니다.'
+      : t<150
+        ? 'failure 전 precursor를 보는 구간입니다. stimulus ordering과 sampled edge가 150 ns mismatch를 유발하는지 확인합니다.'
+        : 'failure 이후 propagation을 보는 구간입니다. 잘못된 credit 값이 send_enable/TX path에 어떻게 퍼지는지 확인합니다.'}</div>
+  </div>`;
+}
+
+function askSpecArbiter(){
+  if(!state.cycleAnalyzed){
+    toast('먼저 선택 cycle을 Analyze 하세요.');
+    return;
+  }
+  state.arbiterResult={
+    class:'B',
+    label:'Spec / Contract ambiguity',
+    confidence:82,
+    summary:'동시 FCT + consume_char의 same-cycle semantics가 현재 Golden/uArch contract에 명시되지 않아 RTL만 바로 수정하면 안 됨.',
+    evidence:[
+      'Waveform: 150 ns window에서 fct_pulse와 consume_char가 동시에 관찰됨.',
+      'Assertion A3: FCT +8 rule은 있으나 simultaneous consume 조건을 포함하지 않음.',
+      'Golden Model: FCT-only / consume-only test는 있으나 simultaneous-event oracle이 없음.',
+      'uArch Timing Contract: registered update는 정의하지만 same-cycle priority/net effect는 미정.',
+      "RTL: unique case에 2'b10/2'b01은 있으나 2'b11 의미가 명시되지 않음."
+    ]
+  };
+  renderVerify();
+  toast('Spec Arbiter 판정 생성 완료 (demo)');
+}
+
+function arbiterPanelHTML(){
+  if(!state.arbiterResult) return `<div class="analysisBox">
+    <div class="row"><div><b>Spec Arbiter</b><div class="muted">수정 전에 failure의 진실의 원천을 분류합니다.</div></div>
+    <button class="btn" onclick="askSpecArbiter()">Ask Spec Arbiter</button></div>
+  </div>`;
+  const a=state.arbiterResult;
+  return `<div class="judgment">
+    <div class="hdr"><div><span class="badge purple">Judgment ${a.class}</span><h3 style="margin-top:6px">${a.label}</h3></div><b>${a.confidence}% confidence</b></div>
+    <div style="font-size:11px;line-height:1.55">${a.summary}</div>
+    <div class="evidenceList">${a.evidence.map((e,i)=>`<div class="evi ${i===4?'red':i===2||i===3?'warn':''}"><b>Evidence ${i+1}</b><br>${e}</div>`).join('')}</div>
+    <div class="callout warn" style="margin-top:9px"><b>Arbiter action:</b> RTL 자동 수정 금지. simultaneous-event oracle/contract를 먼저 확정하고 regression을 추가.</div>
+  </div>`;
+}
+
+function createFailureDecision(){
+  if(!state.arbiterResult){
+    toast('먼저 Ask Spec Arbiter를 실행하세요.');
+    return;
+  }
+  state.decision013={
+    id:'DEC-013',
+    status:'DRAFT',
+    issue:'FCT와 consume_char가 같은 cycle에 발생할 때 credit update semantics',
+    selected:null,
+    options:{
+      A:'FCT 먼저 적용',
+      B:'consume 먼저 적용',
+      C:'net effect = +7',
+      D:'simultaneous event를 illegal/unsupported로 정의'
+    },
+    evidence:['§5.4.8','REQ-ENC-024','GM-024 gap','uArch timing gap','waveform@150ns','Assertion A3'],
+    impact:['Golden Model','uArch Timing Contract','credit_manager.sv','Assertion A3','B1/B2 regression']
+  };
+  renderVerify();
+  toast('DEC-013 draft 생성');
+}
+
+function selectDecision013(opt){
+  if(!state.decision013) return;
+  state.decision013.selected=opt;
+  renderVerify();
+}
+
+function approveDecision013(){
+  if(!state.decision013 || !state.decision013.selected){
+    toast('Decision option을 먼저 선택하세요.');
+    return;
+  }
+  state.decision013.status='APPROVED';
+  state.openDecisions=Math.max(0,state.openDecisions-1);
+  renderVerify();
+  toast('DEC-013 승인 · impacted artifacts 갱신 대상으로 표시');
+}
+
+function decisionPanelHTML(){
+  if(!state.decision013) return `<div class="analysisBox">
+    <div class="row"><div><b>Decision Record</b><div class="muted">Arbiter 결과를 영구 설계 판단으로 남깁니다.</div></div>
+    <button class="btn primary" onclick="createFailureDecision()">Create Decision</button></div>
+  </div>`;
+  const d=state.decision013;
+  return `<div class="decisionDraft">
+    <div class="hdr"><div><span class="tag">${d.id}</span><h3 style="margin-top:6px">${d.issue}</h3></div><span class="badge ${d.status==='APPROVED'?'good':'warnbg'}">${d.status}</span></div>
+    <div class="optionButtons">${Object.entries(d.options).map(([k,v])=>`<button class="${d.selected===k?'selected':''}" onclick="selectDecision013('${k}')"><b>${k}</b> · ${v}</button>`).join('')}</div>
+    <div class="grid2" style="margin-top:9px">
+      <div><b style="font-size:11px">Evidence</b><div class="pillrow" style="margin-top:4px">${d.evidence.map(x=>`<span class="chip">${x}</span>`).join('')}</div></div>
+      <div><b style="font-size:11px">Impact</b><div class="pillrow" style="margin-top:4px">${d.impact.map(x=>`<span class="chip">${x}</span>`).join('')}</div></div>
+    </div>
+    <div class="row"><span>${d.selected?'<b>Selected:</b> '+d.selected+' · '+d.options[d.selected]:'선택 전 — 사람 승인 필요'}</span>
+    <button class="btn success" onclick="approveDecision013()" ${d.selected&&d.status!=='APPROVED'?'':'disabled'}>Approve Decision</button></div>
+    ${d.status==='APPROVED'?`<div class="callout"><b>Result:</b> DEC-013이 승인되었습니다. 다음 작업: Golden test 추가 → uArch contract 갱신 → RTL patch → B1/B2 재실행.</div>`:''}
+  </div>`;
+}
+
+function failureAnalysisHTML(){
+  const c=state.selectedFailCycle;
+  const phase = c<145 ? 'FCT가 수신되어 credit update가 예약된 구간'
+              : c===150 ? 'consume_char와 credit update가 경합하는 failing cycle'
+              : c<170 ? '잘못된 credit 값이 TX FSM으로 전파된 구간'
+              : 'Assertion failure 이후 recovery/cleanup 구간';
+  return `<div class="failureGrid">
+    <section>
+      <div class="failureHero">
+        <h3>FAIL · tb_credit_boundary_multipacket</h3>
+        <div style="font-size:11px;line-height:1.6">Expected <b>tx_credit=56</b>, observed <b>tx_credit=55</b> after simultaneous FCT/consume event.</div>
+        <div class="pillrow" style="margin-top:7px"><span class="badge badbg">Assertion A3</span><span class="badge warnbg">${c} ns</span><span class="badge neutral">REQ-ENC-024</span></div>
+      </div>
+      <h3 style="font-size:13px;margin-top:12px">Root-cause hypotheses</h3>
+      <div class="hypo active"><span class="pct">62%</span><b>RTL event-priority bug</b><div class="evidence">2'b11 동시 이벤트 처리 case가 명시되지 않아 default 유지/순서 문제 가능성.</div></div>
+      <div class="hypo"><span class="pct">23%</span><b>uArch contract ambiguity</b><div class="evidence">FCT와 consume_char가 같은 cycle에 발생할 때 우선순위가 contract에 아직 명시되지 않음.</div></div>
+      <div class="hypo"><span class="pct">10%</span><b>Golden Model incompleteness</b><div class="evidence">Golden test에는 simultaneous event scenario가 빠져 있음.</div></div>
+      <div class="hypo"><span class="pct">5%</span><b>Testbench error</b><div class="evidence">stimulus scheduling과 sampling edge 확인 필요.</div></div>
+      ${cycleAnalysisHTML()}
+    </section>
+
+    <section>
+      <div class="hdr"><h3>Waveform-linked evidence</h3><span class="rootBadge">${phase}</span></div>
+      ${failureWaveHTML()}
+      <div class="callout warn" style="margin-top:9px"><b>${c} ns 해석:</b> ${phase}. Waveform cursor를 바꾸면 분석 context가 갱신됩니다.</div>
+      ${arbiterPanelHTML()}
+    </section>
+
+    <section>
+      <h3 style="font-size:13px;margin-top:0">Trace back to source</h3>
+      <div class="linkCard"><b>1. Assertion</b><span class="lineLink" onclick="state.rtlFile='credit_manager.sv';state.rtlCodeTab='assert';go('rtl')">A3 · p_fct_adds_eight</span><div class="evidence">FCT event 후 credit +8 invariant.</div></div>
+      <div class="linkCard"><b>2. RTL</b><span class="lineLink" onclick="state.rtlFile='credit_manager.sv';state.rtlCodeTab='code';go('rtl')">credit_manager.sv · event case</span><div class="evidence">2'b10 / 2'b01만 정의되어 simultaneous 2'b11 의미가 없음.</div></div>
+      <div class="linkCard"><b>3. uArch</b><span class="lineLink" onclick="state.uarchTab='Timing';go('uarch')">Credit Manager timing contract</span><div class="evidence">동시 FCT/consume 우선순위 추가 필요 가능.</div></div>
+      <div class="linkCard"><b>4. Requirement</b><span class="lineLink" onclick="state.selectedReq='REQ-ENC-024';go('req')">REQ-ENC-024</span><div class="evidence">credit 증가/감소 규칙과 boundary behavior.</div></div>
+      <div class="linkCard"><b>5. Spec</b><span class="lineLink" onclick="state.selectedClause='§5.4.8';go('spec')">ECSS §5.4.8</span><div class="evidence">원문이 simultaneous event 의미를 충분히 명시하는지 재확인.</div></div>
+      ${decisionPanelHTML()}
+    </section>
+  </div>
+
+  <div class="card panel" style="margin-top:10px">
+    <div class="hdr"><h3>AI suggested next experiment</h3><span class="badge purple">LLM over structured evidence</span></div>
+    <div class="timelineMini">
+      <div class="miniNode">Add GM test<br><b>FCT+consume</b></div><div>→</div>
+      <div class="miniNode">Run Golden<br><b>expected rule</b></div><div>→</div>
+      <div class="miniNode">Clarify uArch<br><b>priority</b></div><div>→</div>
+      <div class="miniNode">Patch RTL<br><b>2'b11</b></div><div>→</div>
+      <div class="miniNode">B1/B2 rerun<br><b>regression</b></div>
+    </div>
+    <div class="callout"><b>LLM 입력:</b> waveform slice + failed assertion + RTL source map + Golden behavior + uArch + Requirement + Spec clause. 자유 추측이 아니라 이 evidence bundle을 기반으로 다음 실험을 제안합니다.</div>
+  </div>`;
+}
+
+function renderVerify(){
+ setTitle('Verification','B1/B2 검증 + Failure Analysis + Waveform-to-RTL/Spec 역추적');
+ const tabs=['B1 Functional','B2 Implementation','Regression','Waveform','Failure Analysis'];
+ document.getElementById('content').innerHTML=`<div class="card panel">
+ <div class="hdr"><h3>Verification Workspace</h3><div class="pillrow"><span class="badge ${state.rtl?'good':'warnbg'}">${state.rtl?'RTL ready':'RTL required'}</span><button class="btn primary" onclick="runVerify(state.verifyTab.startsWith('B1')?'b1':'b2')" ${state.rtl?'':'disabled'}>Run Selected</button></div></div>
+ <div class="tabs">${tabs.map(t=>`<button class="${state.verifyTab===t?'active':''}" data-vtab="${t}">${t}</button>`).join('')}</div>
+ ${verifyBody()}</div>`;
+ document.querySelectorAll('[data-vtab]').forEach(b=>b.onclick=()=>{state.verifyTab=b.dataset.vtab;renderVerify()});
+}
+function verifyBody(){
+ if(state.verifyTab==='B1 Functional')return `<div class="grid2"><div><div class="row"><span>Behavior coverage</span><b>${state.b1}%</b></div><div class="progress"><div style="width:${state.b1}%"></div></div><table class="table"><tr><th>Scenario</th><th>Golden</th><th>RTL</th><th>Result</th></tr><tr><td>FCT +8</td><td>16</td><td>${state.rtl?'16':'—'}</td><td>${state.rtl?'<span class="badge good">MATCH</span>':'—'}</td></tr><tr><td>Saturation</td><td>56</td><td>${state.rtl?'56':'—'}</td><td>${state.rtl?'<span class="badge good">MATCH</span>':'—'}</td></tr><tr><td>credit=0 block</td><td>blocked</td><td>${state.rtl?'blocked':'—'}</td><td>${state.rtl?'<span class="badge good">MATCH</span>':'—'}</td></tr><tr><td>FCT + consume same cycle</td><td>pending oracle</td><td>${state.rtl?'55':'—'}</td><td><span class="badge warnbg">NEEDS RULE</span></td></tr></table></div><div class="callout"><b>B1 질문:</b> 동일 입력 sequence에 대해 RTL의 protocol-visible behavior가 Golden Model과 일치하는가?<br><br>simultaneous event처럼 Golden Model 규칙이 빠진 경우는 먼저 Oracle을 보강해야 합니다.</div></div>`;
+ if(state.verifyTab==='B2 Implementation')return `<div class="grid2"><div><div class="row"><span>Implementation coverage</span><b>${state.b2}%</b></div><div class="progress"><div style="width:${state.b2}%"></div></div><table class="table"><tr><th>Contract</th><th>Check</th><th>Status</th></tr><tr><td>6-bit credit register</td><td>structural</td><td>${state.rtl?'<span class="badge good">PASS</span>':'—'}</td></tr><tr><td>registered FCT update</td><td>cycle</td><td>${state.rtl?'<span class="badge good">PASS</span>':'—'}</td></tr><tr><td>send_enable interface</td><td>signal</td><td>${state.rtl?'<span class="badge good">PASS</span>':'—'}</td></tr><tr><td>FCT + consume priority</td><td>cycle semantics</td><td>${state.rtl?'<span class="badge badbg">UNDEFINED</span>':'—'}</td></tr></table></div><div class="callout"><b>B2 질문:</b> 사람이 승인한 uArch contract가 RTL의 FSM/cycle/interface/timing에 정확히 구현되었는가?<br><br>현재 simultaneous event priority가 contract에 빠져 있어 설계 결정이 필요합니다.</div></div>`;
+ if(state.verifyTab==='Regression')return `<table class="table"><tr><th>Testbench</th><th>Type</th><th>Last</th><th>Time</th><th></th></tr><tr><td>tb_credit</td><td>B1+B2</td><td><span class="badge good">PASS</span></td><td>0.8s</td><td></td></tr><tr class="clickable" onclick="state.verifyTab='Failure Analysis';renderVerify()"><td>tb_credit_boundary_multipacket</td><td>Boundary</td><td><span class="badge badbg">FAIL</span></td><td>1.4s</td><td><span class="lineLink">Analyze →</span></td></tr><tr><td>tb_eep_recovery</td><td>Error</td><td><span class="badge good">PASS</span></td><td>1.2s</td><td></td></tr><tr><td>tb_fsm_smoke</td><td>B2</td><td><span class="badge good">PASS</span></td><td>0.3s</td><td></td></tr></table>`;
+ if(state.verifyTab==='Waveform')return `<div class="grid2"><div>${failureWaveHTML()}</div><div><div class="code">120 ns  fct_pulse=1
+130 ns  expected credit update pending
+140 ns  consume_char=1
+150 ns  tx_credit=55   &lt;-- mismatch
+150 ns  A3 assertion FAIL
+160 ns  send_enable=1
+...</div><div class="row"><button class="btn primary" onclick="state.verifyTab='Failure Analysis';renderVerify()">Analyze failing cycle</button></div></div></div>`;
+ return failureAnalysisHTML();
+}
+
+function renderTrace(){
+ setTitle('Traceability','Spec → Requirement → Golden → Architecture Decision → uArch → RTL → Test 연결');
+ document.getElementById('content').innerHTML=`<div class="card panel">
+ <div class="hdr"><h3>End-to-End Trace · REQ-ENC-024</h3><span class="badge good">6/7 artifacts linked</span></div>
+ <div class="trace" style="padding:16px 0">
+  <div class="node" onclick="state.selectedClause='§5.4.8';go('spec')">Spec<br><b>§5.4.8</b></div><div>→</div>
+  <div class="node" onclick="state.selectedReq='REQ-ENC-024';go('req')">Requirement<br><b>REQ-ENC-024</b></div><div>→</div>
+  <div class="node" onclick="go('golden')">Golden<br><b>GM-024</b></div><div>→</div>
+  <div class="node" onclick="go('arch')">Decision<br><b>${state.approved?'DEC-012':'Pending'}</b></div><div>→</div>
+  <div class="node" onclick="go('uarch')">uArch<br><b>CR-MGR</b></div><div>→</div>
+  <div class="node" onclick="go('rtl')">RTL<br><b>${state.rtl?'credit_manager.sv':'Pending'}</b></div><div>→</div>
+  <div class="node" onclick="go('verify')">Tests<br><b>${state.rtl?'B1/B2':'Pending'}</b></div>
+ </div>
+ <table class="table"><tr><th>Artifact</th><th>ID / File</th><th>Source</th><th>Status</th></tr>
+ <tr><td>Spec</td><td>§5.4.8</td><td>ECSS-E-ST-50-12C</td><td><span class="badge good">Parsed</span></td></tr>
+ <tr><td>Requirement</td><td>REQ-ENC-024</td><td>ATOM-548-01/02</td><td><span class="badge good">Confirmed</span></td></tr>
+ <tr><td>Golden</td><td>GM-024</td><td>REQ-ENC-024</td><td><span class="badge good">3/3 PASS</span></td></tr>
+ <tr><td>Decision</td><td>${state.approved?'DEC-012':'—'}</td><td>Architecture Exploration</td><td>${state.approved?'<span class="badge good">Approved</span>':'<span class="badge warnbg">Pending</span>'}</td></tr>
+ <tr><td>uArch</td><td>credit-manager-contract</td><td>${state.approved?'DEC-012':'draft'}</td><td>${state.approved?'<span class="badge good">Locked</span>':'<span class="badge neutral">Draft</span>'}</td></tr>
+ <tr><td>RTL</td><td>${state.rtl?'credit_manager.sv':'—'}</td><td>uArch</td><td>${state.rtl?'<span class="badge good">Generated</span>':'<span class="badge neutral">Pending</span>'}</td></tr>
+ <tr><td>Verification</td><td>B1 / B2</td><td>Golden + uArch</td><td>${state.b1||state.b2?'<span class="badge good">Active</span>':'<span class="badge neutral">Pending</span>'}</td></tr></table>
+ </div>`;
+}
+
+function renderDecision(){
+ setTitle('Decision Log','스펙 모호성, Architecture 선택, rejected option, 판단 근거를 세션 간 누적');
+ document.getElementById('content').innerHTML=`<div class="grid2">
+ <section class="card panel"><div class="hdr"><h3>Decision Records</h3><button class="btn primary" onclick="toast('새 Decision draft를 생성했습니다.')">+ New Decision</button></div>
+ ${(state.decision013?[{id:'DEC-013',date:'2026-09-16',title:state.decision013.issue,status:state.decision013.status==='APPROVED'?'Approved':'Open',req:'REQ-ENC-024'}]:[]).concat(decisionLog).map(d=>`<div class="item" onclick="${d.id==='DEC-013'?'state.verifyTab=\'Failure Analysis\';go(\'verify\')':`showDecision('${d.id}')`}"><div class="row"><b>${d.id} · ${d.title}</b><span class="badge ${d.status==='Approved'?'good':'warnbg'}">${d.status}</span></div><span class="muted">${d.date} · ${d.req}</span></div>`).join('')}</section>
+ <section class="card panel"><div class="hdr"><h3>Decision Quality</h3><span class="badge neutral">SQLite backed</span></div>
+  <div class="meta"><div class="metabox"><span class="muted">Approved</span><b>18</b></div><div class="metabox"><span class="muted">Open</span><b>${state.openDecisions}</b></div><div class="metabox"><span class="muted">Reused</span><b>11</b></div><div class="metabox"><span class="muted">Escalated</span><b>3</b></div></div>
+  <div class="callout" style="margin-top:10px"><b>목적:</b> 같은 질문을 다음 세션에서 다시 판단하지 않도록 arbiter_judgments / uarch_decisions에 근거를 남깁니다.</div>
+  <div class="timeline" style="margin-top:13px"><div class="event"><b>DEC-012</b> standalone credit manager 승인</div><div class="event"><b>ARB-031</b> disconnect ambiguity 재사용</div><div class="event"><b>PAT-006</b> boundary counter overflow pattern 추가</div></div>
+ </section></div>`;
+}
+window.showDecision=id=>{
+ const d=decisionLog.find(x=>x.id===id);
+ openModal(id+' · '+d.title,`<div class="callout"><b>Status:</b> ${d.status}<br><b>Requirement:</b> ${d.req}<br><b>Reason:</b> ${d.reason}<br><b>Rejected:</b> ${d.rejected}</div>`);
+};
+
+function approveArchitecture(){
+ if(state.approved)return;
+ state.approved=true;state.openDecisions=Math.max(0,state.openDecisions-1);toast('Option '+state.option+' 승인 · DEC-012 기록');
+ render();
+}
+function showUarchContract(){
+ openModal('Micro-architecture Contract',`<div class="code">DEC-012
+selected_option = ${state.option}
+clock = 100 MHz
+MAX_CREDIT = 56
+credit_increment = 8
+input_event = fct_pulse
+consume_event = consume_char
+output = tx_credit[5:0], send_enable
+behavior = credit==0 => normal_char_blocked
+B1 = protocol behavior equivalence
+B2 = cycle/interface/timing/structure conformance</div>`);
+}
+function generateRTL(){
+ if(!state.approved){toast('Architecture 승인 후 RTL 생성이 가능합니다.');return}
+ if(state.rtl){toast('RTL은 이미 생성되었습니다.');return}
+ runJob('rtl_generation',()=>{state.rtl=true;resetCompilePipeline();toast('credit_manager.sv 생성 완료 · Compile 준비');render()});
+}
+function runVerify(kind){
+ if(!state.rtl){toast('먼저 RTL을 생성하세요.');return}
+ let key=kind==='b1'?'b1':'b2',target=kind==='b1'?85:68,v=0;
+ const iv=setInterval(()=>{v+=8;if(v>=target){v=target;clearInterval(iv);state[key]=target;toast((kind==='b1'?'B1 Functional':'B2 Implementation')+' verification 완료');render()}},80);
+}
+function runJob(name,cb){
+ state.jobs++;
+ const txt=document.getElementById('jobStatusText'),bad=document.getElementById('jobStatusBadge');
+ if(txt){txt.textContent=name+' running...';bad.textContent='RUNNING';bad.className='badge warnbg'}
+ toast(name+' 실행 시작');
+ setTimeout(()=>{if(cb)cb();else toast(name+' completed')},950);
+}
+
+let mvpCatalog=null,mvpBundle=null,mvpSelected='REQ-FC-E1',mvpTab='summary',mvpBusy=false,mvpLoading=false,mvpError='';
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+async function apiJson(url,options){
+ const response=await fetch(url,options),data=await response.json();
+ if(!response.ok){const error=new Error(data.error?.message||data.run?.status||`HTTP ${response.status}`);error.payload=data;throw error}return data;
+}
+async function loadMvp(){
+ if(mvpLoading)return;mvpLoading=true;mvpError='';renderMvp();
+ try{mvpCatalog=await apiJson('/api/catalog');try{mvpBundle=await apiJson('/api/latest')}catch(e){if(!String(e).includes('No test run'))throw e}}
+ catch(e){mvpError=e.message}finally{mvpLoading=false;renderMvp()}
+}
+function selectMvpRequirement(id){mvpSelected=id;mvpTab='summary';renderMvp()}
+function traceColumn(layer,items){
+ return `<div class="traceColumn ${layer}"><h4>${layer.toUpperCase()}</h4>${items.map(item=>`<button class="traceItem" onclick='openMvpSource(${JSON.stringify(item.file)},${item.start},${item.end},${JSON.stringify(item.symbol)})'><b>${esc(item.symbol)}</b><small>${esc(item.role)} · ${esc(item.file)} · L${item.start}-${item.end}</small></button>`).join('')}</div>`;
+}
+async function openMvpSource(path,start,end,symbol){
+ try{
+  const q=new URLSearchParams({path,focus_start:String(start),focus_end:String(end)}),data=await apiJson('/api/source?'+q);
+  const body=data.lines.map(line=>`<div class="sourceLine ${line.line>=data.focus_start&&line.line<=data.focus_end?'focus':''}"><span class="ln">${line.line}</span><span>${esc(line.text)||' '}</span></div>`).join('');
+  openModal(`${symbol} · L${start}-${end}`,`<div class="muted" style="margin-bottom:7px">${esc(path)} · highlighted trace target</div><div class="sourceView">${body}</div>`);
+ }catch(e){toast('Source open 실패: '+e.message)}
+}
+async function executeMvp(){
+ if(mvpBusy)return;mvpBusy=true;mvpError='';mvpTab='summary';renderMvp();
+ try{mvpBundle=await apiJson('/api/run',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});toast(`MVP run ${mvpBundle.run.status}`)}
+ catch(e){mvpBundle=e.payload?.run?e.payload:mvpBundle;mvpError=e.payload?.run?`Run completed: ${e.payload.run.status}`:e.message;if(!e.payload?.run){try{mvpBundle=await apiJson('/api/latest')}catch(_){}}}
+ finally{mvpBusy=false;renderMvp()}
+}
+function stageSummary(run){
+ if(!run)return '<div class="muted">실행 결과 없음</div>';
+ const labels={golden:'Golden scenario regression',rtl_compile:'RTL compile',rtl_simulation:'RTL simulation'};
+ return run.commands.map(command=>{
+  const passed=command.exit_code===0,detail=command.stage==='golden'?'147/147 Golden baseline':command.stage==='rtl_compile'?'Icarus SystemVerilog compile':`${run.tests.filter(t=>t.layer==='rtl'&&t.status==='PASS').length}/6 RTL checks`;
+  return `<div class="stageRow"><b>${labels[command.stage]||esc(command.stage)}</b><span class="badge ${passed?'good':'bad'}">${passed?'PASS':'FAIL'}</span><span>${esc(detail)}</span><span>${command.duration_seconds}s</span></div>`;
+ }).join('');
+}
+function executePane(run){
+ if(mvpTab==='summary')return stageSummary(run);
+ const keys={golden:'golden',compile:'rtl_compile',simulation:'rtl_simulation',stdout:'stdout'};
+ const text=mvpTab==='stdout'?mvpBundle?.log:mvpBundle?.stage_logs?.[keys[mvpTab]];
+ return `<pre class="mvpLog">${esc(text||'해당 단계 로그가 생성되지 않았습니다.')}</pre>`;
+}
+function valueAt(changes,time){let value=changes[0]||{integer:null,value:'x'};for(const change of changes){if(change.time>time)break;value=change}return value}
+function waveHtml(wave,config){
+ if(!wave)return '<div class="muted">waveform artifact 없음</div>';
+ const names=config.signals.filter(name=>wave.signals[name]),start=config.window_start,end=config.window_end,width=760,left=112,plot=620,rowH=42;
+ const x=time=>left+(Math.max(start,Math.min(end,time))-start)/(end-start)*plot;
+ let eventTime=null;const event=wave.signals[config.event_signal];if(event)eventTime=(event.changes||[]).find(c=>c.time>=start&&c.time<=end&&c.integer===1)?.time;
+ const rows=names.map((name,index)=>{
+  const changes=wave.signals[name].changes||[],base=30+index*rowH,inWindow=[valueAt(changes,start),...changes.filter(c=>c.time>start&&c.time<end)];
+  const binary=inWindow.every(c=>c.integer===0||c.integer===1),points=[];
+  for(let i=0;i<inWindow.length;i++){const current=inWindow[i],from=i===0?start:current.time,to=i+1<inWindow.length?inWindow[i+1].time:end,y=binary?(current.integer===1?base:base+20):base+10;points.push(`${i?'L':'M'}${x(from)},${y} L${x(to)},${y}`);if(i+1<inWindow.length){const next=inWindow[i+1],nextY=binary?(next.integer===1?base:base+20):base+10;points.push(`L${x(to)},${nextY}`)}}
+  const labels=binary?'':inWindow.map((c,i)=>`<text x="${x(i?c.time:start)+4}" y="${base+7}" fill="#9ee6b3" font-size="10">${esc(c.integer??c.value)}</text>`).join('');
+  return `<text x="10" y="${base+14}" fill="#d6e3f3" font-size="11">${esc(name)}</text><line x1="${left}" y1="${base+20}" x2="${left+plot}" y2="${base+20}" stroke="#31475e"/><path d="${points.join(' ')}" fill="none" stroke="${binary?'#68d5ff':'#66e08b'}" stroke-width="2"/>${labels}`;
+ }).join('');
+ const ticks=[0,.25,.5,.75,1].map(p=>{const tx=left+p*plot,t=start+p*(end-start);return `<line x1="${tx}" y1="15" x2="${tx}" y2="${names.length*rowH+26}" stroke="#22384f"/><text x="${tx-14}" y="${names.length*rowH+40}" fill="#8297ad" font-size="9">${Math.round(t/1000)} ns</text>`}).join('');
+ const marker=eventTime?`<line x1="${x(eventTime)}" y1="12" x2="${x(eventTime)}" y2="${names.length*rowH+24}" stroke="#ffd43b" stroke-width="2" stroke-dasharray="4 3"/><text x="${x(eventTime)+5}" y="18" fill="#ffd43b" font-size="10">VERDICT EVENT</text>`:'';
+ return `<svg class="mvpWave" viewBox="0 0 ${width} ${names.length*rowH+48}" role="img" aria-label="${esc(config.annotation)}">${ticks}${rows}${marker}</svg><div class="callout info" style="margin-top:8px"><b>What to inspect:</b> ${esc(config.annotation)}</div>`;
+}
+function testEvidence(req,run){
+ if(!run)return '<div class="muted">실행 결과 없음</div>';
+ const golden=run.tests.find(t=>t.id==='GOLDEN-BASELINE-147'),selected=run.tests.filter(t=>req.result_ids.includes(t.id)),rows=[];
+ if(golden)rows.push({id:'Golden scenario',expected:'Linked scenario passes',actual:golden.detail,status:golden.status});
+ selected.forEach(t=>rows.push({id:t.id,expected:req.behavior.expected,actual:t.detail,status:t.status}));
+ return `<table class="compactEvidence"><thead><tr><th>Evidence</th><th>Expected</th><th>Actual</th><th>Status</th></tr></thead><tbody>${rows.map(r=>`<tr><td><b>${esc(r.id)}</b></td><td>${esc(r.expected)}</td><td>${esc(r.actual)}</td><td><span class="badge ${r.status==='PASS'?'good':'bad'}">${esc(r.status)}</span></td></tr>`).join('')}</tbody></table><div class="artifactLinks"><a class="btn" href="/api/artifact?name=junit" target="_blank">Open JUnit</a><a class="btn" href="/api/artifact?name=vcd" target="_blank">Download VCD</a></div>`;
+}
+function renderMvp(){
+ setTitle('TX Credit Vertical Slice · Live','PDF provenance → highlighted source trace → executable evidence');
+ const content=document.getElementById('content');
+ if(!mvpCatalog&&!mvpLoading){content.innerHTML='<div class="card">Backend 연결 중…</div>';loadMvp();return}
+ if(!mvpCatalog){content.innerHTML=`<div class="card">${mvpLoading?'Backend 연결 중…':esc(mvpError)}</div>`;return}
+ const req=mvpCatalog.requirements.find(r=>r.id===mvpSelected)||mvpCatalog.requirements[0],run=mvpBundle?.run,status=run?.status||'NOT RUN',page=req.spec.pdf_pages[0];
+ content.innerHTML=`
+ <div class="card mvpHeader"><div><b>${esc(mvpCatalog.pilot.id)}</b> · ${esc(mvpCatalog.pilot.title)}<div class="muted">${esc(mvpCatalog.pilot.document)} · published ${esc(mvpCatalog.pilot.published)}</div></div><span class="badge neutral">REAL BACKEND</span></div>
+ <div class="mvpReqGrid"><div class="card"><h3>1. Requirement / Behavior</h3><div class="mvpReqTabs">${mvpCatalog.requirements.map(r=>`<button class="btn ${r.id===req.id?'primary':''}" onclick="selectMvpRequirement('${r.id}')">${r.id}</button>`).join('')}</div><h2 class="mvpReqTitle">${esc(req.id)} · ${esc(req.title)}</h2><div class="mvpProvenance"><b>ECSS §${esc(req.spec.clause)}</b><span>PDF page ${req.spec.pdf_pages.join(', ')}</span><span>Printed page ${req.spec.printed_pages.join(', ')}</span>${mvpCatalog.pilot.spec_available?`<a class="btn" href="/api/spec/pdf#page=${page}" target="_blank">Open PDF page ${page}</a>`:'<span class="badge warnbg">Local PDF not installed</span>'}</div><blockquote class="mvpQuote">${esc(req.spec.excerpt)}</blockquote><div class="muted">Authoritative source: ${esc(mvpCatalog.pilot.spec_asset)} · user-supplied, not distributed</div></div>
+ <div class="card"><h3>Derived executable behavior</h3><div class="mvpBehavior"><div><b>Trigger</b>${esc(req.behavior.trigger)}</div><div><b>Precondition</b>${esc(req.behavior.precondition)}</div><div><b>Expected</b>${esc(req.behavior.expected)}</div><div><b>Verdict</b>${esc(req.behavior.verdict)}</div></div><div class="previewMeta"><span class="chip">Observables</span>${req.observables.map(s=>`<span class="chip">${esc(s)}</span>`).join('')}</div></div></div>
+ <div class="card" style="margin-top:12px"><h3>2. Source Trace · click to open highlighted lines</h3><div class="traceGrid">${traceColumn('golden',req.trace.golden)}${traceColumn('rtl',req.trace.rtl)}${traceColumn('test',req.trace.test)}</div></div>
+ <div class="card" style="margin-top:12px"><h3>3. Execute / Result</h3><div class="executeHead"><button class="btn primary" ${mvpBusy?'disabled':''} onclick="executeMvp()">${mvpBusy?'Running…':'Run Golden + RTL Test'}</button><span class="badge ${status==='PASS'?'good':status==='FAIL'?'bad':'neutral'}">${status}</span><span class="muted">${run?`${esc(run.run_id)} · ${run.summary.passed}/${run.summary.total} PASS · ${run.duration_seconds}s`:'실행 결과 없음'}</span></div>${mvpError?`<div class="callout bad">${esc(mvpError)}</div>`:''}<div class="mvpTabs">${[['summary','Summary'],['golden','Golden'],['compile','Compile'],['simulation','Simulation'],['stdout','stdout.log']].map(([id,label])=>`<button class="${mvpTab===id?'active':''}" onclick="mvpTab='${id}';renderMvp()">${label}</button>`).join('')}</div><div class="mvpTabPane">${executePane(run)}</div></div>
+ <div class="evidenceGrid"><div class="card"><h3>4. Waveform · ${esc(req.id)}</h3>${waveHtml(mvpBundle?.waveform,req.waveform)}</div><div class="card"><h3>Test Evidence · ${esc(req.id)}</h3>${testEvidence(req,run)}</div></div>
+ <div class="card" style="margin-top:12px"><span class="badge neutral">MVP Preview · Not Connected</span> Diagram Service · Architecture/uArch editor · AI design · automatic root-cause analysis</div>`;
+}
+
+function render(){
+ const map={mvp:renderMvp,dashboard:renderDashboard,spec:renderSpec,req:renderReq,golden:renderGolden,diagram:renderDiagram,arch:renderArch,uarch:renderUarch,rtl:renderRTL,verify:renderVerify,trace:renderTrace,decision:renderDecision};
+ map[state.page]();
+}
+window.go=p=>{
+ state.page=p;
+ document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===p));
+ render();
+};
+document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>go(b.dataset.page));
+
+document.getElementById('globalSearch').addEventListener('keydown',e=>{
+ if(e.key!=='Enter')return;
+ const q=e.target.value.trim().toLowerCase();
+ const req=requirements.find(r=>r.id.toLowerCase().includes(q)||r.title.toLowerCase().includes(q));
+ const clause=clauses.find(c=>c.id.toLowerCase().includes(q)||c.title.toLowerCase().includes(q));
+ if(req){state.selectedReq=req.id;go('req');toast(req.id+'로 이동');}
+ else if(clause){state.selectedClause=clause.id;go('spec');toast(clause.id+'로 이동');}
+ else if(q.includes('credit')){state.selectedReq='REQ-ENC-024';go('req');toast('credit 관련 Requirement 표시');}
+ else toast('Mock dataset에서 검색 결과가 없습니다.');
+});
+render();
+</script>
+</body>
+</html>

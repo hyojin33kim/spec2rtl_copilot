@@ -1,0 +1,91 @@
+{
+  "schema_version": 2,
+  "pilot": {
+    "id": "PILOT-TX-CREDIT",
+    "title": "SpaceWire transmit-credit control",
+    "document": "ECSS-E-ST-50-12C Rev.1",
+    "published": "2019-05-15",
+    "spec_asset": "assets/spec/ECSS-E-ST-50-12C-Rev.1(15May2019).pdf",
+    "scope": "5.5.4.e.1, 5.5.4.e.2, 5.5.4.f, 5.5.4.h, 5.5.4.j, 5.5.5.a.2"
+  },
+  "requirements": [
+    {
+      "id": "REQ-FC-E1",
+      "title": "FCT increments transmit credit",
+      "spec": {"clause":"5.5.4.e.1","pdf_pages":[74],"printed_pages":[74],"excerpt":"Each time the data link layer receives an FCT from the encoding layer it increments its transmit credit count by eight."},
+      "behavior": {"trigger":"The encoding layer delivers one independent FCT.","precondition":"Link state is Connecting or Run and the increment does not exceed MAX_CREDIT.","expected":"tx_credit_next = tx_credit + 8.","verdict":"PASS when the observed transmit-credit delta is +8."},
+      "observables": ["got_fct", "tx_credit"],
+      "result_ids": ["REQ-FC-E1"],
+      "trace": {
+        "golden": [
+          {"file":"assets/golden/spw_ref_model.py","symbol":"SpWLink.on_char","start":619,"end":630,"role":"credit oracle"},
+          {"file":"assets/golden/spw_ref_model_test_v5.py","symbol":"scenario_3_flow_control","start":230,"end":268,"role":"Golden scenario"}
+        ],
+        "rtl": [{"file":"assets/rtl/spw_datalink_v2.sv","symbol":"r_tx_credit","start":657,"end":680,"role":"sequential implementation"}],
+        "test": [{"file":"tests/rtl/tb_credit_mvp.sv","symbol":"REQ-FC-E1","start":125,"end":129,"role":"executable check"}]
+      },
+      "waveform": {"signals":["got_fct","tx_credit"],"event_signal":"got_fct","window_start":400000,"window_end":425000,"annotation":"FCT event: tx_credit 8 → 16"}
+    },
+    {
+      "id": "REQ-FC-E2",
+      "title": "N-Char transmission decrements credit",
+      "spec": {"clause":"5.5.4.e.2","pdf_pages":[74],"printed_pages":[74],"excerpt":"Whenever the data link layer sends an N-Char to the encoding layer it decrements its transmit credit count by one."},
+      "behavior": {"trigger":"The data link layer accepts one N-Char for transmission.","precondition":"Link state is Run and tx_credit is greater than zero.","expected":"tx_credit_next = tx_credit - 1.","verdict":"PASS when send_nchar is asserted and the observed credit delta is -1."},
+      "observables": ["send_nchar", "tx_credit"],
+      "result_ids": ["REQ-FC-E2"],
+      "trace": {
+        "golden": [
+          {"file":"assets/golden/spw_ref_model.py","symbol":"SpWLink.note_tx_char_sent","start":645,"end":657,"role":"credit oracle"},
+          {"file":"assets/golden/spw_ref_model_test_v5.py","symbol":"scenario_3_flow_control","start":230,"end":268,"role":"Golden scenario"}
+        ],
+        "rtl": [
+          {"file":"assets/rtl/spw_datalink_v2.sv","symbol":"w_send_nchar / r_tx_credit","start":673,"end":684,"role":"send and decrement"},
+          {"file":"assets/rtl/spw_datalink_v2.sv","symbol":"w_send_nchar","start":873,"end":891,"role":"send arbitration"}
+        ],
+        "test": [{"file":"tests/rtl/tb_credit_mvp.sv","symbol":"REQ-FC-E2","start":131,"end":140,"role":"executable check"}]
+      },
+      "waveform": {"signals":["send_nchar","tx_credit"],"event_signal":"send_nchar","window_start":430000,"window_end":455000,"annotation":"N-Char accepted: tx_credit 5 → 4"}
+    },
+    {
+      "id": "REQ-FC-F",
+      "title": "Zero credit blocks N-Char transmission",
+      "spec": {"clause":"5.5.4.f","pdf_pages":[74],"printed_pages":[74],"excerpt":"If the transmit credit count reaches zero, the data link layer shall cease sending N-Chars until it receives another FCT."},
+      "behavior": {"trigger":"An N-Char is pending for transmission.","precondition":"Link state is Run and tx_credit equals zero.","expected":"send_nchar = 0, nchar_ready = 0 and tx_credit remains zero.","verdict":"PASS when the pending N-Char is not accepted."},
+      "observables": ["nchar_valid", "nchar_ready", "send_nchar", "tx_credit"],
+      "result_ids": ["REQ-FC-F"],
+      "trace": {
+        "golden": [
+          {"file":"assets/golden/spw_ref_model.py","symbol":"SpWNode._select_next_tx_char","start":1039,"end":1047,"role":"Golden send gate"},
+          {"file":"assets/golden/spw_ref_model_test_v5.py","symbol":"scenario_3_flow_control","start":230,"end":268,"role":"Golden scenario"}
+        ],
+        "rtl": [
+          {"file":"assets/rtl/spw_datalink_v2.sv","symbol":"w_send_nchar","start":873,"end":883,"role":"credit gate"},
+          {"file":"assets/rtl/spw_datalink_v2.sv","symbol":"ow_nchar_ready","start":955,"end":966,"role":"interface observable"}
+        ],
+        "test": [{"file":"tests/rtl/tb_credit_mvp.sv","symbol":"REQ-FC-F","start":142,"end":152,"role":"executable check"}]
+      },
+      "waveform": {"signals":["nchar_valid","nchar_ready","send_nchar","tx_credit"],"event_signal":"nchar_valid","window_start":455000,"window_end":485000,"annotation":"Pending N-Char blocked at zero credit"}
+    },
+    {
+      "id": "REQ-FC-HJ",
+      "title": "Credit bound and overflow error",
+      "spec": {"clause":"5.5.4.h / 5.5.4.j / 5.5.5.a.2","pdf_pages":[75],"printed_pages":[75],"excerpt":"The transmit credit count shall have a maximum value of 56. An FCT that causes it to exceed the maximum shall raise a credit error."},
+      "behavior": {"trigger":"An FCT is received when tx_credit is 56.","precondition":"Link state is Connecting or Run.","expected":"credit_error = 1 and tx_credit remains 56.","verdict":"PASS when overflow is detected combinationally and the state does not exceed MAX_CREDIT."},
+      "observables": ["got_fct", "tx_credit", "credit_error", "tx_credit_overflow"],
+      "result_ids": ["REQ-FC-HJ-COMB", "REQ-FC-HJ-STATE"],
+      "trace": {
+        "golden": [
+          {"file":"assets/golden/spw_ref_model.py","symbol":"SpWLink.MAX_CREDIT","start":459,"end":460,"role":"Golden bound"},
+          {"file":"assets/golden/spw_ref_model.py","symbol":"SpWLink.on_char","start":619,"end":630,"role":"overflow oracle"},
+          {"file":"assets/golden/spw_ref_model_test_v5.py","symbol":"scenario_9_credit_error_injection","start":571,"end":607,"role":"Golden scenario"}
+        ],
+        "rtl": [
+          {"file":"assets/rtl/spw_datalink_v2.sv","symbol":"w_tx_credit_err","start":642,"end":655,"role":"overflow detection"},
+          {"file":"assets/rtl/spw_datalink_v2.sv","symbol":"r_tx_credit","start":657,"end":685,"role":"bounded state update"}
+        ],
+        "test": [{"file":"tests/rtl/tb_credit_mvp.sv","symbol":"REQ-FC-HJ","start":173,"end":190,"role":"combinational and state checks"}]
+      },
+      "waveform": {"signals":["got_fct","tx_credit","credit_error","tx_credit_overflow"],"event_signal":"credit_error","window_start":525000,"window_end":555000,"annotation":"Overflow attempt: error asserted, tx_credit remains 56"}
+    }
+  ]
+}

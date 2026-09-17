@@ -1,0 +1,39 @@
+schema_version: 1
+snapshot_id: spacewire-flow-control-2026-09-17
+captured_at: "2026-09-17T13:26:38+09:00"
+policy:
+  implementation_source: spec2rtl/spacewire
+  copied_assets_immutable: true
+  editable_root: spec2rtl_copilot
+  pilot_scope: ECSS-E-ST-50-12C-Rev.1-5.5.4.e-f-h-j
+
+origins:
+  implementation:
+    path: /home/hyojinkim/work/3_Company_PJT/spec2rtl/spacewire
+    git_commit: 8000a3581184107912498fe159bdf7441543ba66
+    worktree_note: ".gitignore had a pre-existing local modification; imported files are content-addressed below"
+  specification:
+    expected_local_path: assets/spec/ECSS-E-ST-50-12C-Rev.1(15May2019).pdf
+    sha256: e1732409cfc337c47299742c8d63706c2fd2cb865bc2d079a291cf2147fb364b
+    repository_commit: 45e224db6ae4f4de7413d8f7ee50e9587f0ef72d
+    role: authoritative_document_only
+    distribution: user_supplied_not_tracked
+  ui_mock:
+    path: /home/hyojinkim/work/3_Company_PJT/spec2rtl_harness_demo_v1_7_4.html
+
+toolchain:
+  python: "3.13.14"
+  iverilog: "12.0 stable"
+  vvp: "12.0 stable"
+  systemverilog_standard: g2005-sv
+
+baseline_commands:
+  golden: "cd assets/golden && python3 spw_ref_model_test_v5.py"
+  rtl: "cd ../spec2rtl/spacewire && bash .claude/hooks/post-edit-sv.sh rtl/spw_datalink_v2.sv"
+  integrity: "sha256sum --check manifests/SHA256SUMS"
+
+expected_results:
+  golden: "PASS 147 / FAIL 0"
+  rtl: "16/16 RTL testbenches passed"
+
+integrity_manifest: manifests/SHA256SUMS
