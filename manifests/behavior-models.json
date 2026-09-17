@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "models": [
+    {
+      "id": "BEH-TX-CREDIT",
+      "title": "Transmit-credit accounting",
+      "kind": "behavioral_state_abstraction",
+      "implementation_note": "Counter-state abstraction for verification; not an RTL control FSM.",
+      "variable": {"name": "tx_credit", "minimum": 0, "maximum": 56},
+      "states": [
+        {"id": "EMPTY", "label": "EMPTY", "invariant": "tx_credit == 0", "x": 70, "y": 112},
+        {"id": "AVAILABLE", "label": "AVAILABLE", "invariant": "1 <= tx_credit <= 55", "x": 220, "y": 112},
+        {"id": "MAX", "label": "MAX", "invariant": "tx_credit == 56", "x": 370, "y": 112}
+      ],
+      "transitions": [
+        {"id": "receive_fct", "from": "EMPTY", "to": "AVAILABLE", "event": "got_fct", "guard": "tx_credit <= 48", "action": "tx_credit += 8", "trace_ids": ["REQ-FC-E1"]},
+        {"id": "receive_fct_increment", "from": "AVAILABLE", "to": "AVAILABLE", "event": "got_fct", "guard": "1 <= tx_credit < 48", "action": "tx_credit += 8", "trace_ids": ["REQ-FC-E1"]},
+        {"id": "send_decrement", "from": "AVAILABLE", "to": "AVAILABLE", "event": "send_nchar", "guard": "tx_credit > 1", "action": "tx_credit -= 1", "trace_ids": ["REQ-FC-E2"]},
+        {"id": "send_to_empty", "from": "AVAILABLE", "to": "EMPTY", "event": "send_nchar", "guard": "tx_credit == 1", "action": "tx_credit = 0", "trace_ids": ["REQ-FC-E2"]},
+        {"id": "send_from_max", "from": "MAX", "to": "AVAILABLE", "event": "send_nchar", "guard": "tx_credit == 56", "action": "tx_credit = 55", "trace_ids": ["REQ-FC-E2"]},
+        {"id": "block_at_empty", "from": "EMPTY", "to": "EMPTY", "event": "nchar_valid", "guard": "tx_credit == 0", "action": "send_nchar = 0", "trace_ids": ["REQ-FC-F"]},
+        {"id": "reach_max", "from": "AVAILABLE", "to": "MAX", "event": "got_fct", "guard": "tx_credit == 48", "action": "tx_credit = 56", "trace_ids": ["REQ-FC-E1", "REQ-FC-HJ"]},
+        {"id": "overflow_above_48", "from": "AVAILABLE", "to": "AVAILABLE", "event": "got_fct", "guard": "49 <= tx_credit <= 55", "action": "credit_error = 1; tx_credit unchanged", "trace_ids": ["REQ-FC-HJ"]},
+        {"id": "overflow_at_max", "from": "MAX", "to": "MAX", "event": "got_fct", "guard": "tx_credit == 56", "action": "credit_error = 1; tx_credit unchanged", "trace_ids": ["REQ-FC-HJ"]}
+      ]
+    }
+  ]
+}

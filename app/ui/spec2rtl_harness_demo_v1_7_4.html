@@ -346,7 +346,6 @@ button.uiPending::after{
 .specPaneHead h3{margin:0}.specViewport{height:500px;overflow:auto;background:#cbd5e1;padding:12px;scroll-behavior:smooth}
 .specPage{position:relative;width:100%;max-width:720px;margin:0 auto;box-shadow:0 4px 18px rgba(15,32,52,.2);line-height:0;background:white}
 .specPage img{display:block;width:100%;height:auto}.specHighlight{position:absolute;background:rgba(255,218,57,.36);border:2px solid #f5b800;box-shadow:0 0 0 1px rgba(255,255,255,.7) inset;pointer-events:none;line-height:1.2}
-.specHighlight span{position:absolute;right:-2px;top:-20px;background:#eaa900;color:#fff;padding:3px 6px;border-radius:4px 4px 0 0;font:8.5px var(--sans);white-space:nowrap}
 .specMissing{display:flex;min-height:420px;align-items:center;justify-content:center;text-align:center;padding:30px;color:#64778d;background:#f8fafc}
 .traceGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}
 .traceColumn{border:1px solid #dfe7f0;border-radius:9px;overflow:hidden;background:#fff}
@@ -367,25 +366,67 @@ button.uiPending::after{
 .artifactLinks{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
 @media(max-width:1100px){.mvpReqGrid,.evidenceGrid{grid-template-columns:1fr}.traceGrid{grid-template-columns:1fr}.mvpBehavior{grid-template-columns:1fr}}
 
+/* W10-W13: Vivado-inspired live trace workspace */
+.traceShell{display:grid;grid-template-columns:245px minmax(0,1fr);gap:8px;height:calc(100vh - 112px);min-height:700px}
+.traceNavigator,.dockPane{background:#fff;border:1px solid #bcc9d8;border-radius:4px;min-width:0;min-height:0;overflow:hidden;box-shadow:0 1px 3px rgba(27,49,74,.05)}
+.traceNavigator{display:flex;flex-direction:column}
+.dockHead{height:34px;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 9px;background:#eef2f6;border-bottom:1px solid #c9d3df;color:#1c3552;font-size:11px;font-weight:850}
+.dockTools{display:flex;gap:3px}.dockTools button{border:0;background:transparent;color:#62748a;padding:2px 5px;border-radius:3px;font-size:12px}.dockTools button:hover{background:#dce7f3;color:#174f99}
+.traceTree{padding:8px;overflow:auto;flex:1;font-size:11px}.treeGroup{margin-bottom:4px}.treeRow{display:flex;align-items:center;gap:6px;padding:6px 7px;border-radius:4px;color:#314b69}.treeRow.branch{font-weight:800}.treeRow.selectable{cursor:pointer}.treeRow.selectable:hover{background:#edf4fc}.treeRow.selected{background:#d8eaff;color:#0e56b4;font-weight:850}.treeIndent{padding-left:18px}.treeMeta{margin-left:auto;font-size:8px;color:#8292a6}.treeIcon{width:13px;text-align:center;color:#54769c}
+.traceNavSearch{border-top:1px solid #d4dde7;padding:7px}.traceNavSearch input{width:100%;border:1px solid #cbd7e3;border-radius:4px;padding:7px 8px;font-size:10px}
+.traceWorkspace{display:grid;grid-template-columns:38fr 32fr 30fr;grid-template-rows:40fr 32fr 28fr;gap:2px;min-width:0;min-height:0;position:relative;background:#fff}
+.dockPane{display:flex;flex-direction:column}.dockBody{flex:1;min-height:0;overflow:auto;padding:9px}.dockPane.maximized{position:fixed;inset:70px 24px 24px 244px;z-index:40;box-shadow:0 18px 60px rgba(18,39,66,.32)}.dockPane.collapsed .dockBody{display:none}.dockPane.collapsed{min-height:34px!important}
+.specDock{grid-column:1;grid-row:1}.fsmDock{grid-column:2;grid-row:1}.propertyDock{grid-column:3;grid-row:1}.goldenDock{grid-column:1 / span 1;grid-row:2}.rtlDock{grid-column:2 / span 2;grid-row:2}.waveDock{grid-column:1 / span 3;grid-row:3}
+.specDock .dockBody{padding:0;background:#cad3de}.specDock .specViewport{height:100%;padding:8px}.specDock .specPage{max-width:none}.specToolbar{height:34px;display:flex;align-items:center;gap:5px;padding:0 7px;background:#f4f6f8;border-bottom:1px solid #aebdcd;color:#273d56;font-size:12px}.specToolbar button{width:28px;height:26px;border:1px solid #b9c6d3;background:#fff;color:#263d57;border-radius:2px;font-size:15px;font-weight:700}.specToolbar button:disabled{opacity:.4}.specPageCount{min-width:70px;text-align:center;font:12px var(--mono);color:#263d57}.specZoom{min-width:46px;text-align:center;font:11px var(--mono);color:#374151}
+.traceProperties{display:grid;grid-template-columns:88px 1fr;font-size:10px}.traceProperties dt,.traceProperties dd{margin:0;padding:7px;border-bottom:1px solid #e1e7ee}.traceProperties dt{color:#64778e;background:#f8fafc}.traceProperties dd{font-weight:750;overflow-wrap:anywhere}
+.fsmSurface{height:100%;min-height:205px;display:flex;flex-direction:column;background:#fbfdff}.fsmSurface svg{width:100%;flex:1;min-height:165px}.fsmLegend{border-top:1px solid #dce4ec;padding:5px 7px;background:#fff;font:8.5px/1.35 var(--mono)}.fsmLegend b{color:#9a6700}.reviewFlag{display:inline-block;background:#fff2ce;color:#8b5b00;border:1px solid #efd07a;padding:3px 6px;border-radius:4px;font-size:8px}
+.sourceDockBody{display:flex;flex-direction:column;padding:0!important}.sourceTabs{height:32px;display:flex;align-items:end;gap:2px;padding:4px 5px 0;background:#e9edf2;border-bottom:1px solid #aebdcd;overflow-x:auto}.sourceTab{height:27px;display:flex;align-items:center;gap:7px;border:1px solid #b8c4d0;border-bottom:0;background:#dfe5eb;color:#374151;padding:0 9px;font:11px var(--mono);white-space:nowrap}.sourceTab.active{background:#fff;color:#1f2937;border-color:#9daebe}.sourceTab .close{opacity:.55}.inlineSource{margin:0;background:#fff;color:#172033;font:11px/1.55 var(--mono);height:100%;overflow:auto;padding:0}.inlineSource .sourceLine{padding:0;grid-template-columns:42px minmax(max-content,1fr);min-width:max-content}.inlineSource .sourceLine .ln{position:sticky;left:0;background:#e5e7eb;color:#4b5563;border-right:1px solid #c7cdd4;padding:0 7px 0 2px;z-index:2}.inlineSource .sourceLine .src{padding:0 9px;min-width:max-content}.inlineSource .sourceLine.focus{background:#fff1a8;color:#172033;border-left:0}.inlineSource .sourceLine.focus .ln{background:#d9dde3;color:#1f2937}.synKw{color:#005cc5;font-weight:600}.synNum{color:#9c36b5}.synStr{color:#a31515}.synCom{color:#237a3b;font-style:italic}.synMacro{color:#7b3fb3}
+.gridSplitter{position:absolute;z-index:18;background:transparent;touch-action:none;outline:none}.gridSplitter::after{content:"";position:absolute;background:#1769e0;opacity:0;transition:opacity .1s}.gridSplitter:hover::after,.gridSplitter:focus-visible::after{opacity:1}.gridSplitter.vertical{top:0;height:var(--row1);width:8px;transform:translateX(-4px);cursor:col-resize}.gridSplitter.vertical::after{top:0;bottom:0;left:3px;width:2px}.gridSplitter.horizontal{left:0;right:0;height:8px;transform:translateY(-4px);cursor:row-resize}.gridSplitter.horizontal::after{left:0;right:0;top:3px;height:2px}.gridSplitter span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+.waveDock .dockBody{padding:6px;background:#0d1b2a}.waveDock .callout{display:none}.traceStatus{position:fixed;left:222px;right:0;bottom:0;height:27px;z-index:20;display:flex;align-items:center;gap:14px;padding:0 12px;background:#f8fafc;border-top:1px solid #c7d2de;font-size:9px}.traceStatus a{color:#075ecb;font-weight:800;cursor:pointer}.traceStatus .push{margin-left:auto}
+.runShell{display:grid;grid-template-columns:minmax(0,1fr);gap:10px}.runNotice{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;border:1px solid #cfe0f5;background:#f3f8ff;border-radius:7px}.runTraceContext{font:10px var(--mono);color:#4c6480}
+@media(max-width:1200px){.traceShell{grid-template-columns:205px minmax(0,1fr)}.traceWorkspace{grid-template-columns:1fr 1fr;grid-template-rows:320px 260px 240px 190px}.specDock{grid-column:1}.fsmDock{grid-column:2}.propertyDock{grid-column:1;grid-row:2}.goldenDock{grid-column:2;grid-row:2}.rtlDock{grid-column:1 / span 2;grid-row:3}.waveDock{grid-column:1 / span 2;grid-row:4}.traceStatus{left:186px}.dockPane.maximized{left:205px}}
+
+/* G1 visual alignment: compact desktop IDE + hover-expand navigation rail */
+body{font-family:Arial,"Segoe UI",sans-serif;font-size:12px;background:#e9edf2;color:#172c45}
+button:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:2px solid #0b63ce;outline-offset:1px}
+.app{grid-template-columns:48px minmax(0,1fr)}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:48px;height:100vh;padding:8px 5px;background:#f8fafc;border-right:1px solid #aebccc;overflow:hidden;transition:width .16s ease;z-index:50;box-shadow:1px 0 3px rgba(25,48,74,.08)}
+.sidebar:hover,.sidebar:focus-within{width:224px;box-shadow:5px 0 18px rgba(25,48,74,.18)}
+.brand{height:42px;margin:0 0 8px;gap:8px;white-space:nowrap}.logo{min-width:36px;width:36px;height:30px;border-radius:3px;background:#2c65a2;font-size:12px}.brandLabel{opacity:0;transition:opacity .1s;line-height:1.1}.sidebar:hover .brandLabel,.sidebar:focus-within .brandLabel{opacity:1}
+.nav button{height:34px;padding:6px 7px;border-radius:3px;display:flex;align-items:center;gap:9px;white-space:nowrap;overflow:hidden;margin:1px 0}
+.navIcon{width:28px;min-width:28px;text-align:center;font-size:14px}.navLabel{opacity:0;transition:opacity .1s;font-size:12px;color:#263d57}.sidebar:hover .navLabel,.sidebar:focus-within .navLabel{opacity:1}
+.sidebar-foot{display:none}.sidebar:hover .sidebar-foot{display:block;left:8px;right:8px;bottom:10px;border-radius:4px}
+.main{grid-column:2;padding:8px 9px;min-width:0}.topbar{height:54px;margin-bottom:6px;padding:0 5px}.topbar.traceCompact{display:none}.topbar.traceCompact + #content .traceShell{height:calc(100vh - 16px);min-height:0}.titlewrap h1{font-size:18px}.titlewrap .sub{font-size:10px}.titlewrap .sub:empty{display:none}.btn{border-radius:3px;padding:6px 9px;font-size:10px}
+.traceShell{grid-template-columns:216px minmax(0,1fr);gap:6px;height:calc(100vh - 78px);min-height:690px;position:relative}.traceWorkspace{grid-template-columns:38fr 32fr 30fr;grid-template-rows:40fr 32fr 28fr;gap:2px;--row1:40%;--row2:32%;--code-split:50%}
+.traceNavigator,.dockPane{border-radius:1px;border-color:#aebdcd;box-shadow:none}.dockPane{margin:0}.dockHead{height:34px;min-height:34px;padding:0 8px;background:#edf0f3;border-color:#b8c4d1;font-size:12px;color:#243b55}.dockBody{padding:7px}.traceTree{padding:6px;font-size:12px}.treeRow{padding:7px;border-radius:2px;color:#243b55}.treeRow.selected{background:#bcd9fb;color:#163f6d}.docIcon{position:relative;width:14px;height:16px;min-width:14px;border:1px solid #2471bb;border-radius:1px;background:linear-gradient(#eaf5ff,#9bc9f3)}.docIcon:after{content:"";position:absolute;left:2px;right:2px;top:4px;height:1px;background:#fff;box-shadow:0 3px #fff,0 6px #fff}
+.dockPane.contextSelected{position:relative;z-index:4;border:1px solid #2d74bf}.dockPane.contextSelected .dockHead{background:#dcecff}
+.dockHead strong{font-weight:800;color:#172c45}.dockDetail{font-weight:400;color:#374151;margin-left:5px}.dockTools button{min-width:21px;min-height:22px}
+.treeText{display:flex;flex-direction:column;gap:2px}.treeText b{font-size:12px}.treeText small{font-size:11px;color:#374151;font-weight:400;line-height:1.25}.traceNavSearch input{font-size:12px;color:#1f2937}
+.traceStatus{left:48px;height:25px;background:#f4f6f8;border-color:#aebdcb}.dockPane.maximized{left:58px;inset-block:62px 30px}.reviewFlag{border-radius:2px}
+.traceProperties{font-size:11px}.fsmLegend{font-size:10.5px;color:#263d57}.waveToolbar{height:28px;display:flex;align-items:center;gap:10px;padding:0 8px;background:#182535;border-bottom:1px solid #34475c;color:#d1d9e2;font:11px var(--mono)}.waveToolbar b{color:#fff}.waveToolbar a{color:#8ec5ff;font-weight:700}.waveViewer{background:#07131f;border:1px solid #26384a}.waveDock .dockBody{padding:0}.mvpWave{display:block;border-radius:0;background:#07131f}
+.navWidthHandle{position:absolute;top:0;bottom:0;left:212px;width:8px;z-index:22;cursor:col-resize;background:transparent;touch-action:none;outline:none}.navWidthHandle::after,.codeSplitter::after{content:"";position:absolute;top:0;bottom:0;left:50%;width:2px;transform:translateX(-50%);background:#1769e0;opacity:0;transition:opacity .1s}.navWidthHandle:hover::after,.navWidthHandle:focus-visible::after,.codeSplitter:hover::after,.codeSplitter:focus-visible::after{opacity:1}.codeRow{grid-column:1 / span 3;grid-row:2;display:grid;grid-template-columns:50fr 50fr;gap:2px;position:relative;min-width:0;min-height:0}.codeRow .dockPane{position:relative;inset:auto;width:auto;height:auto;min-width:0;min-height:0;grid-column:auto;grid-row:auto}.codeSplitter{position:absolute;top:0;bottom:0;z-index:24;width:8px;transform:translateX(-50%);cursor:col-resize;background:transparent;touch-action:none;outline:none}
+@media(max-width:1200px){.app{grid-template-columns:48px minmax(0,1fr)}.sidebar{position:fixed;width:48px;height:100vh}.sidebar:hover{width:224px}.traceShell{grid-template-columns:220px minmax(0,1fr)}.traceStatus{left:48px}.dockPane.maximized{left:58px}}
+
 </style>
 </head>
 <body>
 <div class="app">
   <aside class="sidebar">
-    <div class="brand"><div class="logo">S2</div><div>Spec2RTL<br><span style="font-size:10px;color:#73849a;font-weight:600">Harness Demo V1.7.4</span></div></div>
+    <div class="brand"><div class="logo">S2</div><div class="brandLabel">Spec2RTL<br><span style="font-size:10px;color:#73849a;font-weight:600">Harness Demo V1.7.4</span></div></div>
     <div class="nav" id="nav">
-      <button class="active" data-page="mvp">🧪 MVP Live</button>
-      <button data-page="dashboard">🏠 Dashboard · Mock</button>
-      <button data-page="spec">📄 Specification</button>
-      <button data-page="req">📋 Requirements</button>
-      <button data-page="golden">🧊 Golden Model</button>
-      <button data-page="diagram">🖼 Diagram · Preview</button>
-      <button data-page="arch">🧩 Architecture · Preview</button>
-      <button data-page="uarch">⚙️ uArch · Preview</button>
-      <button data-page="rtl">▣ RTL</button>
-      <button data-page="verify">✅ Verification</button>
-      <button data-page="trace">🔗 Traceability</button>
-      <button data-page="decision">🗂 Decision Log</button>
+      <button class="active" data-page="mvp" title="Trace Explorer"><span class="navIcon">⌘</span><span class="navLabel">Trace Explorer</span></button>
+      <button data-page="mvp-run" title="Verification Run"><span class="navIcon">▶</span><span class="navLabel">Verification Run</span></button>
+      <button data-page="dashboard" title="Dashboard Mock"><span class="navIcon">⌂</span><span class="navLabel">Dashboard · Mock</span></button>
+      <button data-page="spec" title="Specification"><span class="navIcon">▤</span><span class="navLabel">Specification</span></button>
+      <button data-page="req" title="Requirements"><span class="navIcon">☷</span><span class="navLabel">Requirements</span></button>
+      <button data-page="golden" title="Golden Model"><span class="navIcon">◇</span><span class="navLabel">Golden Model</span></button>
+      <button data-page="diagram" title="Diagram Preview"><span class="navIcon">▧</span><span class="navLabel">Diagram · Preview</span></button>
+      <button data-page="arch" title="Architecture Preview"><span class="navIcon">⊞</span><span class="navLabel">Architecture · Preview</span></button>
+      <button data-page="uarch" title="uArch Preview"><span class="navIcon">⚙</span><span class="navLabel">uArch · Preview</span></button>
+      <button data-page="rtl" title="RTL"><span class="navIcon">▣</span><span class="navLabel">RTL</span></button>
+      <button data-page="verify" title="Verification Mock"><span class="navIcon">✓</span><span class="navLabel">Verification · Mock</span></button>
+      <button data-page="trace" title="Traceability"><span class="navIcon">↔</span><span class="navLabel">Traceability</span></button>
+      <button data-page="decision" title="Decision Log"><span class="navIcon">▥</span><span class="navLabel">Decision Log</span></button>
     </div>
     <div class="sidebar-foot"><b>SpaceWire Project</b><br>ECSS-E-ST-50-12C<br><span style="opacity:.76">Interactive prototype · local only</span></div>
   </aside>
@@ -397,7 +438,6 @@ button.uiPending::after{
         <div class="sub" id="pageSub">Spec → Requirement → Golden → Architecture → uArch → RTL → Verification</div>
       </div>
       <div class="actions">
-        <input class="search" id="globalSearch" placeholder="검색: REQ-ENC-024, §5.4.8, credit..." />
         <button class="btn" id="resetBtn">Reset</button>
         <button class="btn primary" id="quickJobBtn">+ Run Job</button>
       </div>
@@ -425,6 +465,9 @@ const __uiDelayPending = new WeakSet();
 document.addEventListener('click', function(ev){
   const btn = ev.target.closest && ev.target.closest('button');
   if(!btn) return;
+
+  // IDE navigation controls must react immediately.
+  if(btn.closest('.dockTools,.specToolbar,.sourceTabs')) return;
 
   // Let the delayed synthetic click execute normally.
   if(__uiDelayBypass.has(btn)){
@@ -509,7 +552,7 @@ function openModal(title,html){document.getElementById('modalTitle').textContent
 document.getElementById('closeModal').onclick=()=>document.getElementById('modalBack').style.display='none';
 document.getElementById('modalBack').onclick=e=>{if(e.target.id==='modalBack')e.currentTarget.style.display='none'};
 document.getElementById('resetBtn').onclick=()=>location.reload();
-document.getElementById('quickJobBtn').onclick=()=>runJob('regression_suite');
+document.getElementById('quickJobBtn').onclick=()=>go('mvp-run');
 
 function flow(){
  return `<div class="flow">
@@ -2031,18 +2074,72 @@ function runJob(name,cb){
  setTimeout(()=>{if(cb)cb();else toast(name+' completed')},950);
 }
 
-let mvpCatalog=null,mvpBundle=null,mvpSelected='REQ-FC-E1',mvpTab='summary',mvpBusy=false,mvpLoading=false,mvpError='';
+let mvpCatalog=null,mvpBundle=null,mvpSelected='REQ-FC-E2',mvpTab='summary',mvpBusy=false,mvpLoading=false,mvpError='';
+let selectionContext={trace_id:'REQ-FC-E2',clause:null,symbol:null,event:null,layer:'requirement'};
+const mvpSourceCache={};
+let mvpSpecPage=null,mvpSpecZoom=1,sourceTabIndex={golden:0,rtl:0};
+let gridRatios={cols:[38,32,30],rows:[40,32,28]},traceNavWidth=216,codeSplit=50;
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 async function apiJson(url,options){
  const response=await fetch(url,options),data=await response.json();
  if(!response.ok){const error=new Error(data.error?.message||data.run?.status||`HTTP ${response.status}`);error.payload=data;throw error}return data;
 }
 async function loadMvp(){
- if(mvpLoading)return;mvpLoading=true;mvpError='';renderMvp();
+ if(mvpLoading)return;mvpLoading=true;mvpError='';render();
  try{mvpCatalog=await apiJson('/api/catalog');try{mvpBundle=await apiJson('/api/latest')}catch(e){if(!String(e).includes('No test run'))throw e}}
- catch(e){mvpError=e.message}finally{mvpLoading=false;renderMvp()}
+ catch(e){mvpError=e.message}finally{
+  mvpLoading=false;
+  const req=mvpCatalog?.requirements.find(r=>r.id===mvpSelected)||mvpCatalog?.requirements[0];
+  if(req){mvpSelected=req.id;mvpSpecPage=req.spec.pdf_pages[0];selectionContext={trace_id:req.trace_id||req.id,clause:req.spec.clause,symbol:null,event:req.waveform.event_signal,layer:'requirement'}}
+  render();if(req)loadTraceSources(req);
+ }
 }
-function selectMvpRequirement(id){mvpSelected=id;mvpTab='summary';renderMvp()}
+function publishSelection(next){
+ selectionContext={...selectionContext,...next};
+ document.dispatchEvent(new CustomEvent('trace:select',{detail:{...selectionContext}}));
+}
+function selectMvpRequirement(id){
+ mvpSelected=id;mvpTab='summary';
+ const req=mvpCatalog?.requirements.find(r=>r.id===id);
+ mvpSpecPage=req?.spec?.pdf_pages?.[0]||null;mvpSpecZoom=1;sourceTabIndex={golden:0,rtl:0};
+ publishSelection({trace_id:req?.trace_id||id,clause:req?.spec?.clause||null,symbol:null,event:req?.waveform?.event_signal||null,layer:'requirement'});
+ renderMvp();if(req)loadTraceSources(req);
+}
+function selectTraceAsset(layer,index){
+ const req=mvpCatalog.requirements.find(r=>r.id===mvpSelected),item=req?.trace?.[layer]?.[index];
+ if(!item)return;
+ if(layer==='golden'||layer==='rtl')sourceTabIndex[layer]=index;
+ publishSelection({trace_id:req.trace_id||req.id,clause:req.spec.clause,symbol:item.symbol,event:req.waveform.event_signal,layer});
+ renderMvp();loadTraceSources(req);
+}
+function selectTraceLayer(layer){publishSelection({layer,symbol:null});renderMvp()}
+function sourceKey(item){return item?`${item.file}:${item.start}:${item.end}`:''}
+function syntaxHighlightLine(text,path){
+ const python=String(path).endsWith('.py'),keywords=python?'class|def|return|if|elif|else|for|while|in|not|and|or|raise|True|False|None|self|import|from|with|as':'module|endmodule|always_ff|always_comb|always|assign|begin|end|if|else|case|endcase|logic|wire|reg|input|output|parameter|localparam|posedge|negedge|generate|endgenerate';
+ const comment=python?'#.*$':'\\/\\/.*$',pattern=new RegExp(`(${comment}|"(?:\\\\.|[^"\\\\])*"|'(?:\\\\.|[^'\\\\])*'|\\\`[A-Za-z_][A-Za-z0-9_]*|\\b(?:${keywords})\\b|\\b(?:\\d+'[bdhoBDHO][0-9a-fA-FxXzZ_]+|\\d+)\\b)`,'g');
+ let out='',last=0,match;
+ while((match=pattern.exec(text))!==null){out+=esc(text.slice(last,match.index));const token=match[0],kind=(python?token.startsWith('#'):token.startsWith('//'))?'synCom':(/^['"]/.test(token)?'synStr':(token.startsWith('`')?'synMacro':(/^\d/.test(token)?'synNum':'synKw')));out+=`<span class="${kind}">${esc(token)}</span>`;last=match.index+token.length}
+ return out+esc(text.slice(last));
+}
+async function fetchTraceSource(item){
+ if(!item)return;
+ const key=sourceKey(item);if(mvpSourceCache[key])return;
+ mvpSourceCache[key]={loading:true};
+ try{const q=new URLSearchParams({path:item.file,focus_start:String(item.start),focus_end:String(item.end)});mvpSourceCache[key]=await apiJson('/api/source?'+q)}
+ catch(e){mvpSourceCache[key]={error:e.message}}
+}
+async function loadTraceSources(req){
+ const items=[req.trace.golden[sourceTabIndex.golden]||req.trace.golden[0],req.trace.rtl[sourceTabIndex.rtl]||req.trace.rtl[0]].filter(Boolean);
+ await Promise.all(items.map(fetchTraceSource));
+ if(state.page==='mvp'&&mvpSelected===req.id)renderMvp();
+}
+function inlineSource(item){
+ if(!item)return '<div class="muted">연결된 source가 없습니다.</div>';
+ const data=mvpSourceCache[sourceKey(item)];
+ if(!data||data.loading)return '<div class="muted" style="padding:10px">Source loading…</div>';
+ if(data.error)return `<div class="callout bad">${esc(data.error)}</div>`;
+ return `<pre class="inlineSource">${data.lines.map(line=>`<span class="sourceLine ${line.line>=data.focus_start&&line.line<=data.focus_end?'focus':''}"><span class="ln">${line.line}</span><span class="src">${syntaxHighlightLine(line.text,data.path)||' '}</span></span>`).join('')}</pre>`;
+}
 function traceColumn(layer,items){
  return `<div class="traceColumn ${layer}"><h4>${layer.toUpperCase()}</h4>${items.map(item=>`<button class="traceItem" onclick='openMvpSource(${JSON.stringify(item.file)},${item.start},${item.end},${JSON.stringify(item.symbol)})'><b>${esc(item.symbol)}</b><small>${esc(item.role)} · ${esc(item.file)} · L${item.start}-${item.end}</small></button>`).join('')}</div>`;
 }
@@ -2054,10 +2151,10 @@ async function openMvpSource(path,start,end,symbol){
  }catch(e){toast('Source open 실패: '+e.message)}
 }
 async function executeMvp(){
- if(mvpBusy)return;mvpBusy=true;mvpError='';mvpTab='summary';renderMvp();
+ if(mvpBusy)return;mvpBusy=true;mvpError='';mvpTab='summary';render();
  try{mvpBundle=await apiJson('/api/run',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});toast(`MVP run ${mvpBundle.run.status}`)}
  catch(e){mvpBundle=e.payload?.run?e.payload:mvpBundle;mvpError=e.payload?.run?`Run completed: ${e.payload.run.status}`:e.message;if(!e.payload?.run){try{mvpBundle=await apiJson('/api/latest')}catch(_){}}}
- finally{mvpBusy=false;renderMvp()}
+ finally{mvpBusy=false;render()}
 }
 function stageSummary(run){
  if(!run)return '<div class="muted">실행 결과 없음</div>';
@@ -2076,19 +2173,22 @@ function executePane(run){
 function valueAt(changes,time){let value=changes[0]||{integer:null,value:'x'};for(const change of changes){if(change.time>time)break;value=change}return value}
 function waveHtml(wave,config){
  if(!wave)return '<div class="muted">waveform artifact 없음</div>';
- const names=config.signals.filter(name=>wave.signals[name]),start=config.window_start,end=config.window_end,width=760,left=112,plot=620,rowH=42;
+ const names=config.signals.filter(name=>wave.signals[name]),start=config.window_start,end=config.window_end,width=1000,left=178,plot=800,rowH=38;
  const x=time=>left+(Math.max(start,Math.min(end,time))-start)/(end-start)*plot;
  let eventTime=null;const event=wave.signals[config.event_signal];if(event)eventTime=(event.changes||[]).find(c=>c.time>=start&&c.time<=end&&c.integer===1)?.time;
  const rows=names.map((name,index)=>{
-  const changes=wave.signals[name].changes||[],base=30+index*rowH,inWindow=[valueAt(changes,start),...changes.filter(c=>c.time>start&&c.time<end)];
-  const binary=inWindow.every(c=>c.integer===0||c.integer===1),points=[];
-  for(let i=0;i<inWindow.length;i++){const current=inWindow[i],from=i===0?start:current.time,to=i+1<inWindow.length?inWindow[i+1].time:end,y=binary?(current.integer===1?base:base+20):base+10;points.push(`${i?'L':'M'}${x(from)},${y} L${x(to)},${y}`);if(i+1<inWindow.length){const next=inWindow[i+1],nextY=binary?(next.integer===1?base:base+20):base+10;points.push(`L${x(to)},${nextY}`)}}
-  const labels=binary?'':inWindow.map((c,i)=>`<text x="${x(i?c.time:start)+4}" y="${base+7}" fill="#9ee6b3" font-size="10">${esc(c.integer??c.value)}</text>`).join('');
-  return `<text x="10" y="${base+14}" fill="#d6e3f3" font-size="11">${esc(name)}</text><line x1="${left}" y1="${base+20}" x2="${left+plot}" y2="${base+20}" stroke="#31475e"/><path d="${points.join(' ')}" fill="none" stroke="${binary?'#68d5ff':'#66e08b'}" stroke-width="2"/>${labels}`;
+  const changes=wave.signals[name].changes||[],base=43+index*rowH,inWindow=[valueAt(changes,start),...changes.filter(c=>c.time>start&&c.time<end)];
+  const binary=inWindow.every(c=>c.integer===0||c.integer===1),cursorValue=valueAt(changes,eventTime||start),segments=[];
+  for(let i=0;i<inWindow.length;i++){
+   const current=inWindow[i],from=i===0?start:current.time,to=i+1<inWindow.length?inWindow[i+1].time:end,xf=x(from),xt=x(to);
+   if(binary){const y=current.integer===1?base-9:base+9,next=i+1<inWindow.length?(inWindow[i+1].integer===1?base-9:base+9):y;segments.push(`<path d="M${xf},${y} L${xt},${y}${i+1<inWindow.length?` L${xt},${next}`:''}" fill="none" stroke="#48e287" stroke-width="0.58" shape-rendering="crispEdges"/>`)}
+   else{const value=current.integer??current.value,inset=Math.min(5,Math.max(1,(xt-xf)/4));segments.push(`<path d="M${xf},${base} L${xf+inset},${base-8} L${xt-inset},${base-8} L${xt},${base} L${xt-inset},${base+8} L${xf+inset},${base+8} Z" fill="none" stroke="#48e287" stroke-width="0.55"/><text x="${xf+inset+4}" y="${base+4}" fill="#b7f4cc" font-size="9">${esc(value)}</text>`)}
+  }
+  return `<rect x="0" y="${base-18}" width="${width}" height="${rowH}" fill="${index%2?'#091827':'#07131f'}"/><text x="12" y="${base+4}" fill="#cbd8e5" font-size="10">${esc(name)}</text><text x="118" y="${base+4}" fill="#8fe3ae" font-size="10">${esc(cursorValue.integer??cursorValue.value)}</text><line x1="${left}" y1="${base+15}" x2="${left+plot}" y2="${base+15}" stroke="#24394d"/>${segments.join('')}`;
  }).join('');
- const ticks=[0,.25,.5,.75,1].map(p=>{const tx=left+p*plot,t=start+p*(end-start);return `<line x1="${tx}" y1="15" x2="${tx}" y2="${names.length*rowH+26}" stroke="#22384f"/><text x="${tx-14}" y="${names.length*rowH+40}" fill="#8297ad" font-size="9">${Math.round(t/1000)} ns</text>`}).join('');
- const marker=eventTime?`<line x1="${x(eventTime)}" y1="12" x2="${x(eventTime)}" y2="${names.length*rowH+24}" stroke="#ffd43b" stroke-width="2" stroke-dasharray="4 3"/><text x="${x(eventTime)+5}" y="18" fill="#ffd43b" font-size="10">VERDICT EVENT</text>`:'';
- return `<svg class="mvpWave" viewBox="0 0 ${width} ${names.length*rowH+48}" role="img" aria-label="${esc(config.annotation)}">${ticks}${rows}${marker}</svg><div class="callout info" style="margin-top:8px"><b>What to inspect:</b> ${esc(config.annotation)}</div>`;
+ const ticks=[0,.125,.25,.375,.5,.625,.75,.875,1].map(p=>{const tx=left+p*plot,t=start+p*(end-start);return `<line x1="${tx}" y1="24" x2="${tx}" y2="${names.length*rowH+25}" stroke="${p%0.25===0?'#334b61':'#1d3042'}"/><text x="${tx-14}" y="18" fill="#91a4b8" font-size="8">${Math.round(t/1000)} ns</text>`}).join('');
+ const marker=eventTime?`<rect x="${x(eventTime)-5}" y="24" width="10" height="${names.length*rowH+1}" fill="rgba(255,212,59,.14)"/><line x1="${x(eventTime)}" y1="22" x2="${x(eventTime)}" y2="${names.length*rowH+25}" stroke="#ffd43b" stroke-width="2" stroke-dasharray="4 3"/><path d="M${x(eventTime)-5},22 L${x(eventTime)+5},22 L${x(eventTime)},29 Z" fill="#ffd43b"/><text x="${x(eventTime)+7}" y="32" fill="#ffd43b" font-size="8">VERDICT EVENT</text>`:'';
+ return `<div class="waveViewer"><div class="waveToolbar"><b>VCD</b><a href="/api/artifact?name=vcd" target="_blank">waveform.vcd</a><span>timescale ${esc(wave.timescale||'1ps')}</span><span>window ${Math.round(start/1000)}–${Math.round(end/1000)} ns</span><span>cursor ${eventTime?Math.round(eventTime/1000)+' ns':'—'}</span><span>actual run artifact</span></div><svg class="mvpWave" viewBox="0 0 ${width} ${names.length*rowH+31}" role="img" aria-label="${esc(config.annotation)}"><rect x="0" y="0" width="178" height="24" fill="#142334"/><text x="12" y="16" fill="#b7c5d3" font-size="9">Name</text><text x="118" y="16" fill="#b7c5d3" font-size="9">Value</text><line x1="108" y1="0" x2="108" y2="${names.length*rowH+31}" stroke="#34495d"/><line x1="${left}" y1="0" x2="${left}" y2="${names.length*rowH+31}" stroke="#496078"/>${ticks}${rows}${marker}</svg></div><div class="callout info" style="margin-top:8px"><b>What to inspect:</b> ${esc(config.annotation)}</div>`;
 }
 function testEvidence(req,run){
  if(!run)return '<div class="muted">실행 결과 없음</div>';
@@ -2106,26 +2206,143 @@ function scrollSpecViewer(percent){
 function specViewer(req){
  const page=req.spec.pdf_pages[0],highlights=req.spec.highlights||[];
  if(mvpCatalog.pilot.spec_available===false)return `<div class="card specPane"><div class="specPaneHead"><h3>Spec PDF · page ${page}</h3><span class="badge warnbg">PDF unavailable</span></div><div class="specMissing">로컬 PDF가 없습니다.<br>assets/spec/README.md를 확인하세요.</div></div>`;
- const overlays=highlights.map(h=>`<div class="specHighlight" style="left:${h.x}%;top:${h.y}%;width:${h.width}%;height:${h.height}%"><span>${esc(h.label)}</span></div>`).join('');
+ const overlays=highlights.map(h=>`<div class="specHighlight" aria-label="Highlighted trace target" style="left:${h.x}%;top:${h.y}%;width:${h.width}%;height:${h.height}%"></div>`).join('');
  const first=highlights[0]?.y||0;
  return `<div class="card specPane"><div class="specPaneHead"><h3>Spec PDF · page ${page}</h3><span class="badge warnbg">Highlighted ${esc(req.spec.clause)}</span></div><div class="specViewport" id="specViewport"><div class="specPage" id="specPage"><img src="/api/spec/page?page=${page}" alt="ECSS page ${page}" onload="scrollSpecViewer(${first})">${overlays}</div></div></div>`;
 }
+function dockHead(title,id,detail=''){
+ return `<div class="dockHead"><span><strong>${title}</strong>${detail?`<span class="dockDetail">( ${detail} )</span>`:''}</span><span class="dockTools"><button title="Collapse" onclick="toggleDock('${id}','collapse')">—</button><button title="Maximize" onclick="toggleDock('${id}','maximize')">□</button></span></div>`;
+}
+function toggleDock(id,action){
+ const pane=document.getElementById(id);if(!pane)return;
+ if(action==='collapse')pane.classList.toggle('collapsed');
+ if(action==='maximize')pane.classList.toggle('maximized');
+}
+function traceNavigator(req){
+ return `<aside class="traceNavigator"><div class="dockHead"><strong>TRACE NAVIGATOR</strong></div><div class="traceTree"><div class="treeGroup">${mvpCatalog.requirements.map(r=>`<div class="treeRow selectable ${r.id===req.id?'selected':''}" onclick="selectMvpRequirement('${r.id}')"><span class="docIcon" aria-hidden="true"></span><span class="treeText"><b>§${esc(r.spec.clause)}</b><small>${esc(r.title)}</small></span></div>`).join('')}</div></div><div class="traceNavSearch"><input aria-label="Trace filter" placeholder="Filter clause…"></div></aside>`;
+}
+function changeSpecPage(delta){
+ const total=mvpCatalog?.pilot?.spec_total_pages||124,current=mvpSpecPage||1;
+ mvpSpecPage=Math.max(1,Math.min(total,current+delta));renderMvp();
+}
+function adjustSpecZoom(delta){
+ mvpSpecZoom=Math.max(.6,Math.min(2.4,Math.round((mvpSpecZoom+delta)*10)/10));
+ const page=document.getElementById('specPage'),label=document.getElementById('specZoomValue');if(page)page.style.width=Math.round(mvpSpecZoom*100)+'%';if(label)label.textContent=Math.round(mvpSpecZoom*100)+'%';
+}
+function handleSpecKey(event){
+ if(event.key==='ArrowLeft'||event.key==='PageUp'){event.preventDefault();changeSpecPage(-1)}
+ else if(event.key==='ArrowRight'||event.key==='PageDown'){event.preventDefault();changeSpecPage(1)}
+ else if(event.key==='+'||event.key==='='){event.preventDefault();adjustSpecZoom(.1)}
+ else if(event.key==='-'){event.preventDefault();adjustSpecZoom(-.1)}
+}
+function traceSpecBody(req){
+ const page=mvpSpecPage||req.spec.pdf_pages[0],total=mvpCatalog.pilot.spec_total_pages||124,highlights=page===req.spec.pdf_pages[0]?(req.spec.highlights||[]):[];
+ if(mvpCatalog.pilot.spec_available===false)return '<div class="specMissing">Local PDF unavailable<br>See assets/spec/README.md</div>';
+ const overlays=highlights.map(h=>`<div class="specHighlight" aria-label="Highlighted trace target" style="left:${h.x}%;top:${h.y}%;width:${h.width}%;height:${h.height}%"></div>`).join('');
+ return `<div class="specToolbar" role="toolbar" aria-label="PDF controls"><button type="button" aria-label="Zoom out" title="Zoom out (-)" onclick="adjustSpecZoom(-.1)">−</button><button type="button" aria-label="Zoom in" title="Zoom in (+)" onclick="adjustSpecZoom(.1)">＋</button><span class="specZoom" id="specZoomValue">${Math.round(mvpSpecZoom*100)}%</span><button type="button" aria-label="Previous page" title="Previous page" onclick="changeSpecPage(-1)" ${page<=1?'disabled':''}>‹</button><span class="specPageCount">${page} / ${total}</span><button type="button" aria-label="Next page" title="Next page" onclick="changeSpecPage(1)" ${page>=total?'disabled':''}>›</button></div><div class="specViewport" id="specViewport" tabindex="0" aria-label="PDF page ${page} of ${total}" onkeydown="handleSpecKey(event)"><div class="specPage" id="specPage" style="width:${Math.round(mvpSpecZoom*100)}%"><img src="/api/spec/page?page=${page}" alt="ECSS page ${page}" onload="scrollSpecViewer(${highlights[0]?.y||0})">${overlays}</div></div>`;
+}
+function sourceBasename(path){return String(path||'').split('/').pop()}
+function sourcePane(layer,req){
+ const items=req.trace[layer],active=Math.min(sourceTabIndex[layer]||0,items.length-1),item=items[active];
+ const tabs=items.map((entry,index)=>{const basename=sourceBasename(entry.file),duplicate=items.filter(candidate=>sourceBasename(candidate.file)===basename).length>1,label=duplicate?`${basename} · ${entry.symbol}`:basename;return `<button class="sourceTab ${index===active?'active':''}" role="tab" tabindex="${index===active?0:-1}" aria-selected="${index===active}" onclick="event.stopPropagation();selectTraceAsset('${layer}',${index})"><span>${esc(label)}</span><span class="close" aria-hidden="true">×</span></button>`}).join('');
+ return `<div class="sourceTabs" role="tablist" aria-label="${layer} source files">${tabs}</div>${inlineSource(item)}`;
+}
+function gridTemplateStyle(){return `grid-template-columns:${gridRatios.cols.join('fr ')}fr;grid-template-rows:${gridRatios.rows.join('fr ')}fr`}
+function gridSplitters(){
+ const c1=gridRatios.cols[0],c2=c1+gridRatios.cols[1],r1=gridRatios.rows[0],r2=r1+gridRatios.rows[1];
+ return `<div class="gridSplitter vertical" style="left:${c1}%" role="separator" aria-label="Resize first and second columns" aria-orientation="vertical" aria-valuenow="${c1}" tabindex="0" onpointerdown="startGridResize(event,'cols',0)" onkeydown="gridResizeKey(event,'cols',0)"><span>Resize columns</span></div><div class="gridSplitter vertical" style="left:${c2}%" role="separator" aria-label="Resize second and third columns" aria-orientation="vertical" aria-valuenow="${c2}" tabindex="0" onpointerdown="startGridResize(event,'cols',1)" onkeydown="gridResizeKey(event,'cols',1)"><span>Resize columns</span></div><div class="gridSplitter horizontal" style="top:${r1}%" role="separator" aria-label="Resize top and middle rows" aria-orientation="horizontal" aria-valuenow="${r1}" tabindex="0" onpointerdown="startGridResize(event,'rows',0)" onkeydown="gridResizeKey(event,'rows',0)"><span>Resize rows</span></div><div class="gridSplitter horizontal" style="top:${r2}%" role="separator" aria-label="Resize code and waveform rows" aria-orientation="horizontal" aria-valuenow="${r2}" tabindex="0" onpointerdown="startGridResize(event,'rows',1)" onkeydown="gridResizeKey(event,'rows',1)"><span>Resize rows</span></div>`;
+}
+function setGridBoundary(axis,boundary,percent){
+ const values=gridRatios[axis],minimum=axis==='cols'?[22,20,18]:[24,20,18];
+ if(boundary===0){const pair=values[0]+values[1],next=Math.max(minimum[0],Math.min(pair-minimum[1],percent));values[1]=pair-next;values[0]=next}
+ else{const next=Math.max(values[0]+minimum[1],Math.min(100-minimum[2],percent));values[1]=next-values[0];values[2]=100-next}
+ applyGridRatios();
+}
+function applyGridRatios(){
+ const workspace=document.querySelector('.traceWorkspace');if(!workspace)return;
+ workspace.style.gridTemplateColumns=gridRatios.cols.join('fr ')+'fr';workspace.style.gridTemplateRows=gridRatios.rows.join('fr ')+'fr';
+ workspace.style.setProperty('--row1',gridRatios.rows[0]+'%');workspace.style.setProperty('--row2',gridRatios.rows[1]+'%');
+ const splitters=workspace.querySelectorAll('.gridSplitter');if(splitters.length===4){splitters[0].style.left=gridRatios.cols[0]+'%';splitters[1].style.left=(gridRatios.cols[0]+gridRatios.cols[1])+'%';splitters[2].style.top=gridRatios.rows[0]+'%';splitters[3].style.top=(gridRatios.rows[0]+gridRatios.rows[1])+'%'}
+}
+function startGridResize(event,axis,boundary){
+ event.preventDefault();const workspace=document.querySelector('.traceWorkspace'),rect=workspace.getBoundingClientRect();
+ const move=ev=>{const percent=axis==='cols'?(ev.clientX-rect.left)/rect.width*100:(ev.clientY-rect.top)/rect.height*100;setGridBoundary(axis,boundary,percent)};
+ const stop=()=>{window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',stop)};
+ window.addEventListener('pointermove',move);window.addEventListener('pointerup',stop,{once:true});
+}
+function gridResizeKey(event,axis,boundary){
+ const valid=axis==='cols'?['ArrowLeft','ArrowRight']:['ArrowUp','ArrowDown'];if(!valid.includes(event.key))return;
+ event.preventDefault();const cumulative=boundary===0?gridRatios[axis][0]:gridRatios[axis][0]+gridRatios[axis][1],delta=(event.key==='ArrowRight'||event.key==='ArrowDown')?2:-2;setGridBoundary(axis,boundary,cumulative+delta);
+}
+function setNavigatorWidth(value){
+ traceNavWidth=Math.max(160,Math.min(380,Math.round(value)));const shell=document.querySelector('.traceShell');if(!shell)return;
+ shell.style.gridTemplateColumns=`${traceNavWidth}px minmax(0,1fr)`;const handle=shell.querySelector('.navWidthHandle');if(handle)handle.style.left=(traceNavWidth-4)+'px';
+}
+function startNavigatorResize(event){
+ event.preventDefault();const shell=document.querySelector('.traceShell'),rect=shell.getBoundingClientRect();
+ const move=ev=>setNavigatorWidth(ev.clientX-rect.left),stop=()=>{window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',stop)};
+ window.addEventListener('pointermove',move);window.addEventListener('pointerup',stop,{once:true});
+}
+function navigatorResizeKey(event){if(!['ArrowLeft','ArrowRight'].includes(event.key))return;event.preventDefault();setNavigatorWidth(traceNavWidth+(event.key==='ArrowRight'?10:-10))}
+function setCodeSplit(value){
+ codeSplit=Math.max(22,Math.min(78,Math.round(value*10)/10));const row=document.querySelector('.codeRow');if(!row)return;
+ row.style.gridTemplateColumns=`${codeSplit}fr ${100-codeSplit}fr`;const splitter=row.querySelector('.codeSplitter');if(splitter)splitter.style.left=codeSplit+'%';
+}
+function startCodeResize(event){
+ event.preventDefault();const workspace=document.querySelector('.codeRow'),rect=workspace.getBoundingClientRect();
+ const move=ev=>setCodeSplit((ev.clientX-rect.left)/rect.width*100),stop=()=>{window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',stop)};
+ window.addEventListener('pointermove',move);window.addEventListener('pointerup',stop,{once:true});
+}
+function codeResizeKey(event){if(!['ArrowLeft','ArrowRight'].includes(event.key))return;event.preventDefault();setCodeSplit(codeSplit+(event.key==='ArrowRight'?2:-2))}
+function behaviorFsm(req){
+ const model=mvpCatalog.behavior_models?.find(m=>m.id===req.behavior_model?.model_id);
+ if(!model)return '<div class="muted">Behavior model unavailable</div>';
+ const activeIds=new Set(req.behavior_model.transition_ids),stateById=Object.fromEntries(model.states.map(s=>[s.id,s]));
+ const activeStates=new Set(model.transitions.filter(t=>activeIds.has(t.id)).flatMap(t=>[t.from,t.to]));
+ const nodes=model.states.map(s=>`<g><circle cx="${s.x}" cy="${s.y}" r="44" fill="${activeStates.has(s.id)?'#dcebff':'#f5f7fa'}" stroke="${activeStates.has(s.id)?'#2768ac':'#718399'}" stroke-width="${activeStates.has(s.id)?2:1.3}"/><text x="${s.x}" y="${s.y-3}" text-anchor="middle" font-size="12" font-weight="800" fill="#173151">${esc(s.label)}</text><text x="${s.x}" y="${s.y+14}" text-anchor="middle" font-size="8" fill="#526a84">${esc(s.invariant)}</text></g>`).join('');
+ const arrows=model.transitions.map((t,index)=>{
+  const from=stateById[t.from],to=stateById[t.to],active=activeIds.has(t.id),stroke=active?'#111827':'#8292a5',marker=active?'url(#fsmArrowActive)':'url(#fsmArrow)',opacity=active?1:.38;
+  if(t.from===t.to){const side=from.x<150?-1:1,x1=from.x+side*30,y1=from.y-32,x2=from.x+side*44,y2=from.y+8,labelX=from.x+side*55,labelY=from.y-55-(t.id==='send_decrement'?12:0);return `<path d="M${x1},${y1} C${from.x+side*70},${from.y-75} ${from.x+side*75},${from.y+55} ${x2},${y2}" fill="none" stroke="${stroke}" stroke-width="${active?2.4:1.2}" opacity="${opacity}" marker-end="${marker}"/><text x="${labelX}" y="${labelY}" text-anchor="middle" font-size="8.5" fill="${stroke}" opacity="${opacity}">${esc(t.event)}</text>`}
+  const direction=from.x<to.x?1:-1,startX=from.x+direction*44,endX=to.x-direction*44,curve=direction>0?-28:30,mid=(startX+endX)/2;return `<path d="M${startX},${from.y} Q${mid},${from.y+curve} ${endX},${to.y}" fill="none" stroke="${stroke}" stroke-width="${active?2.4:1.2}" opacity="${opacity}" marker-end="${marker}"/><text x="${mid}" y="${from.y+curve+(curve<0?-5:13)}" text-anchor="middle" font-size="8.5" font-weight="${active?800:400}" fill="${stroke}" opacity="${opacity}">${esc(t.event)}</text>`;
+ }).join('');
+ const selected=model.transitions.filter(t=>activeIds.has(t.id)).map(t=>`<div><b>${esc(t.id)}</b> · ${esc(t.guard)} → ${esc(t.action)}</div>`).join('');
+ return `<div class="fsmSurface"><svg viewBox="0 0 440 225" role="img" aria-label="${esc(model.kind)}"><defs><marker id="fsmArrow" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#8292a5"/></marker><marker id="fsmArrowActive" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#111827"/></marker></defs>${arrows}${nodes}<text x="220" y="215" text-anchor="middle" font-size="8" fill="#687c91">counter-state abstraction · not an RTL control FSM</text></svg><div class="fsmLegend">${selected}</div></div>`;
+}
 function renderMvp(){
- setTitle('TX Credit Vertical Slice · Live','PDF provenance → highlighted source trace → executable evidence');
+ setTitle('Trace Explorer','');
+ document.querySelector('.topbar').classList.add('traceCompact');
+ document.getElementById('quickJobBtn').style.display='none';
  const content=document.getElementById('content');
  if(!mvpCatalog&&!mvpLoading){content.innerHTML='<div class="card">Backend 연결 중…</div>';loadMvp();return}
  if(!mvpCatalog){content.innerHTML=`<div class="card">${mvpLoading?'Backend 연결 중…':esc(mvpError)}</div>`;return}
  const req=mvpCatalog.requirements.find(r=>r.id===mvpSelected)||mvpCatalog.requirements[0],run=mvpBundle?.run,status=run?.status||'NOT RUN';
- content.innerHTML=`
- <div class="mvpReqGrid"><div class="card"><h3>1. Requirement / Behavior</h3><div class="mvpReqTabs">${mvpCatalog.requirements.map(r=>`<button class="btn ${r.id===req.id?'primary':''}" onclick="selectMvpRequirement('${r.id}')">${r.id}</button>`).join('')}</div><h2 class="mvpReqTitle">${esc(req.title)}</h2><div class="mvpProvenance"><b>ECSS §${esc(req.spec.clause)}</b><span>page ${req.spec.printed_pages.join(', ')}</span></div><blockquote class="mvpQuote">${esc(req.spec.excerpt)}</blockquote><h3 style="margin-top:13px">Derived executable behavior</h3><div class="mvpBehavior"><div><b>Trigger</b>${esc(req.behavior.trigger)}</div><div><b>Precondition</b>${esc(req.behavior.precondition)}</div><div><b>Expected</b>${esc(req.behavior.expected)}</div><div><b>Verdict</b>${esc(req.behavior.verdict)}</div></div><div class="previewMeta"><span class="chip">Observables</span>${req.observables.map(s=>`<span class="chip">${esc(s)}</span>`).join('')}</div></div>${specViewer(req)}</div>
- <div class="card" style="margin-top:12px"><h3>2. Source Trace · click to open highlighted lines</h3><div class="traceGrid">${traceColumn('golden',req.trace.golden)}${traceColumn('rtl',req.trace.rtl)}${traceColumn('test',req.trace.test)}</div></div>
- <div class="card" style="margin-top:12px"><h3>3. Execute / Result</h3><div class="executeHead"><button class="btn primary" ${mvpBusy?'disabled':''} onclick="executeMvp()">${mvpBusy?'Running…':'Run Golden + RTL Test'}</button><span class="badge ${status==='PASS'?'good':status==='FAIL'?'bad':'neutral'}">${status}</span><span class="muted">${run?`${esc(run.run_id)} · ${run.summary.passed}/${run.summary.total} PASS · ${run.duration_seconds}s`:'실행 결과 없음'}</span></div>${mvpError?`<div class="callout bad">${esc(mvpError)}</div>`:''}<div class="mvpTabs">${[['summary','Summary'],['golden','Golden'],['compile','Compile'],['simulation','Simulation'],['stdout','stdout.log']].map(([id,label])=>`<button class="${mvpTab===id?'active':''}" onclick="mvpTab='${id}';renderMvp()">${label}</button>`).join('')}</div><div class="mvpTabPane">${executePane(run)}</div></div>
- <div class="evidenceGrid"><div class="card"><h3>4. Waveform · ${esc(req.id)}</h3>${waveHtml(mvpBundle?.waveform,req.waveform)}</div><div class="card"><h3>Test Evidence · ${esc(req.id)}</h3>${testEvidence(req,run)}</div></div>
- <div class="card" style="margin-top:12px"><span class="badge neutral">MVP Preview · Not Connected</span> Diagram Service · Architecture/uArch editor · AI design · automatic root-cause analysis</div>`;
+ if(mvpSpecPage===null)mvpSpecPage=req.spec.pdf_pages[0];
+ const golden=req.trace.golden[sourceTabIndex.golden]||req.trace.golden[0],rtl=req.trace.rtl[sourceTabIndex.rtl]||req.trace.rtl[0];
+ selectionContext.trace_id=req.trace_id||req.id;selectionContext.clause=req.spec.clause;selectionContext.event=req.waveform.event_signal;
+ content.innerHTML=`<div class="traceShell" style="grid-template-columns:${traceNavWidth}px minmax(0,1fr)">${traceNavigator(req)}<div class="navWidthHandle" style="left:${traceNavWidth-4}px" role="separator" aria-label="Resize Trace Navigator" aria-orientation="vertical" tabindex="0" onpointerdown="startNavigatorResize(event)" onkeydown="navigatorResizeKey(event)"></div><section class="traceWorkspace" style="${gridTemplateStyle()};--row1:${gridRatios.rows[0]}%;--row2:${gridRatios.rows[1]}%;--code-split:${codeSplit}%">
+ <article class="dockPane specDock" id="specDock">${dockHead('SPEC','specDock')}<div class="dockBody">${traceSpecBody(req)}</div></article>
+ <article class="dockPane fsmDock ${selectionContext.layer==='behavior'?'contextSelected':''}" id="fsmDock">${dockHead('BEHAVIOR','fsmDock')}<div class="dockBody" onclick="selectTraceLayer('behavior')">${behaviorFsm(req)}</div></article>
+ <article class="dockPane propertyDock" id="propertyDock">${dockHead('TRACE PROPERTIES','propertyDock')}<div class="dockBody"><dl class="traceProperties"><dt>trace_id</dt><dd>${esc(selectionContext.trace_id)}</dd><dt>clause</dt><dd>ECSS §${esc(selectionContext.clause)}</dd><dt>title</dt><dd>${esc(req.title)}</dd><dt>selected</dt><dd>${esc(selectionContext.layer)}${selectionContext.symbol?` · ${esc(selectionContext.symbol)}`:''}</dd><dt>event</dt><dd>${esc(selectionContext.event)}</dd><dt>latest</dt><dd><span class="badge ${status==='PASS'?'good':status==='FAIL'?'bad':'neutral'}">${status}</span></dd></dl><h4>Executable behavior</h4><div class="callout"><b>Trigger:</b> ${esc(req.behavior.trigger)}<br><b>Expected:</b> ${esc(req.behavior.expected)}</div></div></article>
+ <div class="codeRow" style="grid-template-columns:${codeSplit}fr ${100-codeSplit}fr"><article class="dockPane goldenDock ${selectionContext.layer==='golden'?'contextSelected':''}" id="goldenDock">${dockHead('GOLDEN','goldenDock',esc(golden.symbol))}<div class="dockBody sourceDockBody" onclick="selectTraceAsset('golden',${sourceTabIndex.golden})">${sourcePane('golden',req)}</div></article>
+ <article class="dockPane rtlDock ${selectionContext.layer==='rtl'?'contextSelected':''}" id="rtlDock">${dockHead('RTL','rtlDock',esc(rtl.symbol))}<div class="dockBody sourceDockBody" onclick="selectTraceAsset('rtl',${sourceTabIndex.rtl})">${sourcePane('rtl',req)}</div></article><div class="codeSplitter" style="left:${codeSplit}%" role="separator" aria-label="Resize Golden and RTL" aria-orientation="vertical" tabindex="0" onpointerdown="startCodeResize(event)" onkeydown="codeResizeKey(event)"></div></div>
+ <article class="dockPane waveDock" id="waveDock">${dockHead('WAVE','waveDock',esc(req.waveform.annotation))}<div class="dockBody">${waveHtml(mvpBundle?.waveform,req.waveform)}</div></article>
+ ${gridSplitters()}</section></div>`;
+ if(!mvpSourceCache[sourceKey(golden)]||!mvpSourceCache[sourceKey(rtl)])loadTraceSources(req);
+}
+function renderMvpRun(){
+ setTitle('Verification Run','Execute Golden regression, RTL compile and simulation; inspect logs and artifacts');
+ document.getElementById('quickJobBtn').style.display='none';
+ const content=document.getElementById('content');
+ if(!mvpCatalog&&!mvpLoading){content.innerHTML='<div class="card">Backend 연결 중…</div>';loadMvp();return}
+ if(!mvpCatalog){content.innerHTML=`<div class="card">${mvpLoading?'Backend 연결 중…':esc(mvpError)}</div>`;return}
+ const req=mvpCatalog.requirements.find(r=>r.id===mvpSelected)||mvpCatalog.requirements[0],run=mvpBundle?.run,status=run?.status||'NOT RUN';
+ content.innerHTML=`<div class="runShell"><div class="runNotice"><div><b>Selected trace: ${esc(req.trace_id||req.id)}</b><div class="runTraceContext">ECSS §${esc(req.spec.clause)} · event=${esc(req.waveform.event_signal)}</div></div><button class="btn" onclick="go('mvp')">Back to Trace Explorer</button></div><div class="card"><h3>Execute / Result</h3><div class="executeHead"><button class="btn primary" ${mvpBusy?'disabled':''} onclick="executeMvp()">${mvpBusy?'Running…':'Run Golden + RTL Test'}</button><span class="badge ${status==='PASS'?'good':status==='FAIL'?'bad':'neutral'}">${status}</span><span class="muted">${run?`${esc(run.run_id)} · ${run.summary.passed}/${run.summary.total} PASS · ${run.duration_seconds}s`:'실행 결과 없음'}</span></div>${mvpError?`<div class="callout bad">${esc(mvpError)}</div>`:''}<div class="mvpTabs">${[['summary','Summary'],['golden','Golden'],['compile','Compile'],['simulation','Simulation'],['stdout','stdout.log']].map(([id,label])=>`<button class="${mvpTab===id?'active':''}" onclick="mvpTab='${id}';renderMvpRun()">${label}</button>`).join('')}</div><div class="mvpTabPane">${executePane(run)}</div></div><div class="evidenceGrid"><div class="card"><h3>WAVE · ${esc(req.id)}</h3>${waveHtml(mvpBundle?.waveform,req.waveform)}</div><div class="card"><h3>Test Evidence · ${esc(req.id)}</h3>${testEvidence(req,run)}</div></div></div>`;
 }
 
 function render(){
- const map={mvp:renderMvp,dashboard:renderDashboard,spec:renderSpec,req:renderReq,golden:renderGolden,diagram:renderDiagram,arch:renderArch,uarch:renderUarch,rtl:renderRTL,verify:renderVerify,trace:renderTrace,decision:renderDecision};
+ document.querySelector('.topbar').classList.remove('traceCompact');
+ document.getElementById('quickJobBtn').style.display='';
+ const map={mvp:renderMvp,'mvp-run':renderMvpRun,dashboard:renderDashboard,spec:renderSpec,req:renderReq,golden:renderGolden,diagram:renderDiagram,arch:renderArch,uarch:renderUarch,rtl:renderRTL,verify:renderVerify,trace:renderTrace,decision:renderDecision};
  map[state.page]();
 }
 window.go=p=>{
@@ -2135,7 +2352,8 @@ window.go=p=>{
 };
 document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>go(b.dataset.page));
 
-document.getElementById('globalSearch').addEventListener('keydown',e=>{
+const globalSearch=document.getElementById('globalSearch');
+if(globalSearch)globalSearch.addEventListener('keydown',e=>{
  if(e.key!=='Enter')return;
  const q=e.target.value.trim().toLowerCase();
  const req=requirements.find(r=>r.id.toLowerCase().includes(q)||r.title.toLowerCase().includes(q));

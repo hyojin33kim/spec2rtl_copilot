@@ -17,8 +17,10 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 UI = ROOT / "app/ui/spec2rtl_harness_demo_v1_7_4.html"
 CATALOG = ROOT / "manifests/catalog.json"
+BEHAVIOR_MODELS = ROOT / "manifests/behavior-models.json"
 RUNNER = ROOT / "scripts/run_mvp.py"
 SPEC_PDF = ROOT / "assets/spec/ECSS-E-ST-50-12C-Rev.1(15May2019).pdf"
+SPEC_TOTAL_PAGES = 124
 SPEC_PAGE_CACHE = ROOT / "app/backend/.runtime/spec-pages"
 ALLOWED_SOURCE_ROOTS = tuple((ROOT / path).resolve() for path in (
     "assets/golden", "assets/rtl", "assets/tb", "tests/rtl",
@@ -100,6 +102,8 @@ class Handler(BaseHTTPRequestHandler):
             elif parsed.path == "/api/catalog":
                 catalog = read_json(CATALOG)
                 catalog["pilot"]["spec_available"] = SPEC_PDF.is_file()
+                catalog["pilot"]["spec_total_pages"] = SPEC_TOTAL_PAGES
+                catalog["behavior_models"] = read_json(BEHAVIOR_MODELS)["models"]
                 self.json_response(catalog)
             elif parsed.path == "/api/latest":
                 self.json_response(latest_bundle())
@@ -172,14 +176,8 @@ class Handler(BaseHTTPRequestHandler):
         if not SPEC_PDF.is_file():
             raise FileNotFoundError("Local ECSS PDF is not installed")
         page = int(query.get("page", ["0"])[0])
-        catalog = read_json(CATALOG)
-        allowed_pages = {
-            value
-            for requirement in catalog["requirements"]
-            for value in requirement["spec"]["pdf_pages"]
-        }
-        if page not in allowed_pages:
-            raise ValueError("PDF page is outside the approved pilot trace")
+        if not 1 <= page <= SPEC_TOTAL_PAGES:
+            raise ValueError(f"PDF page must be in range 1..{SPEC_TOTAL_PAGES}")
         SPEC_PAGE_CACHE.mkdir(parents=True, exist_ok=True)
         image = SPEC_PAGE_CACHE / f"page-{page}.png"
         with SPEC_RENDER_LOCK:

@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "event": "trace:select",
+  "selection_context": {
+    "required": ["trace_id", "clause", "event", "layer"],
+    "optional": ["symbol"],
+    "layers": ["requirement", "behavior", "golden", "rtl", "test"]
+  },
+  "consumers": {
+    "spec": "open the referenced PDF page, scroll to the clause and highlight it",
+    "behavior": "highlight the reviewed behavioral state or transition",
+    "golden": "open the linked symbol and highlight its source range",
+    "rtl": "open the linked symbol and highlight its source range",
+    "wave": "show the latest run window and the selected event cursor",
+    "properties": "show the shared context and latest evidence status"
+  },
+  "example": {
+    "trace_id": "REQ-FC-E2",
+    "clause": "5.5.4.e.2",
+    "event": "send_nchar",
+    "layer": "requirement",
+    "symbol": null
+  }
+}

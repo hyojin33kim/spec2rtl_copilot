@@ -56,6 +56,8 @@ class BackendAcceptance(unittest.TestCase):
         status, catalog = self.request("/api/catalog")
         self.assertEqual(status, 200)
         self.assertEqual(len(catalog["requirements"]), 4)
+        self.assertEqual(catalog["behavior_models"][0]["id"], "BEH-TX-CREDIT")
+        self.assertEqual(catalog["pilot"]["spec_total_pages"], 124)
         status, source = self.request(
             "/api/source?path=assets/rtl/spw_datalink_v2.sv&focus_start=657&focus_end=680")
         self.assertEqual(status, 200)
@@ -85,6 +87,11 @@ class BackendAcceptance(unittest.TestCase):
 
     def test_02_source_containment(self):
         status, payload = self.request("/api/source?path=../spacewire/README.md")
+        self.assertEqual(status, 400)
+        self.assertEqual(payload["error"]["code"], "BAD_REQUEST")
+
+    def test_02b_pdf_page_range_is_bounded(self):
+        status, payload = self.request("/api/spec/page?page=125")
         self.assertEqual(status, 400)
         self.assertEqual(payload["error"]["code"], "BAD_REQUEST")
 
