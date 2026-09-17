@@ -19,12 +19,14 @@ UI = ROOT / "app/ui/spec2rtl_harness_demo_v1_7_4.html"
 CATALOG = ROOT / "manifests/catalog.json"
 RUNNER = ROOT / "scripts/run_mvp.py"
 SPEC_PDF = ROOT / "assets/spec/ECSS-E-ST-50-12C-Rev.1(15May2019).pdf"
+SPEC_PAGE_CACHE = ROOT / "app/backend/.runtime/spec-pages"
 ALLOWED_SOURCE_ROOTS = tuple((ROOT / path).resolve() for path in (
     "assets/golden", "assets/rtl", "assets/tb", "tests/rtl",
     "requirements", "trace", "manifests",
 ))
 ALLOWED_SUFFIXES = {".py", ".sv", ".yaml", ".json", ".md", ".log", ".xml"}
 RUN_LOCK = threading.Lock()
+SPEC_RENDER_LOCK = threading.Lock()
 
 
 def read_json(path: pathlib.Path) -> dict:
@@ -103,6 +105,8 @@ class Handler(BaseHTTPRequestHandler):
                 self.json_response(latest_bundle())
             elif parsed.path == "/api/spec/pdf":
                 self.serve_file(SPEC_PDF, "application/pdf", inline=True)
+            elif parsed.path == "/api/spec/page":
+                self.serve_spec_page(urllib.parse.parse_qs(parsed.query))
             elif parsed.path == "/api/source":
                 self.serve_source(urllib.parse.parse_qs(parsed.query))
             elif parsed.path == "/api/artifact":
@@ -163,6 +167,35 @@ class Handler(BaseHTTPRequestHandler):
         if not path.is_file():
             raise FileNotFoundError(f"Artifact not found: {filename}")
         self.serve_file(path, content_type, inline=name in {"junit", "waveform", "log"})
+
+    def serve_spec_page(self, query: dict) -> None:
+        if not SPEC_PDF.is_file():
+            raise FileNotFoundError("Local ECSS PDF is not installed")
+        page = int(query.get("page", ["0"])[0])
+        catalog = read_json(CATALOG)
+        allowed_pages = {
+            value
+            for requirement in catalog["requirements"]
+            for value in requirement["spec"]["pdf_pages"]
+        }
+        if page not in allowed_pages:
+            raise ValueError("PDF page is outside the approved pilot trace")
+        SPEC_PAGE_CACHE.mkdir(parents=True, exist_ok=True)
+        image = SPEC_PAGE_CACHE / f"page-{page}.png"
+        with SPEC_RENDER_LOCK:
+            if not image.exists():
+                prefix = SPEC_PAGE_CACHE / f"page-{page}"
+                try:
+                    result = subprocess.run(
+                        ["pdftoppm", "-f", str(page), "-l", str(page), "-png",
+                         "-r", "120", "-singlefile", str(SPEC_PDF), str(prefix)],
+                        text=True, capture_output=True, timeout=30, check=False,
+                    )
+                except (OSError, subprocess.TimeoutExpired) as exc:
+                    raise ValueError(f"Unable to render PDF page: {exc}") from exc
+                if result.returncode != 0 or not image.exists():
+                    raise ValueError(f"Unable to render PDF page: {result.stderr.strip()}")
+        self.serve_file(image, "image/png", inline=True)
 
     def do_POST(self) -> None:  # noqa: N802
         if urllib.parse.urlparse(self.path).path != "/api/run":

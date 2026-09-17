@@ -21,6 +21,8 @@ SPEC.loader.exec_module(SERVER)
 class BackendAcceptance(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        cls.latest_path = ROOT / "runs/latest.json"
+        cls.latest_before = cls.latest_path.read_bytes() if cls.latest_path.exists() else None
         cls.server = SERVER.MvpServer(("127.0.0.1", 0), SERVER.Handler, enable_test_faults=True)
         cls.thread = threading.Thread(target=cls.server.serve_forever, daemon=True)
         cls.thread.start()
@@ -31,6 +33,10 @@ class BackendAcceptance(unittest.TestCase):
         cls.server.shutdown()
         cls.server.server_close()
         cls.thread.join(timeout=2)
+        if cls.latest_before is not None:
+            cls.latest_path.write_bytes(cls.latest_before)
+        elif cls.latest_path.exists():
+            cls.latest_path.unlink()
 
     def request(self, path, payload=None):
         data = None if payload is None else json.dumps(payload).encode()
@@ -65,6 +71,10 @@ class BackendAcceptance(unittest.TestCase):
             self.assertEqual(status, 200)
             self.assertEqual(headers.get_content_type(), "application/pdf")
             self.assertTrue(body.startswith(b"%PDF"))
+            status, headers, body = self.binary_request("/api/spec/page?page=74")
+            self.assertEqual(status, 200)
+            self.assertEqual(headers.get_content_type(), "image/png")
+            self.assertTrue(body.startswith(b"\x89PNG"))
         else:
             status, payload = self.request("/api/spec/pdf")
             self.assertEqual(status, 404)

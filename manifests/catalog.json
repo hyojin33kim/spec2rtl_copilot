@@ -12,7 +12,7 @@
     {
       "id": "REQ-FC-E1",
       "title": "FCT increments transmit credit",
-      "spec": {"clause":"5.5.4.e.1","pdf_pages":[74],"printed_pages":[74],"excerpt":"Each time the data link layer receives an FCT from the encoding layer it increments its transmit credit count by eight."},
+      "spec": {"clause":"5.5.4.e.1","pdf_pages":[74],"printed_pages":[74],"excerpt":"Each time the data link layer receives an FCT from the encoding layer it increments its transmit credit count by eight.","highlights":[{"x":31.5,"y":66.5,"width":57.0,"height":4.8,"label":"§5.5.4.e.1"}]},
       "behavior": {"trigger":"The encoding layer delivers one independent FCT.","precondition":"Link state is Connecting or Run and the increment does not exceed MAX_CREDIT.","expected":"tx_credit_next = tx_credit + 8.","verdict":"PASS when the observed transmit-credit delta is +8."},
       "observables": ["got_fct", "tx_credit"],
       "result_ids": ["REQ-FC-E1"],
@@ -29,7 +29,7 @@
     {
       "id": "REQ-FC-E2",
       "title": "N-Char transmission decrements credit",
-      "spec": {"clause":"5.5.4.e.2","pdf_pages":[74],"printed_pages":[74],"excerpt":"Whenever the data link layer sends an N-Char to the encoding layer it decrements its transmit credit count by one."},
+      "spec": {"clause":"5.5.4.e.2","pdf_pages":[74],"printed_pages":[74],"excerpt":"Whenever the data link layer sends an N-Char to the encoding layer it decrements its transmit credit count by one.","highlights":[{"x":31.5,"y":70.6,"width":57.0,"height":4.4,"label":"§5.5.4.e.2"}]},
       "behavior": {"trigger":"The data link layer accepts one N-Char for transmission.","precondition":"Link state is Run and tx_credit is greater than zero.","expected":"tx_credit_next = tx_credit - 1.","verdict":"PASS when send_nchar is asserted and the observed credit delta is -1."},
       "observables": ["send_nchar", "tx_credit"],
       "result_ids": ["REQ-FC-E2"],
@@ -49,7 +49,7 @@
     {
       "id": "REQ-FC-F",
       "title": "Zero credit blocks N-Char transmission",
-      "spec": {"clause":"5.5.4.f","pdf_pages":[74],"printed_pages":[74],"excerpt":"If the transmit credit count reaches zero, the data link layer shall cease sending N-Chars until it receives another FCT."},
+      "spec": {"clause":"5.5.4.f","pdf_pages":[74],"printed_pages":[74],"excerpt":"If the transmit credit count reaches zero, the data link layer shall cease sending N-Chars until it receives another FCT.","highlights":[{"x":28.0,"y":79.8,"width":61.0,"height":6.7,"label":"§5.5.4.f"}]},
       "behavior": {"trigger":"An N-Char is pending for transmission.","precondition":"Link state is Run and tx_credit equals zero.","expected":"send_nchar = 0, nchar_ready = 0 and tx_credit remains zero.","verdict":"PASS when the pending N-Char is not accepted."},
       "observables": ["nchar_valid", "nchar_ready", "send_nchar", "tx_credit"],
       "result_ids": ["REQ-FC-F"],
@@ -69,7 +69,7 @@
     {
       "id": "REQ-FC-HJ",
       "title": "Credit bound and overflow error",
-      "spec": {"clause":"5.5.4.h / 5.5.4.j / 5.5.5.a.2","pdf_pages":[75],"printed_pages":[75],"excerpt":"The transmit credit count shall have a maximum value of 56. An FCT that causes it to exceed the maximum shall raise a credit error."},
+      "spec": {"clause":"5.5.4.h / 5.5.4.j / 5.5.5.a.2","pdf_pages":[75],"printed_pages":[75],"excerpt":"The transmit credit count shall have a maximum value of 56. An FCT that causes it to exceed the maximum shall raise a credit error.","highlights":[{"x":28.0,"y":12.1,"width":61.0,"height":4.5,"label":"§5.5.4.h"},{"x":28.0,"y":18.2,"width":61.0,"height":4.5,"label":"§5.5.4.j"},{"x":32.0,"y":56.0,"width":55.0,"height":4.5,"label":"§5.5.5.a.2"}]},
       "behavior": {"trigger":"An FCT is received when tx_credit is 56.","precondition":"Link state is Connecting or Run.","expected":"credit_error = 1 and tx_credit remains 56.","verdict":"PASS when overflow is detected combinationally and the state does not exceed MAX_CREDIT."},
       "observables": ["got_fct", "tx_credit", "credit_error", "tx_credit_overflow"],
       "result_ids": ["REQ-FC-HJ-COMB", "REQ-FC-HJ-STATE"],

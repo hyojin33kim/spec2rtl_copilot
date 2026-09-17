@@ -333,7 +333,7 @@ button.uiPending::after{
 
 /* Live MVP evidence workspace */
 .mvpHeader{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
-.mvpReqGrid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(360px,.85fr);gap:12px}
+.mvpReqGrid{display:grid;grid-template-columns:minmax(410px,.9fr) minmax(500px,1.1fr);gap:12px;align-items:stretch}
 .mvpReqTabs,.mvpTabs{display:flex;gap:5px;flex-wrap:wrap}
 .mvpReqTitle{font-size:17px;margin:12px 0 5px}
 .mvpProvenance{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:9px 10px;background:#eef5ff;border:1px solid #cfe0f5;border-radius:8px;margin:9px 0}
@@ -341,6 +341,13 @@ button.uiPending::after{
 .mvpBehavior{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:9px}
 .mvpBehavior>div{padding:8px;background:#fafbfd;border:1px solid #e5ebf2;border-radius:7px;font-size:10px;line-height:1.45}
 .mvpBehavior b{display:block;color:#507095;font-size:9px;text-transform:uppercase;margin-bottom:3px}
+.specPane{display:flex;flex-direction:column;min-height:0;padding:0;overflow:hidden}
+.specPaneHead{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid #dce5ef;background:#f7faff}
+.specPaneHead h3{margin:0}.specViewport{height:500px;overflow:auto;background:#cbd5e1;padding:12px;scroll-behavior:smooth}
+.specPage{position:relative;width:100%;max-width:720px;margin:0 auto;box-shadow:0 4px 18px rgba(15,32,52,.2);line-height:0;background:white}
+.specPage img{display:block;width:100%;height:auto}.specHighlight{position:absolute;background:rgba(255,218,57,.36);border:2px solid #f5b800;box-shadow:0 0 0 1px rgba(255,255,255,.7) inset;pointer-events:none;line-height:1.2}
+.specHighlight span{position:absolute;right:-2px;top:-20px;background:#eaa900;color:#fff;padding:3px 6px;border-radius:4px 4px 0 0;font:8.5px var(--sans);white-space:nowrap}
+.specMissing{display:flex;min-height:420px;align-items:center;justify-content:center;text-align:center;padding:30px;color:#64778d;background:#f8fafc}
 .traceGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}
 .traceColumn{border:1px solid #dfe7f0;border-radius:9px;overflow:hidden;background:#fff}
 .traceColumn h4{margin:0;padding:9px 10px;background:#edf5ff;color:#174f99;font-size:11px}
@@ -2090,16 +2097,27 @@ function testEvidence(req,run){
  selected.forEach(t=>rows.push({id:t.id,expected:req.behavior.expected,actual:t.detail,status:t.status}));
  return `<table class="compactEvidence"><thead><tr><th>Evidence</th><th>Expected</th><th>Actual</th><th>Status</th></tr></thead><tbody>${rows.map(r=>`<tr><td><b>${esc(r.id)}</b></td><td>${esc(r.expected)}</td><td>${esc(r.actual)}</td><td><span class="badge ${r.status==='PASS'?'good':'bad'}">${esc(r.status)}</span></td></tr>`).join('')}</tbody></table><div class="artifactLinks"><a class="btn" href="/api/artifact?name=junit" target="_blank">Open JUnit</a><a class="btn" href="/api/artifact?name=vcd" target="_blank">Download VCD</a></div>`;
 }
+function scrollSpecViewer(percent){
+ const viewport=document.getElementById('specViewport'),page=document.getElementById('specPage');
+ if(!viewport||!page)return;
+ const target=page.offsetTop+page.offsetHeight*(percent/100)-viewport.clientHeight*.25;
+ viewport.scrollTop=Math.max(0,target);
+}
+function specViewer(req){
+ const page=req.spec.pdf_pages[0],highlights=req.spec.highlights||[];
+ if(!mvpCatalog.pilot.spec_available)return `<div class="card specPane"><div class="specPaneHead"><h3>Spec PDF · page ${page}</h3><span class="badge warnbg">Local PDF not installed</span></div><div class="specMissing">PDF는 공개 저장소에 포함되지 않습니다.<br>assets/spec/README.md의 경로에 로컬 문서를 배치하면<br>이 위치에서 해당 clause가 강조됩니다.</div></div>`;
+ const overlays=highlights.map(h=>`<div class="specHighlight" style="left:${h.x}%;top:${h.y}%;width:${h.width}%;height:${h.height}%"><span>${esc(h.label)}</span></div>`).join('');
+ const first=highlights[0]?.y||0;
+ return `<div class="card specPane"><div class="specPaneHead"><h3>Spec PDF · page ${page}</h3><span class="badge warnbg">Highlighted ${esc(req.spec.clause)}</span></div><div class="specViewport" id="specViewport"><div class="specPage" id="specPage"><img src="/api/spec/page?page=${page}" alt="ECSS page ${page}" onload="scrollSpecViewer(${first})">${overlays}</div></div></div>`;
+}
 function renderMvp(){
  setTitle('TX Credit Vertical Slice · Live','PDF provenance → highlighted source trace → executable evidence');
  const content=document.getElementById('content');
  if(!mvpCatalog&&!mvpLoading){content.innerHTML='<div class="card">Backend 연결 중…</div>';loadMvp();return}
  if(!mvpCatalog){content.innerHTML=`<div class="card">${mvpLoading?'Backend 연결 중…':esc(mvpError)}</div>`;return}
- const req=mvpCatalog.requirements.find(r=>r.id===mvpSelected)||mvpCatalog.requirements[0],run=mvpBundle?.run,status=run?.status||'NOT RUN',page=req.spec.pdf_pages[0];
+ const req=mvpCatalog.requirements.find(r=>r.id===mvpSelected)||mvpCatalog.requirements[0],run=mvpBundle?.run,status=run?.status||'NOT RUN';
  content.innerHTML=`
- <div class="card mvpHeader"><div><b>${esc(mvpCatalog.pilot.id)}</b> · ${esc(mvpCatalog.pilot.title)}<div class="muted">${esc(mvpCatalog.pilot.document)} · published ${esc(mvpCatalog.pilot.published)}</div></div><span class="badge neutral">REAL BACKEND</span></div>
- <div class="mvpReqGrid"><div class="card"><h3>1. Requirement / Behavior</h3><div class="mvpReqTabs">${mvpCatalog.requirements.map(r=>`<button class="btn ${r.id===req.id?'primary':''}" onclick="selectMvpRequirement('${r.id}')">${r.id}</button>`).join('')}</div><h2 class="mvpReqTitle">${esc(req.id)} · ${esc(req.title)}</h2><div class="mvpProvenance"><b>ECSS §${esc(req.spec.clause)}</b><span>PDF page ${req.spec.pdf_pages.join(', ')}</span><span>Printed page ${req.spec.printed_pages.join(', ')}</span>${mvpCatalog.pilot.spec_available?`<a class="btn" href="/api/spec/pdf#page=${page}" target="_blank">Open PDF page ${page}</a>`:'<span class="badge warnbg">Local PDF not installed</span>'}</div><blockquote class="mvpQuote">${esc(req.spec.excerpt)}</blockquote><div class="muted">Authoritative source: ${esc(mvpCatalog.pilot.spec_asset)} · user-supplied, not distributed</div></div>
- <div class="card"><h3>Derived executable behavior</h3><div class="mvpBehavior"><div><b>Trigger</b>${esc(req.behavior.trigger)}</div><div><b>Precondition</b>${esc(req.behavior.precondition)}</div><div><b>Expected</b>${esc(req.behavior.expected)}</div><div><b>Verdict</b>${esc(req.behavior.verdict)}</div></div><div class="previewMeta"><span class="chip">Observables</span>${req.observables.map(s=>`<span class="chip">${esc(s)}</span>`).join('')}</div></div></div>
+ <div class="mvpReqGrid"><div class="card"><h3>1. Requirement / Behavior</h3><div class="mvpReqTabs">${mvpCatalog.requirements.map(r=>`<button class="btn ${r.id===req.id?'primary':''}" onclick="selectMvpRequirement('${r.id}')">${r.id}</button>`).join('')}</div><h2 class="mvpReqTitle">${esc(req.id)} · ${esc(req.title)}</h2><div class="mvpProvenance"><b>ECSS §${esc(req.spec.clause)}</b><span>page ${req.spec.printed_pages.join(', ')}</span></div><blockquote class="mvpQuote">${esc(req.spec.excerpt)}</blockquote><h3 style="margin-top:13px">Derived executable behavior</h3><div class="mvpBehavior"><div><b>Trigger</b>${esc(req.behavior.trigger)}</div><div><b>Precondition</b>${esc(req.behavior.precondition)}</div><div><b>Expected</b>${esc(req.behavior.expected)}</div><div><b>Verdict</b>${esc(req.behavior.verdict)}</div></div><div class="previewMeta"><span class="chip">Observables</span>${req.observables.map(s=>`<span class="chip">${esc(s)}</span>`).join('')}</div></div>${specViewer(req)}</div>
  <div class="card" style="margin-top:12px"><h3>2. Source Trace · click to open highlighted lines</h3><div class="traceGrid">${traceColumn('golden',req.trace.golden)}${traceColumn('rtl',req.trace.rtl)}${traceColumn('test',req.trace.test)}</div></div>
  <div class="card" style="margin-top:12px"><h3>3. Execute / Result</h3><div class="executeHead"><button class="btn primary" ${mvpBusy?'disabled':''} onclick="executeMvp()">${mvpBusy?'Running…':'Run Golden + RTL Test'}</button><span class="badge ${status==='PASS'?'good':status==='FAIL'?'bad':'neutral'}">${status}</span><span class="muted">${run?`${esc(run.run_id)} · ${run.summary.passed}/${run.summary.total} PASS · ${run.duration_seconds}s`:'실행 결과 없음'}</span></div>${mvpError?`<div class="callout bad">${esc(mvpError)}</div>`:''}<div class="mvpTabs">${[['summary','Summary'],['golden','Golden'],['compile','Compile'],['simulation','Simulation'],['stdout','stdout.log']].map(([id,label])=>`<button class="${mvpTab===id?'active':''}" onclick="mvpTab='${id}';renderMvp()">${label}</button>`).join('')}</div><div class="mvpTabPane">${executePane(run)}</div></div>
  <div class="evidenceGrid"><div class="card"><h3>4. Waveform · ${esc(req.id)}</h3>${waveHtml(mvpBundle?.waveform,req.waveform)}</div><div class="card"><h3>Test Evidence · ${esc(req.id)}</h3>${testEvidence(req,run)}</div></div>

@@ -23,6 +23,12 @@ class TraceUiContract(unittest.TestCase):
             self.assertEqual(spec["pdf_pages"], [expected_pages[requirement["id"]]])
             self.assertEqual(spec["printed_pages"], spec["pdf_pages"])
             self.assertGreater(len(spec["excerpt"]), 40)
+            self.assertTrue(spec["highlights"])
+            for highlight in spec["highlights"]:
+                self.assertGreaterEqual(highlight["x"], 0)
+                self.assertLessEqual(highlight["x"] + highlight["width"], 100)
+                self.assertGreaterEqual(highlight["y"], 0)
+                self.assertLessEqual(highlight["y"] + highlight["height"], 100)
 
     def test_each_requirement_has_executable_contract(self):
         for requirement in self.catalog["requirements"]:
@@ -38,7 +44,7 @@ class TraceUiContract(unittest.TestCase):
 
     def test_ui_exposes_required_views(self):
         for token in (
-            "Open PDF page", "highlighted trace target", "Summary", "Golden", "Compile",
+            "Spec PDF · page", "scrollSpecViewer", "specHighlight", "highlighted trace target", "Summary", "Golden", "Compile",
             "Simulation", "stdout.log", "VERDICT EVENT", "Open JUnit", "Download VCD",
         ):
             self.assertIn(token, self.html)

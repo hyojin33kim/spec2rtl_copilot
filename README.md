@@ -46,9 +46,10 @@ cd spec2rtl_copilot
 python3 app/backend/server.py
 ```
 
-PDF page opening is enabled only when the user has placed the specification at
-the documented local path. Trace metadata and page references remain available
-without redistributing the document.
+The embedded, highlighted PDF page view is enabled when the user has placed the
+specification at the documented local path and Poppler's `pdftoppm` is
+available. Trace metadata and page references remain available without
+redistributing the document.
 
 Run the complete acceptance suite:
 
