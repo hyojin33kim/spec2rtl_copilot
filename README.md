@@ -67,3 +67,7 @@ cd assets/golden && python3 spw_ref_model_test_v5.py
 
 RTL regression uses Icarus Verilog 12.0 with `-g2005-sv`; `-g2012` is
 intentionally excluded because of the documented Icarus multi-instance issue.
+
+## Current UI
+
+![Spec2RTL Copilot Trace Explorer v0.2.0](docs/images/trace-explorer-v0.2.0.png)
