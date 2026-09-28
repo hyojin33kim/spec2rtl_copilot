@@ -1,0 +1,307 @@
+{
+  "schema_version": 1,
+  "source": "waveform.vcd",
+  "timescale": "1ps",
+  "signals": {
+    "link_state": {
+      "source": "tb_credit_mvp.dut.r_state",
+      "changes": [
+        {
+          "time": 0,
+          "value": "x",
+          "integer": null
+        },
+        {
+          "time": 5000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 115000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 285000,
+          "value": "10",
+          "integer": 2
+        },
+        {
+          "time": 335000,
+          "value": "11",
+          "integer": 3
+        },
+        {
+          "time": 365000,
+          "value": "100",
+          "integer": 4
+        },
+        {
+          "time": 395000,
+          "value": "101",
+          "integer": 5
+        },
+        {
+          "time": 520000,
+          "value": "100",
+          "integer": 4
+        }
+      ]
+    },
+    "tx_credit": {
+      "source": "tb_credit_mvp.dut.r_tx_credit",
+      "changes": [
+        {
+          "time": 0,
+          "value": "x",
+          "integer": null
+        },
+        {
+          "time": 5000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 385000,
+          "value": "1000",
+          "integer": 8
+        },
+        {
+          "time": 415000,
+          "value": "10000",
+          "integer": 16
+        },
+        {
+          "time": 430000,
+          "value": "101",
+          "integer": 5
+        },
+        {
+          "time": 445000,
+          "value": "100",
+          "integer": 4
+        },
+        {
+          "time": 460000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 490000,
+          "value": "1010",
+          "integer": 10
+        },
+        {
+          "time": 515000,
+          "value": "10001",
+          "integer": 17
+        },
+        {
+          "time": 530000,
+          "value": "111000",
+          "integer": 56
+        }
+      ]
+    },
+    "got_fct": {
+      "source": "tb_credit_mvp.dut.w_got_fct",
+      "changes": [
+        {
+          "time": 0,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 365000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 370000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 380000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 390000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 410000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 420000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 510000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 520000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 540000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 550000,
+          "value": "0",
+          "integer": 0
+        }
+      ]
+    },
+    "send_nchar": {
+      "source": "tb_credit_mvp.dut.w_send_nchar",
+      "changes": [
+        {
+          "time": 0,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 440000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 450000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 510000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 520000,
+          "value": "0",
+          "integer": 0
+        }
+      ]
+    },
+    "credit_error": {
+      "source": "tb_credit_mvp.dut.w_credit_err",
+      "changes": [
+        {
+          "time": 0,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 540000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 550000,
+          "value": "0",
+          "integer": 0
+        }
+      ]
+    },
+    "tx_credit_overflow": {
+      "source": "tb_credit_mvp.dut.w_tx_credit_err",
+      "changes": [
+        {
+          "time": 0,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 540000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 550000,
+          "value": "0",
+          "integer": 0
+        }
+      ]
+    },
+    "nchar_valid": {
+      "source": "tb_credit_mvp.nchar_valid",
+      "changes": [
+        {
+          "time": 0,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 440000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 450000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 470000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 480000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 510000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 520000,
+          "value": "0",
+          "integer": 0
+        }
+      ]
+    },
+    "nchar_ready": {
+      "source": "tb_credit_mvp.nchar_ready",
+      "changes": [
+        {
+          "time": 0,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 440000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 450000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 510000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 520000,
+          "value": "0",
+          "integer": 0
+        }
+      ]
+    }
+  }
+}

@@ -1,5 +1,13 @@
 __pycache__/
+.env
+.env.*
+!.env.example
+*.sqlite3
+*.sqlite3-journal
+*.sqlite3-wal
+*.sqlite3-shm
 *.pyc
+*.swp
 *.vvp
 *.vcd
 *.fst
@@ -12,4 +20,7 @@ runs/[0-9]*/
 !runs/20260917T152341+0900-d7a76090/
 !runs/20260917T152341+0900-d7a76090/**
 !runs/20260917T152341+0900-d7a76090/waveform.vcd
+!runs/20260928T044401+0000-d466b73b/
+!runs/20260928T044401+0000-d466b73b/**
+!runs/20260928T044401+0000-d466b73b/waveform.vcd
 runs/*/build/

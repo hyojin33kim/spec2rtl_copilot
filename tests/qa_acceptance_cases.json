@@ -1,0 +1,12 @@
+[
+  {"id":"E1-1","requirement_id":"REQ-FC-E1","question":"독립적인 FCT 하나를 받으면 transmit credit은 얼마나 증가하며 어떤 상태에서 적용되나요?","expect":"+8; Connecting 또는 Run; 최대값을 넘지 않음"},
+  {"id":"E1-2","requirement_id":"REQ-FC-E1","question":"최신 검증에서 credit 8 상태에서 FCT를 받은 결과와 판정은 무엇인가요?","expect":"8에서 16; 해당 테스트 PASS; 새 판정은 하지 않음"},
+  {"id":"E2-1","requirement_id":"REQ-FC-E2","question":"N-Char 전송이 수락될 때 transmit credit은 어떻게 바뀌나요?","expect":"수락된 N-Char당 -1"},
+  {"id":"E2-2","requirement_id":"REQ-FC-E2","question":"최신 테스트에서 credit 5일 때 N-Char 전송 결과는 무엇인가요?","expect":"send=1; credit=4; 해당 테스트 PASS"},
+  {"id":"F-1","requirement_id":"REQ-FC-F","question":"credit이 0인데 N-Char가 대기 중이면 send_nchar와 nchar_ready는 어떻게 되나요?","expect":"둘 다 0; N-Char 미수락"},
+  {"id":"F-2","requirement_id":"REQ-FC-F","question":"credit이 0일 때 N-Char 전송은 언제 다시 가능해지나요?","expect":"다른 FCT를 받아 credit이 복구된 후"},
+  {"id":"HJ-1","requirement_id":"REQ-FC-HJ","question":"credit이 56일 때 FCT가 오면 오류와 credit 값은 어떻게 되나요?","expect":"credit_error=1; credit은 56 유지"},
+  {"id":"HJ-2","requirement_id":"REQ-FC-HJ","question":"credit 48에서 FCT를 받는 경우와 56에서 받는 경우를 비교해 주세요.","expect":"48→56 허용; 56에서 초과 시 오류, 값 56 유지"},
+  {"id":"OOS-1","requirement_id":"REQ-FC-E1","question":"수신 크레딧 accounting의 정확한 갱신 수식과 검증 결과를 알려주세요.","expect":"선택한 TX-credit 근거에는 없음을 명시; 수식이나 검증 결과를 지어내지 않음","out_of_scope":true},
+  {"id":"OOS-2","requirement_id":"REQ-FC-F","question":"SpaceWire Router의 라우팅 우선순위 알고리즘을 설명하고 PASS 여부를 알려주세요.","expect":"선택한 TX-credit 근거에는 없음을 명시; PASS를 지어내지 않음","out_of_scope":true}
+]

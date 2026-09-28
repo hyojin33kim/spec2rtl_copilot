@@ -379,6 +379,8 @@ button.uiPending::after{
 .specDock{grid-column:1;grid-row:1}.fsmDock{grid-column:2;grid-row:1}.propertyDock{grid-column:3;grid-row:1}.goldenDock{grid-column:1 / span 1;grid-row:2}.rtlDock{grid-column:2 / span 2;grid-row:2}.waveDock{grid-column:1 / span 3;grid-row:3}
 .specDock .dockBody{padding:0;background:#cad3de}.specDock .specViewport{height:100%;padding:8px}.specDock .specPage{max-width:none}.specToolbar{height:34px;display:flex;align-items:center;gap:5px;padding:0 7px;background:#f4f6f8;border-bottom:1px solid #aebdcd;color:#273d56;font-size:12px}.specToolbar button{width:28px;height:26px;border:1px solid #b9c6d3;background:#fff;color:#263d57;border-radius:2px;font-size:15px;font-weight:700}.specToolbar button:disabled{opacity:.4}.specPageCount{min-width:70px;text-align:center;font:12px var(--mono);color:#263d57}.specZoom{min-width:46px;text-align:center;font:11px var(--mono);color:#374151}
 .traceProperties{display:grid;grid-template-columns:88px 1fr;font-size:10px}.traceProperties dt,.traceProperties dd{margin:0;padding:7px;border-bottom:1px solid #e1e7ee}.traceProperties dt{color:#64778e;background:#f8fafc}.traceProperties dd{font-weight:750;overflow-wrap:anywhere}
+.qaEntry{margin:0 0 8px;width:100%}.qaQuestion{width:100%;min-height:78px;resize:vertical;border:1px solid #b8c4d1;border-radius:5px;padding:9px;font:13px/1.5 Arial,sans-serif}.qaAnswer{white-space:pre-wrap;line-height:1.55;margin-top:12px}.qaSources{margin-top:12px;padding-left:20px}.qaSources li{margin:5px 0}
+.qaHistory{margin-top:14px;border-top:1px solid #dce4ec;padding-top:10px}.qaHistoryItem{display:block;width:100%;text-align:left;margin-top:5px;padding:7px;border:1px solid #dce4ec;background:#f8fafc;border-radius:4px;color:#263d57}.qaHistoryItem small{display:block;color:#64748b;margin-top:3px}
 .fsmSurface{height:100%;min-height:205px;display:flex;flex-direction:column;background:#fbfdff}.fsmSurface svg{width:100%;flex:1;min-height:165px}.fsmLegend{border-top:1px solid #dce4ec;padding:5px 7px;background:#fff;font:8.5px/1.35 var(--mono)}.fsmLegend b{color:#9a6700}.reviewFlag{display:inline-block;background:#fff2ce;color:#8b5b00;border:1px solid #efd07a;padding:3px 6px;border-radius:4px;font-size:8px}
 .sourceDockBody{display:flex;flex-direction:column;padding:0!important}.sourceTabs{height:32px;display:flex;align-items:end;gap:2px;padding:4px 5px 0;background:#e9edf2;border-bottom:1px solid #aebdcd;overflow-x:auto}.sourceTab{height:27px;display:flex;align-items:center;gap:7px;border:1px solid #b8c4d0;border-bottom:0;background:#dfe5eb;color:#374151;padding:0 9px;font:11px var(--mono);white-space:nowrap}.sourceTab.active{background:#fff;color:#1f2937;border-color:#9daebe}.sourceTab .close{opacity:.55}.inlineSource{margin:0;background:#fff;color:#172033;font:11px/1.55 var(--mono);height:100%;overflow:auto;padding:0}.inlineSource .sourceLine{padding:0;grid-template-columns:42px minmax(max-content,1fr);min-width:max-content}.inlineSource .sourceLine .ln{position:sticky;left:0;background:#e5e7eb;color:#4b5563;border-right:1px solid #c7cdd4;padding:0 7px 0 2px;z-index:2}.inlineSource .sourceLine .src{padding:0 9px;min-width:max-content}.inlineSource .sourceLine.focus{background:#fff1a8;color:#172033;border-left:0}.inlineSource .sourceLine.focus .ln{background:#d9dde3;color:#1f2937}.synKw{color:#005cc5;font-weight:600}.synNum{color:#9c36b5}.synStr{color:#a31515}.synCom{color:#237a3b;font-style:italic}.synMacro{color:#7b3fb3}
 .gridSplitter{position:absolute;z-index:18;background:transparent;touch-action:none;outline:none}.gridSplitter::after{content:"";position:absolute;background:#1769e0;opacity:0;transition:opacity .1s}.gridSplitter:hover::after,.gridSplitter:focus-visible::after{opacity:1}.gridSplitter.vertical{top:0;height:var(--row1);width:8px;transform:translateX(-4px);cursor:col-resize}.gridSplitter.vertical::after{top:0;bottom:0;left:3px;width:2px}.gridSplitter.horizontal{left:0;right:0;height:8px;transform:translateY(-4px);cursor:row-resize}.gridSplitter.horizontal::after{left:0;right:0;top:3px;height:2px}.gridSplitter span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
@@ -2105,6 +2107,52 @@ function selectMvpRequirement(id){
  publishSelection({trace_id:req?.trace_id||id,clause:req?.spec?.clause||null,symbol:null,event:req?.waveform?.event_signal||null,layer:'requirement'});
  renderMvp();if(req)loadTraceSources(req);
 }
+let qaHistoryItems=[];
+function qaAnswerHtml(data,stored=false){
+ const links=(data.sources||[]).map(source=>{
+  let href='#';
+  if(source.kind==='spec'&&!mvpCatalog?.pilot?.spec_available)return `<li>[${esc(source.id)}] ${esc(source.label)} · 로컬 PDF 없음</li>`;
+  if(source.kind==='spec')href=`/api/spec/pdf#page=${source.page}`;
+  if(source.kind==='source')href='/api/source?'+new URLSearchParams({path:source.file,focus_start:String(source.start),focus_end:String(source.end)});
+  if(source.kind==='evidence')href=source.url;
+  return `<li><a href="${esc(href)}" target="_blank" rel="noopener noreferrer">[${esc(source.id)}] ${esc(source.label)}</a></li>`;
+ }).join('');
+ const meta=stored?`<div class="muted">저장된 답변 · ${esc(new Date(data.created_at).toLocaleString('ko-KR'))} · ${esc(data.model||'로컬 범위 검사')}${data.run_id?` · ${esc(data.run_id)}`:''}</div>`:data.history_saved===false?'<div class="callout warn">답변은 생성됐지만 이력 저장에 실패했습니다.</div>':'';
+ return `${meta}<div class="qaAnswer">${esc(data.answer)}</div><b>Sources</b><ul class="qaSources">${links}</ul>`;
+}
+async function loadMvpQaHistory(requirementId){
+ const host=document.getElementById('qaHistory');if(!host)return;
+ host.textContent='이력 불러오는 중…';
+ try{
+  const data=await apiJson('/api/qa/history?'+new URLSearchParams({requirement_id:requirementId,limit:'5'}));
+  if(!document.getElementById('qaHistory')||mvpSelected!==requirementId)return;
+  qaHistoryItems=data.items;
+  host.innerHTML=`<b>Previous questions</b>${data.items.length?data.items.map((item,index)=>`<button class="qaHistoryItem" onclick="showMvpQaHistory(${index})">${esc(item.question.slice(0,90))}<small>${esc(new Date(item.created_at).toLocaleString('ko-KR'))} · ${esc(item.model||'로컬 범위 검사')}</small></button>`).join(''):'<div class="muted">저장된 질문이 없습니다.</div>'}`;
+ }catch(error){host.innerHTML=`<div class="callout bad">이력 조회 실패: ${esc(error.message)}</div>`}
+}
+function showMvpQaHistory(index){
+ const item=qaHistoryItems[index];if(!item)return;
+ document.getElementById('qaQuestion').value=item.question;
+ document.getElementById('qaResult').innerHTML=qaAnswerHtml(item,true);
+}
+function openMvpQa(){
+ const req=mvpCatalog?.requirements.find(r=>r.id===mvpSelected);if(!req)return;
+ qaHistoryItems=[];
+ openModal(`Q&A · ${req.id}`,`<div class="muted">선택된 ECSS §${esc(req.spec.clause)}의 Spec, Golden, RTL을 근거로 답합니다. Test와 최신 실행 결과는 검증 질문일 때만 포함합니다. 질문 시 해당 발췌가 OpenAI API로 전송됩니다.</div><label for="qaQuestion"><b>Question</b></label><textarea id="qaQuestion" class="qaQuestion" maxlength="1000" placeholder="예: credit이 0일 때 N-Char 전송은 어떻게 막히나?"></textarea><div class="row" style="margin-top:8px"><button id="qaSubmit" class="btn primary" onclick="askMvpQa()">Ask</button></div><div id="qaResult" role="status" aria-live="polite"></div><div id="qaHistory" class="qaHistory"></div>`);
+ document.getElementById('qaQuestion')?.focus();
+ loadMvpQaHistory(req.id);
+}
+async function askMvpQa(){
+ const question=document.getElementById('qaQuestion')?.value.trim(),result=document.getElementById('qaResult'),button=document.getElementById('qaSubmit');
+ if(!question){result.textContent='질문을 입력하세요.';return}
+ button.disabled=true;result.textContent='근거를 확인하며 답변 중…';
+ try{
+  const data=await apiJson('/api/qa',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({requirement_id:mvpSelected,question})});
+  result.innerHTML=qaAnswerHtml(data);
+  if(data.history_saved)loadMvpQaHistory(mvpSelected);
+ }catch(error){result.innerHTML=`<div class="callout bad">${esc(error.message)}</div>`}
+ finally{button.disabled=false}
+}
 function selectTraceAsset(layer,index){
  const req=mvpCatalog.requirements.find(r=>r.id===mvpSelected),item=req?.trace?.[layer]?.[index];
  if(!item)return;
@@ -2322,7 +2370,7 @@ function renderMvp(){
  content.innerHTML=`<div class="traceShell" style="grid-template-columns:${traceNavWidth}px minmax(0,1fr)">${traceNavigator(req)}<div class="navWidthHandle" style="left:${traceNavWidth-4}px" role="separator" aria-label="Resize Trace Navigator" aria-orientation="vertical" tabindex="0" onpointerdown="startNavigatorResize(event)" onkeydown="navigatorResizeKey(event)"></div><section class="traceWorkspace" style="${gridTemplateStyle()};--row1:${gridRatios.rows[0]}%;--row2:${gridRatios.rows[1]}%;--code-split:${codeSplit}%">
  <article class="dockPane specDock" id="specDock">${dockHead('SPEC','specDock')}<div class="dockBody">${traceSpecBody(req)}</div></article>
  <article class="dockPane fsmDock ${selectionContext.layer==='behavior'?'contextSelected':''}" id="fsmDock">${dockHead('BEHAVIOR','fsmDock')}<div class="dockBody" onclick="selectTraceLayer('behavior')">${behaviorFsm(req)}</div></article>
- <article class="dockPane propertyDock" id="propertyDock">${dockHead('TRACE PROPERTIES','propertyDock')}<div class="dockBody"><dl class="traceProperties"><dt>trace_id</dt><dd>${esc(selectionContext.trace_id)}</dd><dt>clause</dt><dd>ECSS §${esc(selectionContext.clause)}</dd><dt>title</dt><dd>${esc(req.title)}</dd><dt>selected</dt><dd>${esc(selectionContext.layer)}${selectionContext.symbol?` · ${esc(selectionContext.symbol)}`:''}</dd><dt>event</dt><dd>${esc(selectionContext.event)}</dd><dt>latest</dt><dd><span class="badge ${status==='PASS'?'good':status==='FAIL'?'bad':'neutral'}">${status}</span></dd></dl><h4>Executable behavior</h4><div class="callout"><b>Trigger:</b> ${esc(req.behavior.trigger)}<br><b>Expected:</b> ${esc(req.behavior.expected)}</div></div></article>
+ <article class="dockPane propertyDock" id="propertyDock">${dockHead('TRACE PROPERTIES','propertyDock')}<div class="dockBody"><button class="btn qaEntry" onclick="openMvpQa()">Ask about this trace</button><dl class="traceProperties"><dt>trace_id</dt><dd>${esc(selectionContext.trace_id)}</dd><dt>clause</dt><dd>ECSS §${esc(selectionContext.clause)}</dd><dt>title</dt><dd>${esc(req.title)}</dd><dt>selected</dt><dd>${esc(selectionContext.layer)}${selectionContext.symbol?` · ${esc(selectionContext.symbol)}`:''}</dd><dt>event</dt><dd>${esc(selectionContext.event)}</dd><dt>latest</dt><dd><span class="badge ${status==='PASS'?'good':status==='FAIL'?'bad':'neutral'}">${status}</span></dd></dl><h4>Executable behavior</h4><div class="callout"><b>Trigger:</b> ${esc(req.behavior.trigger)}<br><b>Expected:</b> ${esc(req.behavior.expected)}</div></div></article>
  <div class="codeRow" style="grid-template-columns:${codeSplit}fr ${100-codeSplit}fr"><article class="dockPane goldenDock ${selectionContext.layer==='golden'?'contextSelected':''}" id="goldenDock">${dockHead('GOLDEN','goldenDock',esc(golden.symbol))}<div class="dockBody sourceDockBody" onclick="selectTraceAsset('golden',${sourceTabIndex.golden})">${sourcePane('golden',req)}</div></article>
  <article class="dockPane rtlDock ${selectionContext.layer==='rtl'?'contextSelected':''}" id="rtlDock">${dockHead('RTL','rtlDock',esc(rtl.symbol))}<div class="dockBody sourceDockBody" onclick="selectTraceAsset('rtl',${sourceTabIndex.rtl})">${sourcePane('rtl',req)}</div></article><div class="codeSplitter" style="left:${codeSplit}%" role="separator" aria-label="Resize Golden and RTL" aria-orientation="vertical" tabindex="0" onpointerdown="startCodeResize(event)" onkeydown="codeResizeKey(event)"></div></div>
  <article class="dockPane waveDock" id="waveDock">${dockHead('WAVE','waveDock',esc(req.waveform.annotation))}<div class="dockBody">${waveHtml(mvpBundle?.waveform,req.waveform)}</div></article>

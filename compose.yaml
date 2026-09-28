@@ -1,0 +1,50 @@
+services:
+  spec2rtl-app:
+    build: .
+    command: ["uvicorn", "fastapi_server:app", "--app-dir", "app/backend", "--host", "0.0.0.0", "--port", "8765"]
+    user: "${LOCAL_UID:-1000}:${LOCAL_GID:-1000}"
+    ports:
+      - "127.0.0.1:8765:8765"
+    environment:
+      SPEC2RTL_DB_PATH: /app/app/backend/.runtime/qa-history.sqlite3
+    volumes:
+      - ./runs:/app/runs
+      - ./app/backend/.runtime:/app/app/backend/.runtime
+      - ./assets/spec:/app/assets/spec:ro
+      - ./.env:/app/.env:ro
+    read_only: true
+    tmpfs:
+      - /tmp:rw,nosuid,nodev,size=64m
+    init: true
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8765/api/health', timeout=2).close()"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+  spec2rtl-fastapi:
+    profiles: [fastapi]
+    build: .
+    command: ["uvicorn", "fastapi_server:app", "--app-dir", "app/backend", "--host", "0.0.0.0", "--port", "8766"]
+    user: "${LOCAL_UID:-1000}:${LOCAL_GID:-1000}"
+    ports:
+      - "127.0.0.1:8766:8766"
+    environment:
+      SPEC2RTL_DB_PATH: /app/app/backend/.runtime/qa-history.sqlite3
+    volumes:
+      - ./app/backend/.runtime/fastapi-preview-runs:/app/runs
+      - ./app/backend/.runtime/fastapi-preview:/app/app/backend/.runtime
+      - ./assets/spec:/app/assets/spec:ro
+      - ./.env:/app/.env:ro
+    read_only: true
+    tmpfs:
+      - /tmp:rw,nosuid,nodev,size=64m
+    init: true
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8766/api/health', timeout=2).close()"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s

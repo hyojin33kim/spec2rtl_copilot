@@ -1,0 +1,139 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title description">
+  <title id="title">Spec2RTL Copilot current deployment architecture</title>
+  <desc id="description">A browser connects to a single Docker FastAPI container on local port 8765. The container serves Trace Explorer, trace navigation, selected requirement Q&amp;A, and Golden and RTL verification. Host mounts hold SQLite, run evidence, the ECSS PDF, and the API key environment file. Q&amp;A calls the external OpenAI API.</desc>
+  <defs>
+    <filter id="shadow" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="7" stdDeviation="10" flood-color="#15345b" flood-opacity="0.10"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#477399"/>
+    </marker>
+    <marker id="arrow-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8056c7"/>
+    </marker>
+    <style>
+      text { font-family: Arial, "DejaVu Sans", sans-serif; fill: #1d2b42; }
+      text[fill="#fff"] { fill: #fff; }
+      text[fill="#d9f3f6"] { fill: #d9f3f6; }
+      .title { font-size: 35px; font-weight: 800; letter-spacing: -1px; }
+      .subtitle { font-size: 17px; fill: #5b6d84; }
+      .section { font-size: 21px; font-weight: 750; }
+      .cardTitle { font-size: 20px; font-weight: 750; }
+      .body { font-size: 16px; }
+      .small { font-size: 14px; fill: #5b6d84; }
+      .tiny { font-size: 13px; fill: #66768b; }
+      .mono { font-family: "DejaVu Sans Mono", Consolas, monospace; }
+      .edge { fill: none; stroke: #477399; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; marker-end: url(#arrow); }
+      .edgePurple { fill: none; stroke: #8056c7; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; marker-end: url(#arrow-purple); }
+    </style>
+  </defs>
+
+  <rect width="1600" height="900" fill="#f5f8fc"/>
+  <rect x="0" y="0" width="1600" height="11" fill="#147e91"/>
+  <text x="64" y="69" class="title">Spec2RTL Copilot · Current Architecture</text>
+  <text x="65" y="103" class="subtitle">FastAPI deployment  ·  one Docker container  ·  four TX credit pilot requirements</text>
+  <rect x="1254" y="40" width="284" height="43" rx="21" fill="#e1f4ed" stroke="#98d9bc"/>
+  <circle cx="1278" cy="61" r="6" fill="#1b9e68"/>
+  <text x="1293" y="67" font-size="16" font-weight="700" fill="#167250">LIVE  127.0.0.1:8765</text>
+
+  <!-- Browser -->
+  <rect x="58" y="222" width="276" height="400" rx="21" fill="#fff" stroke="#d5e1ee" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="58" y="222" width="276" height="74" rx="21" fill="#213855"/>
+  <rect x="58" y="272" width="276" height="24" fill="#213855"/>
+  <circle cx="84" cy="256" r="6" fill="#ee7e86"/>
+  <circle cx="104" cy="256" r="6" fill="#f2c468"/>
+  <circle cx="124" cy="256" r="6" fill="#76c9a7"/>
+  <text x="79" y="332" class="section">User browser</text>
+  <text x="79" y="361" class="small">Single HTML / JavaScript UI</text>
+  <line x1="79" y1="385" x2="310" y2="385" stroke="#e4ebf3" stroke-width="2"/>
+  <rect x="79" y="405" width="230" height="42" rx="10" fill="#ecf6f9"/>
+  <text x="94" y="432" class="body">Trace Explorer</text>
+  <rect x="79" y="458" width="230" height="42" rx="10" fill="#ecf6f9"/>
+  <text x="94" y="485" class="body">Trace Navigator / search</text>
+  <rect x="79" y="511" width="230" height="42" rx="10" fill="#f2ecfb"/>
+  <text x="94" y="538" class="body">Selected trace Q&amp;A</text>
+  <text x="79" y="587" class="small">Run tests · inspect evidence</text>
+
+  <!-- Docker boundary and app -->
+  <rect x="391" y="161" width="774" height="615" rx="25" fill="#edf4fb" stroke="#8bacca" stroke-width="2.5" stroke-dasharray="11 8"/>
+  <text x="420" y="200" class="section" fill="#294f77">Docker Compose · default service</text>
+  <text x="1058" y="199" class="small mono">1 container</text>
+  <rect x="419" y="222" width="718" height="523" rx="20" fill="#fff" stroke="#c7d8e8" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="419" y="222" width="718" height="92" rx="20" fill="#165d73"/>
+  <rect x="419" y="292" width="718" height="22" fill="#165d73"/>
+  <text x="449" y="259" font-size="25" font-weight="800" fill="#fff">spec2rtl-app</text>
+  <text x="449" y="289" font-size="17" fill="#d9f3f6">Uvicorn + FastAPI · Python 3.13</text>
+  <rect x="925" y="248" width="183" height="40" rx="20" fill="#d9f3f6"/>
+  <text x="947" y="274" font-size="15" font-weight="700" fill="#165d73">HTTP :8765</text>
+
+  <rect x="447" y="342" width="662" height="83" rx="14" fill="#eaf6f8" stroke="#acd9df" stroke-width="2"/>
+  <text x="469" y="373" class="cardTitle" fill="#166175">UI serving + API routes</text>
+  <text x="469" y="401" class="small">/api/catalog · /api/source · /api/latest · /api/qa · /api/run</text>
+
+  <rect x="447" y="458" width="204" height="185" rx="15" fill="#eef4ff" stroke="#c2d3f4" stroke-width="2"/>
+  <rect x="466" y="476" width="43" height="43" rx="11" fill="#d4e2ff"/>
+  <text x="478" y="505" font-size="24" font-weight="800" fill="#365ca9">T</text>
+  <text x="466" y="549" class="cardTitle" fill="#315895">Trace / search</text>
+  <text x="466" y="578" class="small">catalog trace links</text>
+  <text x="466" y="603" class="small">SQLite FTS5 index</text>
+  <text x="466" y="628" class="tiny">Spec → Golden → RTL → Test</text>
+
+  <rect x="667" y="458" width="204" height="185" rx="15" fill="#f5effc" stroke="#d9c4f2" stroke-width="2"/>
+  <rect x="686" y="476" width="43" height="43" rx="11" fill="#e7d8fa"/>
+  <text x="698" y="505" font-size="24" font-weight="800" fill="#8056c7">Q</text>
+  <text x="686" y="549" class="cardTitle" fill="#714aae">Evidence Q&amp;A</text>
+  <text x="686" y="578" class="small">Selected trace only</text>
+  <text x="686" y="603" class="small">Citations + history</text>
+  <text x="686" y="628" class="tiny">Default: gpt-5-mini</text>
+
+  <rect x="887" y="458" width="222" height="185" rx="15" fill="#fff6e9" stroke="#f0d6a5" stroke-width="2"/>
+  <rect x="906" y="476" width="43" height="43" rx="11" fill="#fce8bf"/>
+  <text x="917" y="505" font-size="24" font-weight="800" fill="#ad7621">R</text>
+  <text x="906" y="549" class="cardTitle" fill="#9f6a1f">Verification runner</text>
+  <text x="906" y="578" class="small">Golden Model · Icarus</text>
+  <text x="906" y="603" class="small">JUnit · VCD · waveform</text>
+  <text x="906" y="628" class="tiny">Run lock / PASS verdict</text>
+
+  <rect x="447" y="674" width="662" height="48" rx="11" fill="#f3f7fa" stroke="#dde7ee"/>
+  <text x="465" y="704" class="small">In image: UI · manifests/catalog.json · Golden / RTL / Test snapshots</text>
+
+  <!-- External API -->
+  <rect x="1223" y="175" width="322" height="140" rx="20" fill="#fff" stroke="#d8c5ee" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="1223" y="175" width="322" height="49" rx="20" fill="#8056c7"/>
+  <rect x="1223" y="204" width="322" height="20" fill="#8056c7"/>
+  <text x="1245" y="207" font-size="18" font-weight="750" fill="#fff">External OpenAI API</text>
+  <text x="1245" y="260" class="body">Responses API · gpt-5-mini</text>
+  <text x="1245" y="286" class="small">Selected trace evidence only</text>
+
+  <!-- Host-mounted data -->
+  <rect x="1223" y="357" width="322" height="389" rx="20" fill="#fff" stroke="#cbded7" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="1223" y="357" width="322" height="52" rx="20" fill="#26765f"/>
+  <rect x="1223" y="389" width="322" height="20" fill="#26765f"/>
+  <text x="1245" y="390" font-size="18" font-weight="750" fill="#fff">Host files · bind mounts</text>
+  <text x="1245" y="441" font-size="16" font-weight="700" fill="#23614f">SQLite · read / write</text>
+  <text x="1245" y="466" class="small mono">.runtime/qa-history.sqlite3</text>
+  <text x="1245" y="489" class="tiny">Q&amp;A history + Spec search index</text>
+  <line x1="1245" y1="509" x2="1523" y2="509" stroke="#e3ece8"/>
+  <text x="1245" y="538" font-size="16" font-weight="700" fill="#23614f">Run evidence · read / write</text>
+  <text x="1245" y="563" class="small mono">runs/</text>
+  <text x="1245" y="586" class="tiny">run.json · logs · JUnit · VCD</text>
+  <line x1="1245" y1="606" x2="1523" y2="606" stroke="#e3ece8"/>
+  <text x="1245" y="636" font-size="16" font-weight="700" fill="#23614f">Inputs · read only</text>
+  <text x="1245" y="661" class="small mono">assets/spec/*.pdf</text>
+  <text x="1245" y="687" class="small mono">.env  (OPENAI_API_KEY)</text>
+  <text x="1245" y="718" class="tiny">PDF and key are excluded from the image</text>
+
+  <!-- Labeled connections -->
+  <path class="edge" d="M 334 391 H 432"/>
+  <rect x="346" y="352" width="95" height="27" rx="8" fill="#f5f8fc"/>
+  <text x="353" y="371" class="tiny mono">localhost</text>
+  <path class="edgePurple" d="M 769 458 V 437 H 1188 V 247 H 1223"/>
+  <rect x="1029" y="394" width="125" height="27" rx="8" fill="#f5f8fc"/>
+  <text x="1037" y="413" class="tiny">HTTPS / Q&amp;A</text>
+  <path class="edge" d="M 1137 680 H 1189 V 566 H 1223"/>
+  <rect x="1139" y="624" width="65" height="27" rx="8" fill="#f5f8fc"/>
+  <text x="1148" y="643" class="tiny">mount</text>
+
+  <text x="66" y="833" class="small">Default deployment: one spec2rtl-app container · optional isolated 8766 preview is inactive</text>
+  <text x="66" y="859" class="tiny">Sources: compose.yaml · Dockerfile · app/backend/fastapi_server.py · app/backend/history.py · app/backend/spec_index.py</text>
+</svg>

@@ -7,11 +7,18 @@ import argparse
 import json
 import pathlib
 import re
+import sqlite3
 import subprocess
+import sys
 import threading
 import urllib.parse
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+from qa import QAError, answer_question
+from history import list_answers, save_answer
+from spec_index import search_spec
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
@@ -107,6 +114,10 @@ class Handler(BaseHTTPRequestHandler):
                 self.json_response(catalog)
             elif parsed.path == "/api/latest":
                 self.json_response(latest_bundle())
+            elif parsed.path == "/api/qa/history":
+                self.serve_qa_history(urllib.parse.parse_qs(parsed.query))
+            elif parsed.path == "/api/spec/search":
+                self.serve_spec_search(urllib.parse.parse_qs(parsed.query))
             elif parsed.path == "/api/spec/pdf":
                 self.serve_file(SPEC_PDF, "application/pdf", inline=True)
             elif parsed.path == "/api/spec/page":
@@ -165,12 +176,45 @@ class Handler(BaseHTTPRequestHandler):
         }
         if name not in allowed:
             raise ValueError("Unknown or disallowed artifact")
-        _, run_dir = latest_run_dir()
+        run_id = query.get("run_id", [None])[0]
+        if run_id is None:
+            _, run_dir = latest_run_dir()
+        else:
+            if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9+._-]{0,119}", run_id):
+                raise ValueError("Invalid run ID")
+            run_dir = (ROOT / "runs" / run_id).resolve()
+            if not run_dir.is_relative_to((ROOT / "runs").resolve()):
+                raise ValueError("Invalid run ID")
         filename, content_type = allowed[name]
         path = run_dir / filename
         if not path.is_file():
             raise FileNotFoundError(f"Artifact not found: {filename}")
         self.serve_file(path, content_type, inline=name in {"junit", "waveform", "log"})
+
+    def serve_qa_history(self, query: dict) -> None:
+        requirement_id = query.get("requirement_id", [""])[0]
+        catalog = read_json(CATALOG)
+        if requirement_id not in {item["id"] for item in catalog["requirements"]}:
+            raise ValueError("Requirement is outside the TX-credit pilot")
+        limit = int(query.get("limit", ["5"])[0])
+        if not 1 <= limit <= 20:
+            raise ValueError("History limit must be 1–20")
+        try:
+            items = list_answers(requirement_id, limit)
+        except (sqlite3.Error, OSError, ValueError):
+            self.error_response(503, "HISTORY_UNAVAILABLE", "Q&A history is unavailable")
+            return
+        self.json_response({"requirement_id": requirement_id, "items": items})
+
+    def serve_spec_search(self, query: dict) -> None:
+        text = query.get("q", [""])[0]
+        limit = int(query.get("limit", ["20"])[0])
+        try:
+            items = search_spec(text, read_json(CATALOG), limit)
+        except (sqlite3.Error, OSError):
+            self.error_response(503, "SPEC_INDEX_UNAVAILABLE", "Spec search is unavailable")
+            return
+        self.json_response({"query": text.strip(), "source": "manifests/catalog.json", "items": items})
 
     def serve_spec_page(self, query: dict) -> None:
         if not SPEC_PDF.is_file():
@@ -196,7 +240,11 @@ class Handler(BaseHTTPRequestHandler):
         self.serve_file(image, "image/png", inline=True)
 
     def do_POST(self) -> None:  # noqa: N802
-        if urllib.parse.urlparse(self.path).path != "/api/run":
+        path = urllib.parse.urlparse(self.path).path
+        if path == "/api/qa":
+            self.ask_qa()
+            return
+        if path != "/api/run":
             self.error_response(404, "NOT_FOUND", "Unknown endpoint")
             return
         if not RUN_LOCK.acquire(blocking=False):
@@ -229,6 +277,38 @@ class Handler(BaseHTTPRequestHandler):
             self.error_response(400, "BAD_REQUEST", str(exc))
         finally:
             RUN_LOCK.release()
+
+    def ask_qa(self) -> None:
+        try:
+            size = int(self.headers.get("Content-Length", "0"))
+            if not 0 < size <= 4096:
+                raise QAError("BAD_REQUEST", "Request body must be 1–4096 bytes")
+            body = json.loads(self.rfile.read(size))
+            if not isinstance(body, dict) or not isinstance(body.get("requirement_id"), str) or not isinstance(body.get("question"), str):
+                raise QAError("BAD_REQUEST", "requirement_id and question are required")
+            catalog = read_json(CATALOG)
+            req = next((item for item in catalog["requirements"] if item["id"] == body["requirement_id"]), None)
+            if req is None:
+                raise QAError("UNKNOWN_REQUIREMENT", "Requirement is outside the TX-credit pilot")
+            try:
+                _, run_dir = latest_run_dir()
+                run = read_json(run_dir / "run.json")
+            except FileNotFoundError:
+                run = None
+            answer = answer_question(req, body["question"], run)
+            linked_run = run["run_id"] if run and any(
+                item["kind"] == "evidence" for item in answer["sources"]) else None
+            try:
+                saved = save_answer(req["id"], body["question"].strip(), answer, linked_run)
+                answer["history_saved"] = True
+                answer["history_id"] = saved["id"]
+            except (sqlite3.Error, OSError, ValueError):
+                answer["history_saved"] = False
+            self.json_response(answer)
+        except (ValueError, json.JSONDecodeError):
+            self.error_response(400, "BAD_REQUEST", "Invalid JSON request")
+        except QAError as exc:
+            self.error_response(exc.status, exc.code, str(exc))
 
     def log_message(self, fmt: str, *args) -> None:
         print(f"{self.address_string()} - {fmt % args}")

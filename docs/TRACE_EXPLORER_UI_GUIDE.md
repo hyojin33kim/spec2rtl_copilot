@@ -128,6 +128,23 @@ PDF 본문의 글자는 이미지(raster)이므로 일반 CSS 폰트 크기로 �
 
 현재 모든 글자는 Arial/Segoe UI 계열의 비례폭 폰트다. `trace_id`도 monospace가 아니다.
 
+### 선택 항목 Q&A
+
+`Ask about this trace`는 TRACE PROPERTIES 패널 본문 맨 위에 있으며,
+현재 선택된 Requirement에 대한 질문 창을 연다. 질문을 보내면
+Backend가 해당 Requirement의 Spec excerpt, Golden/RTL/Test 연결 소스와 최신 실행
+결과를 근거로 사용한다. Test와 최신 실행 결과는 질문이 검증·실행 증거를 요구할 때만
+LLM에 전달한다. 답변의 `[S1]`, `[G1]`, `[R1]`, `[T1]`, `[E1]` 표기는
+질문 창 아래의 Sources 링크에 연결된다. 링크는 Spec PDF, 소스 발췌 또는 JUnit을 연다.
+PDF가 로컬에 설치되지 않은 경우 Spec 링크는 열리지 않는다.
+질문 창은 선택된 근거 발췌가 외부 OpenAI API로 전송됨을 표시한다.
+질문과 답변은 로컬 SQLite에 저장된다. `Previous questions`에는 현재 Requirement의
+최근 5건이 표시되며, 항목을 누르면 저장된 답변과 근거를 다시 보여준다.
+저장된 실행 근거 링크는 질문 당시의 run ID를 사용한다. 이력 조회는 LLM을 호출하지 않는다.
+
+Q&A는 기존 테스트의 PASS/FAIL을 설명할 수 있지만 새 판정을 수행하지 않는다.
+API 키가 없거나 LLM 호출에 실패하면 질문 창에 오류가 표시된다.
+
 ## 8. GOLDEN / RTL 패널
 
 실제 trace source를 보여주는 두 개의 **source viewer**다.
@@ -184,7 +201,9 @@ Source viewer는 11px monospace, line-height 1.55를 사용한다. GOLDEN과 RTL
 ## 11. 구현 파일 위치
 
 - UI와 interaction: `app/ui/spec2rtl_harness_demo_v1_7_4.html`
-- Backend/API: `app/backend/server.py`
+- 기본 Docker Backend/API: `app/backend/fastapi_server.py`
+- 공유 helper 및 로컬 레거시 서버: `app/backend/server.py`
+- Q&A evidence bundle 및 OpenAI adapter: `app/backend/qa.py`
 - Trace catalog: `manifests/catalog.json`
 - Behavior/FSM data: `manifests/behavior-models.json`
 - Selection event 계약: `manifests/selection-context.json`

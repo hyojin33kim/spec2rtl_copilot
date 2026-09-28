@@ -1,0 +1,227 @@
+
+===== golden =====
+$ python3 spw_ref_model_test_v5.py
+============================================================
+SpaceWire Reference Model 자체 검증 (HO_01 섹션 7.3)
+============================================================
+
+[시나리오 1] 링크 초기화: ErrorReset -> Run
+  [PASS] Node A가 Run 상태 도달 (cycle=2041)
+  [PASS] Node B가 Run 상태 도달 (cycle=2041)
+
+[시나리오 2] 타이머 정확도 (ErrorReset=6.4us / ErrorWait=12.8us / Connecting=12.8us)
+  [PASS] ErrorReset 구간 길이 == CNT_6US (±1) (measured=640, expected=640)
+  [PASS] ErrorWait 구간 길이 == CNT_12US (±1) (measured=1280, expected=1280)
+  [PASS] Connecting 구간 길이가 CNT_12US 이내 (measured=40, limit=1280)
+
+[시나리오 3] FCT / credit 소진 시 송신 차단
+  [PASS] 사전조건: 양 노드 Run 상태
+  [PASS] Run 진입 시점 credit>=8 확보 (tx_credit=8)
+  [PASS] B가 송신한 문자를 모두 수신 (credit 부족분은 이후 FCT로 보충되어 결국 도달) (received=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], n_send=13)
+
+[시나리오 4] 패킷 TX/RX (EOP 포함)
+  [PASS] 수신 데이터 바이트 == 송신 데이터 바이트 (rx=[16, 32, 48, 171, 255])
+  [PASS] EOP 정상 수신 (bit8=1, code=0x00) (last=256)
+
+[시나리오 5] Parity 에러 주입 (정확히 1비트 반전)
+  [PASS] 사전조건: B가 Run 상태
+  [PASS] parity_error 플래그 발생 (정확히 1비트 반전)
+  [PASS] parity_error 이후 ErrorReset 진입
+
+[시나리오 6] Disconnect 주입 (무신호 정지)
+  [PASS] 사전조건: B가 Run 상태
+  [PASS] disconnect 플래그 발생
+  [PASS] disconnect 이후 ErrorReset 진입
+  [PASS] disconnect 감지 소요 사이클 ≈ CNT_DISC [CNT_DISC=85] (measured=85)
+
+[시나리오 7] Timecode 송수신
+  [PASS] ow_tick_out 펄스 수신
+  [PASS] time_in == time_out (expected=0xAA, got=170)
+
+[시나리오 8] Credit 경계값 스윕 (55/56/57/64바이트) — ERRATA-11/23 회귀
+  [PASS] [55B] 수신 바이트 == 송신 바이트 (len(rx)=55)
+  [PASS] [55B] EOP 정상 수신 (last=256)
+  [PASS] [55B] credit_error 미발생 (정상 흐름제어 내) (credit_error=False)
+  [PASS] [56B] 수신 바이트 == 송신 바이트 (len(rx)=56)
+  [PASS] [56B] EOP 정상 수신 (last=256)
+  [PASS] [56B] credit_error 미발생 (정상 흐름제어 내) (credit_error=False)
+  [PASS] [57B] 수신 바이트 == 송신 바이트 (len(rx)=57)
+  [PASS] [57B] EOP 정상 수신 (last=256)
+  [PASS] [57B] credit_error 미발생 (정상 흐름제어 내) (credit_error=False)
+  [PASS] [64B] 수신 바이트 == 송신 바이트 (len(rx)=64)
+  [PASS] [64B] EOP 정상 수신 (last=256)
+  [PASS] [64B] credit_error 미발생 (정상 흐름제어 내) (credit_error=False)
+
+[시나리오 9] Credit error 주입 (MAX_CREDIT 초과 독립 FCT 강제)
+  [PASS] 사전조건: A가 Run 상태
+  [PASS] MAX_CREDIT 초과 FCT 주입 -> credit_error 발생 (tx_credit=52, credit_error=True)
+  [PASS] credit_error 시 tx_credit 추가 가산 금지 (saturate 아님) (tx_credit=52)
+  [PASS] RUN 중 credit_error -> ErrorReset 즉시 전이 (state=0)
+  [PASS] credit_error 플래그가 reset 시 클리어됨 (reset() 경로는 다음 tick에서 _enter(ERROR_RESET) 시 확인)
+
+[시나리오 10] port_reset: 프로토콜 상태만 리셋, 사용자 FIFO 보존
+  [PASS] 사전조건: 양 노드 Run 상태
+  [PASS] port_reset 전 B의 RX FIFO에 데이터 적재됨 (rx_fifo_len=3)
+  [PASS] port_reset 인가 -> B가 ErrorReset 상태로 전이 (state=0)
+  [PASS] port_reset 이후에도 RX FIFO 사용자 데이터 보존됨 (유실 없음) (before=3, after=4)
+  [PASS] [ERRATA-18] 미완성 패킷이었으므로 EEP 가 자동으로 뒤에 추가됨 (2026-09-02 구현 이전엔 이 자리가 그냥 3바이트로 끝났었음) (rx_fifo=[DATA(0x11), DATA(0x22), DATA(0x33), EEP])
+  [PASS] port_reset 이후 재연결 -> 양쪽 다시 Run 도달 (B state=5)
+
+[시나리오 11] i_rst_n vs port_reset 구분 (DECISION-16)
+  [PASS] 사전조건: 양 노드 Run 상태
+  [PASS] i_rst_n 인가 전 B의 RX FIFO에 데이터 적재됨 (rx_fifo_len=3)
+  [PASS] i_rst_n 인가 -> B가 ErrorReset 상태로 전이 (state=0)
+  [PASS] i_rst_n 인가 -> port_reset과 달리 RX FIFO 도 초기화됨 (사용자 데이터 유실) (rx_fifo_len=0 (port_reset이었다면 3 이어야 함))
+  [PASS] i_rst_n 인가 -> TX FIFO 도 초기화됨 (tx_fifo_len=0)
+  [PASS] [대조] port_reset은 FIFO를 보존함 (i_rst_n과의 차이 확인, ERRATA-18로 EEP 1개가 추가된 것 포함) (rx_fifo=[DATA(0x11), DATA(0x22), DATA(0x33), EEP])
+  [PASS] i_rst_n 이후 재연결 -> 양쪽 다시 Run 도달 (B state=5)
+
+[시나리오 12] Camera-to-memory 유사 스트림 (4패킷 x 300바이트)
+  [PASS] 패킷 1/4 (300B) 무결성 + EOP
+  [PASS] 패킷 2/4 (300B) 무결성 + EOP
+  [PASS] 패킷 3/4 (300B) 무결성 + EOP
+  [PASS] 패킷 4/4 (300B) 무결성 + EOP
+  [PASS] 전체 스트림 동안 credit_error 없음 (연속 패킷 흐름제어 정상) (credit_error=False)
+  [PASS] 전체 스트림 동안 disconnect 없음 (disconnect=False)
+
+[시나리오 13] Timecode RUN 이전 폐기 확인 — ERRATA-19 회귀
+  [PASS] 사전조건: Connecting 상태에서 tick_in 주입함
+  [PASS] 사전조건: 이후 Run 상태 도달
+  [PASS] RUN 이전 tick_in 은 폐기됨 (RUN 이후 지연 발송 없음)
+  [PASS] RUN 이후 정상 tick_in 은 정상적으로 tick_out 전달 (got=True, time=42)
+
+[시나리오: ESC/Null 원자성] 두 번째 문자(FCT) 완성 원자성 (encoder busy 회귀 감시)
+  [PASS] Node A: ESC 문자가 실제로 관찰됨 (esc_count=2497)
+  [PASS] Node A: 모든 ESC 뒤에 FCT/TIMECODE 만 옴 (유실/중복 없음) (violations=0)
+  [PASS] Node B: ESC 문자가 실제로 관찰됨 (esc_count=2497)
+  [PASS] Node B: 모든 ESC 뒤에 FCT/TIMECODE 만 옴 (유실/중복 없음) (violations=0)
+
+[시나리오 14] Parity error가 credit 경계(56바이트) 부근에서 발생 (복합 결함)
+  [PASS] 사전조건: 양 노드 Run 상태
+  [PASS] credit 경계 부근 parity error -> B가 ErrorReset 진입 (B state=0, fault_started=True)
+  [PASS] ErrorReset 진입 시 rx_credit_budget 도 함께 초기화됨 (좀비 상태 없음)
+  [PASS] 결함 복구 후 재연결 -> 양쪽 다시 Run 도달 (동시 RUN 상태 직접 확인) (A=5, B=5)
+  [PASS] [ERRATA-26, 2026-09-02 해결 확인] 끊긴 패킷의 잔여 바이트가 재연결 후 전혀 새 나가지 않음 (leaked==0, tx_flushing이 내부에서 조용히 버림) (leaked_bytes=0: [])
+  [PASS] 잔재를 비운 뒤에는 새 패킷이 깨끗하게 정상 송수신됨 (received=[17, 34, 51, 256])
+
+[시나리오 15] 양쪽 노드에 동시 port_reset (복합 결함 — 레이스 조건)
+  [PASS] 사전조건: 양 노드 Run 상태
+  [PASS] 동시 port_reset -> 양쪽 다 ErrorReset 진입 (A=0, B=0)
+  [PASS] 동시 리셋 후 재연결 -> 양쪽 다시 Run 도달 (데드락 없음) (A=5, B=5)
+  [PASS] 재연결 후 정상 송수신 (received=[170, 187, 256])
+
+[시나리오 16] ESC 원자쌍의 두 번째 문자 전송 도중 결함 (복합 결함)
+  [PASS] 사전조건: 양 노드 Run 상태
+  [PASS] ESC 직후(원자쌍 진행 중) port_reset 주입됨
+  [PASS] port_reset 이후 B가 ErrorReset 진입 (B state=0)
+  [PASS] 원자쌍 잔재(_esc_seq_continue) 리셋으로 정리됨
+  [PASS] 재연결 -> 양쪽 다시 Run 도달 (동시 RUN 상태 직접 확인) (A=5, B=5)
+  [PASS] 재연결 후 ESC 원자쌍 정상 관측 (esc_count=60)
+  [PASS] 재연결 후 ESC 원자쌍 유실/중복 없음 (violations=0)
+
+[시나리오 17] 명시적 EEP로 패킷 종료, 바로 다음 패킷 연속 (정상 EEP 경로)
+  [PASS] 사전조건: 양 노드 Run 상태
+  [PASS] 패킷 1: DATA 3개 + EEP 정상 수신 (EEP 코드 0x101) (received=[170, 187, 204, 257])
+  [PASS] 패킷 2: EEP 직후 새 패킷이 섞이지 않고 정확히 구분되어 수신됨 (received=[17, 34, 51, 68, 256])
+  [PASS] EEP 처리 중 credit_error/disconnect 없음 (credit_error=False, disconnect=False)
+
+[시나리오 18] EEP 자동 복구 검증 (ERRATA-18, ECSS 5.5.8.4.a.2 — 2026-09-02 구현 완료)
+  [PASS] 사전조건: 양 노드 Run 상태
+  [PASS] 사전조건: EOP/EEP 없이 DATA 3개만 B의 RX FIFO에 도착 (rx_fifo=[DATA(0x10), DATA(0x20), DATA(0x30)])
+  [PASS] port_reset -> ErrorReset 진입
+  [PASS] [ERRATA-18] 끊긴 패킷 뒤에 EEP 가 자동으로 삽입됨 (3바이트 그대로 + EEP 1개) (rx_fifo_after=[DATA(0x10), DATA(0x20), DATA(0x30), EEP])
+  [PASS] [ERRATA-18] eep_pending 즉시 해소됨 (FIFO 에 이미 여유 있었으므로)
+  [PASS] 호스트가 EEP로 종료된 4바이트를 정상적으로 읽어감 (0x101로 종료) (popped=[16, 32, 48, 257])
+  [PASS] 재연결 -> 양쪽 다시 Run 도달 (A=5, B=5)
+  [PASS] 재연결 후 새 패킷이 EEP 뒤에 깨끗하게 이어짐 (경계 섞임 없음) (received=[170, 187, 204, 256])
+
+[시나리오 19] Full-duplex 양방향 동시 트래픽 (item 2)
+  [PASS] 사전조건(A): 양 노드 Run 상태
+  [PASS] A->B 300B, B가 동시에 반대 방향으로 송신 중에도 무결성 유지 (len(recv_at_b)=301/301)
+  [PASS] B->A 250B, A가 동시에 반대 방향으로 송신 중에도 무결성 유지 (len(recv_at_a)=251/251)
+  [PASS] 동시 양방향 트래픽 중 credit_error 없음 (양쪽 독립성 확인) (A.credit_error=False, B.credit_error=False)
+  [PASS] 동시 양방향 트래픽 중 esc_error 없음 (양쪽) (A.esc_error=False, B.esc_error=False)
+  [PASS] 동시 양방향 트래픽 후 양쪽 다 여전히 Run 상태 (A=5, B=5)
+  [PASS] 사전조건(B): 양 노드 Run 상태
+  [PASS] B->A 200B 대용량 패킷, 반대쪽 빈번한 Timecode 주입 중에도 무결성 유지 (len(recv_big)=201/201)
+  [PASS] 빈번한 Timecode 주입 중 다수의 tick_out 이 실제로 도착 (우선순위 스택 유지) (tick_out_events=8/8시도)
+  [PASS] 대용량 패킷 진행 중 credit_error 없음 (양쪽) (A.credit_error=False, B.credit_error=False)
+
+[시나리오 20] EEP 복구 -- RX FIFO full 대기(레벨 신호) + 순서 보장 인터록
+  [PASS] 사전조건: 양 노드 Run 상태
+  [PASS] 사전조건: DATA 8개 도착, RX FIFO(깊이8) 완전히 꽉 참 (len=8)
+  [PASS] 사전조건: 이 시점 rx_free_space == 0
+  [PASS] port_reset -> ErrorReset 진입
+  [PASS] [ERRATA-18] eep_pending 무장됨 (미완성 패킷 있었음, FIFO full)
+  [PASS] [레벨 신호 확인] FIFO 가 안 비는 3000클럭 내내 eep_pending 유지됨 (1클럭 pulse 였다면 훨씬 일찍 사라졌을 것) (still_pending_count=3000/3000)
+  [PASS] [순서보장] eep_pending 동안 재연결 시도해도 Run 에 못 들어감 (초기 FCT 도 인터록으로 보류되어 SentFCT 성립 불가) (B state=4)
+  [PASS] [FIFO 무결성] eep_pending 대기 중에도 FIFO 는 8개 그대로, 오버플로우로 깨지지 않음 (len=8)
+  [PASS] [레벨 신호 확인] 호스트가 드레인 시작하자 eep_pending 이 곧 해소됨 (eep_appeared_cycle=1)
+  [PASS] [순서보장] 호스트가 최종적으로 DATA 8개 -> EEP 순서 그대로 수신 (EEP 가 중간에 끼어들지 않음) (popped=[64, 65, 66, 67, 68, 69, 70, 71, 257])
+  [PASS] eep_pending 해소 후 재연결 -> 양쪽 다시 Run 도달 (A=5, B=5)
+  [PASS] 재연결 후 새 패킷 정상 송수신 (지연된 EEP 복구 이후에도 정상) (received=[119, 136, 256])
+
+[시나리오 21] EEP 복구 -- 유휴 상태(미완성 패킷 없음)에서는 인터록이 걸리지 않음
+  [PASS] 사전조건: 양 노드 Run 상태
+  [PASS] 사전조건: 정상 패킷 완결 수신 (EOP 로 끝남) (received=[1, 2, 256])
+  [PASS] 사전조건: 이 시점 rx_pkt_in_progress == False (EOP 로 이미 종료됨)
+  [PASS] 유휴 상태 port_reset -> ErrorReset 진입
+  [PASS] [대조군] 미완성 패킷이 없었으므로 eep_pending 이 무장되지 않음
+  [PASS] [대조군] RX FIFO에 엉뚱한 EEP 가 추가되지 않음 (완결된 패킷 그대로) (rx_fifo=[])
+  [PASS] [대조군] 인터록 없이 정상 속도로 재연결됨 (A=5, B=5)
+
+[시나리오 22] TX flush 자동 복구 검증 (ERRATA-26)
+  [PASS] 사전조건: 양 노드 Run 상태
+  [PASS] 사전조건: A가 패킷을 다 못 보낸 채(TX FIFO에 잔여 있음) 에러 직전 상태 (residual=50, idx=51/51)
+  [PASS] 사전조건: 아직 EOP 도착 전(패킷 미완결) (received_before=[])
+  [PASS] port_reset(A) -> A가 ErrorReset 진입
+  [PASS] [ERRATA-26] tx_flushing 무장됨 (미송신 패킷 있었음)
+  [PASS] [ERRATA-26] 재연결까지 잔여 바이트가 전혀 새 나가지 않음 (leaked==0) (leaked=[])
+  [PASS] [ERRATA-26] tx_flushing 이 재연결 훨씬 전에 이미 해소됨(내부에서 빠르게 flush)
+  [PASS] 재연결 -> 양쪽 다시 Run 도달 (A=5, B=5)
+  [PASS] 재연결 후 새 패킷 정상 송수신 (잔여 flush 이후에도 정상) (received=[153, 136, 119, 256])
+
+[시나리오 23] TX flush -- 유휴 상태(미송신 패킷 없음)에서는 인터록이 걸리지 않음
+  [PASS] 사전조건: 양 노드 Run 상태
+  [PASS] 사전조건: 정상 패킷 완결 송신 (EOP 로 끝남) (received=[1, 2, 256])
+  [PASS] 사전조건: 이 시점 tx_pkt_in_progress == False (EOP 로 이미 종료됨)
+  [PASS] 유휴 상태 port_reset -> A ErrorReset 진입
+  [PASS] [대조군] 미송신 패킷이 없었으므로 tx_flushing 이 무장되지 않음
+  [PASS] [대조군] 인터록 없이 정상 속도로 재연결됨 (A=5, B=5)
+
+[시나리오 24] DECISION-17 -- 물리적 최대 속도로 tick_in을 toggle할 때 N-Char가 실제로 얼마나 밀리는가 (Option B 적용 후)
+  [PASS] 사전조건(baseline): 양 노드 Run 상태
+  [PASS] baseline: Timecode 트래픽 없이 501바이트 정상 완주 (len(base_recv)=501/501)
+  [PASS] [DECISION-17 Option B] 물리적 최대 tick_in 토글 중에도 501바이트 전량이 결국 정상 도착 (완전 정체 재발 없음) (len(recv)=501/501, stalled=False, cycles_used=72360)
+  [PASS] [DECISION-17 Option B] 지연이 유한하게 상한 걸림 (baseline=50280클럭 대비 201120클럭 이내) (cycles_used=72360, baseline=50280, ratio=1.44x)
+  [PASS] [DECISION-17 Option B] credit_error/esc_error 없음
+  [PASS] [DECISION-17 Option B] Timecode 자체는 여전히 다수 정상 전달됨 (Broadcast 최우선은 정상 동작 시 그대로 유지) (tick_out_events=499)
+
+[시나리오 25] DECISION-18 -- parity/ESC error가 gotNull 이전/이후에 다르게 처리되는가 (Option B: r_gotnull_latch)
+  [PASS] 사전조건(Part A): ErrorWait 도달, 아직 gotNull 이전 (state=1, _gotnull_latch=False)
+  [PASS] [DECISION-18 Option B] gotNull 이전 parity_error 는 ErrorReset을 유발하지 않음 (ErrorWait 유지) (state=1)
+  [PASS] [DECISION-18 Option B] ow_err_parity(원인 신호)는 게이팅 없이 그대로 관측 가능 (검출 자체를 숨기지는 않음) (ow_err_parity=True)
+  [PASS] 사전조건(Part B): 양 노드 Run 상태, gotNull 이후 (state=5, _gotnull_latch=True)
+  [PASS] [DECISION-18 Option B] gotNull 이후에는 parity_error 가 여전히 ErrorReset을 유발함 (게이팅 과잉 아님) (state=0)
+
+============================================================
+결과: PASS 147 / FAIL 0
+============================================================
+
+===== rtl_compile =====
+$ iverilog -g2005-sv -s tb_credit_mvp -o /app/runs/20260928T044401+0000-d466b73b/build/tb_credit_mvp.vvp /app/assets/rtl/spw_datalink_v2.sv /app/assets/rtl/spw_enc.sv /app/assets/rtl/spw_network.sv /app/assets/rtl/spw_phy_v2.sv /app/assets/rtl/spw_top.sv /app/tests/rtl/tb_credit_mvp.sv
+/app/assets/rtl/spw_datalink_v2.sv:825: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/app/assets/rtl/spw_datalink_v2.sv:825: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/app/assets/rtl/spw_datalink_v2.sv:239: vvp.tgt sorry: Case unique/unique0 qualities are ignored.
+/app/assets/rtl/spw_datalink_v2.sv:354: vvp.tgt sorry: Case unique/unique0 qualities are ignored.
+
+===== rtl_simulation =====
+$ vvp /app/runs/20260928T044401+0000-d466b73b/build/tb_credit_mvp.vvp
+VCD info: dumpfile waveform.vcd opened for output.
+MVP_RESULT|REQ-FC-E1|PASS|tx_credit=16 expected=16
+MVP_RESULT|REQ-FC-E2|PASS|send=1 tx_credit=4 expected=4
+MVP_RESULT|REQ-FC-F|PASS|send=0 ready=0 tx_credit=0
+MVP_RESULT|DEC-FC-SIMULTANEOUS-001|PASS|got_fct=1 send=1 tx_credit=17 expected=17
+MVP_RESULT|REQ-FC-HJ-COMB|PASS|credit_error=1 overflow=1
+MVP_RESULT|REQ-FC-HJ-STATE|PASS|tx_credit=56 expected=56
+MVP_SUMMARY|PASS|6|0
