@@ -11,7 +11,8 @@ __pycache__/
 *.vvp
 *.vcd
 *.fst
-app/backend/.runtime/
+app/backend/.runtime/*
+!app/backend/.runtime/.gitkeep
 assets/spec/*.pdf
 
 # Test runs are immutable local evidence. Commit only the reviewed reference run;

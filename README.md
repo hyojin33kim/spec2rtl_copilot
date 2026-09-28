@@ -131,6 +131,8 @@ Q&A history across container recreation. The local ECSS PDF is mounted from
 `assets/spec/` read-only; it is excluded from the image. The container runs as
 UID/GID 1000 by default. If your files have another owner, start with
 `LOCAL_UID=$(id -u) LOCAL_GID=$(id -g) docker compose up --build -d`.
+The checkout includes an empty `.runtime/` directory so the container can
+create its SQLite database with the host user's permissions on first start.
 Stop with `docker compose down`; the bind-mounted files remain on the host.
 
 ![Current single-container FastAPI, SQLite, runner, and Q&A architecture](docs/SystemArchitecture-fastapi-current.png)
