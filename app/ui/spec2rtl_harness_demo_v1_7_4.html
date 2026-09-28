@@ -2208,7 +2208,7 @@ function stageSummary(run){
  if(!run)return '<div class="muted">실행 결과 없음</div>';
  const labels={golden:'Golden scenario regression',rtl_compile:'RTL compile',rtl_simulation:'RTL simulation'};
  return run.commands.map(command=>{
-  const passed=command.exit_code===0,detail=command.stage==='golden'?'147/147 Golden baseline':command.stage==='rtl_compile'?'Icarus SystemVerilog compile':`${run.tests.filter(t=>t.layer==='rtl'&&t.status==='PASS').length}/6 RTL checks`;
+  const passed=command.exit_code===0,rtlTests=run.tests.filter(t=>t.layer==='rtl'),detail=command.stage==='golden'?'147/147 Golden baseline':command.stage==='rtl_compile'?'Icarus SystemVerilog compile':`${rtlTests.filter(t=>t.status==='PASS').length}/${rtlTests.length} RTL checks`;
   return `<div class="stageRow"><b>${labels[command.stage]||esc(command.stage)}</b><span class="badge ${passed?'good':'bad'}">${passed?'PASS':'FAIL'}</span><span>${esc(detail)}</span><span>${command.duration_seconds}s</span></div>`;
  }).join('');
 }

@@ -37,13 +37,13 @@ trace from ECSS requirement to Golden Model, RTL, and verification evidence.
 - MVP Live opens focused Golden/RTL/Test source with highlighted line ranges,
   separates Golden/compile/simulation logs into tabs, and renders a
   requirement-specific waveform window with a verdict-event marker.
-- Basic P2 navigation is included: direct PDF-page opening, four-requirement
+- Basic P2 navigation is included: direct PDF-page opening, eighteen-requirement
   switching, and JUnit/VCD artifact access. Cross-pilot search remains deferred.
-- Trace Properties now offers evidence-scoped Q&A for the four pilot requirements.
+- Trace Properties now offers evidence-scoped Q&A for the eighteen executable requirements.
   Answers cite the selected Spec, Golden, RTL, Test, and latest run sources;
   verification verdicts still come from the executable tests.
 - Q&A history is stored locally in SQLite and shown by selected Requirement.
-- The four approved Spec clauses and their Golden/RTL/Test links are indexed in
+- The eighteen approved Spec cards and their Golden/RTL/Test links are indexed in
   SQLite for search; `manifests/catalog.json` remains the authoritative view model.
 
 Start the legacy local server directly and open `http://127.0.0.1:8765`:
@@ -88,6 +88,13 @@ The pilot Q&A acceptance questions and review results are in
 `tests/qa_acceptance_cases.json` and `docs/QA_ACCEPTANCE_REPORT.md`.
 The current [project handoff](docs/PROJECT_HANDOFF.md) and
 [five-minute demo script](docs/DEMO_SCRIPT.md) summarize the deployed scope.
+The [presentation report PDF](docs/Spec2RTL_Copilot_Demo_Report.pdf) packages
+the implementation, verification results, demo flow, and expected Q&A.
+The [RTL-based 12-item coverage matrix](docs/RTL_COVERAGE_MATRIX.md) separates
+implemented, tested, and MVP-integrated scope for the next expansion.
+The [Encoding Layer coverage matrix](docs/ENCODING_COVERAGE_MATRIX.md) evaluates
+seven ECSS 5.4 candidates and separates four immediately integrable cards from
+three items that need a dedicated test or layer-boundary decision.
 
 Run the complete acceptance suite:
 

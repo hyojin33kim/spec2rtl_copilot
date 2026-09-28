@@ -75,17 +75,29 @@ class FastApiContract(unittest.TestCase):
     def test_catalog_source_and_sqlite_search(self) -> None:
         status, _, body = self.get("/api/catalog")
         self.assertEqual(status, 200)
-        self.assertEqual(len(json.loads(body)["requirements"]), 4)
+        self.assertEqual(len(json.loads(body)["requirements"]), 18)
 
         status, _, body = self.get("/api/source?path=assets/rtl/spw_datalink_v2.sv&focus_start=657&focus_end=680")
         self.assertEqual(status, 200)
         self.assertTrue(any("r_tx_credit" in line["text"] for line in json.loads(body)["lines"]))
+        for path, symbol in (
+            ("golden/encoding_compliance.py", "FIRST_NULL_BITS"),
+            ("rtl/spw_encoding_compliance.sv", "FIRST_NULL_PATTERN"),
+        ):
+            status, _, body = self.get(
+                "/api/source?" + urllib.parse.urlencode(
+                    {"path": path, "focus_start": 1, "focus_end": 60}
+                )
+            )
+            self.assertEqual(status, 200)
+            self.assertTrue(any(symbol in line["text"] for line in json.loads(body)["lines"]))
         status, _, body = self.get("/api/source?path=../spacewire/README.md")
         self.assertEqual((status, json.loads(body)["error"]["code"]), (400, "BAD_REQUEST"))
 
         status, _, body = self.get("/api/spec/search?q=zero%20credit")
         self.assertEqual(status, 200)
-        self.assertEqual([item["requirement_id"] for item in json.loads(body)["items"]], ["REQ-FC-F"])
+        self.assertEqual([item["requirement_id"] for item in json.loads(body)["items"]],
+                         ["REQ-FC-F", "REQ-RC-ERR"])
         self.assertTrue((self.temp_path / "qa.sqlite3").is_file())
 
     def test_qa_stores_only_selected_history_with_mocked_provider(self) -> None:

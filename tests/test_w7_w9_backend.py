@@ -8,6 +8,7 @@ import pathlib
 import threading
 import unittest
 import urllib.error
+import urllib.parse
 import urllib.request
 
 
@@ -55,7 +56,7 @@ class BackendAcceptance(unittest.TestCase):
     def test_01_catalog_and_source_trace(self):
         status, catalog = self.request("/api/catalog")
         self.assertEqual(status, 200)
-        self.assertEqual(len(catalog["requirements"]), 4)
+        self.assertEqual(len(catalog["requirements"]), 18)
         self.assertEqual(catalog["behavior_models"][0]["id"], "BEH-TX-CREDIT")
         self.assertEqual(catalog["pilot"]["spec_total_pages"], 124)
         status, source = self.request(
@@ -65,6 +66,17 @@ class BackendAcceptance(unittest.TestCase):
         self.assertEqual(source["focus_end"], 680)
         self.assertLess(source["start"], source["focus_start"])
         self.assertTrue(any("r_tx_credit" in line["text"] for line in source["lines"]))
+        for path, symbol in (
+            ("golden/encoding_compliance.py", "FIRST_NULL_BITS"),
+            ("rtl/spw_encoding_compliance.sv", "FIRST_NULL_PATTERN"),
+        ):
+            status, source = self.request(
+                "/api/source?" + urllib.parse.urlencode(
+                    {"path": path, "focus_start": 1, "focus_end": 60}
+                )
+            )
+            self.assertEqual(status, 200)
+            self.assertTrue(any(symbol in line["text"] for line in source["lines"]))
 
     def test_01b_pdf_and_artifact_access(self):
         pdf = ROOT / "assets/spec/ECSS-E-ST-50-12C-Rev.1(15May2019).pdf"
@@ -121,9 +133,10 @@ class BackendAcceptance(unittest.TestCase):
         status, payload = self.request("/api/run", {})
         self.assertEqual(status, 200)
         self.assertEqual(payload["run"]["status"], "PASS")
-        self.assertEqual(payload["run"]["summary"]["passed"], 7)
+        self.assertEqual(payload["run"]["summary"]["passed"], 22)
         self.assertIn("tx_credit", payload["waveform"]["signals"])
-        self.assertEqual(set(payload["stage_logs"]), {"golden", "rtl_compile", "rtl_simulation"})
+        self.assertEqual(set(payload["stage_logs"]),
+                         {"golden", "encoding_golden", "rtl_compile", "rtl_simulation"})
 
 
 if __name__ == "__main__":

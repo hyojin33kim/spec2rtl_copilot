@@ -3,8 +3,8 @@
 ## 기준과 목표
 
 - 기준일: 2026-09-28. 이 문서는 `main`의 로컬 **FastAPI TX-credit MVP 기준 커밋**을 설명한다. 원격 `origin/main`에는 아직 push하지 않았다.
-- 목표: ECSS-E-ST-50-12C Rev.1의 TX-credit 파일럿 4개 Requirement에 대해 **Spec → Golden → RTL → Test → Evidence**를 탐색하고 재실행하며, 선택한 근거에 한정된 Q&A를 제공한다.
-- 범위: `REQ-FC-E1`(FCT +8), `REQ-FC-E2`(N-Char −1), `REQ-FC-F`(0-credit 차단), `REQ-FC-HJ`(56 상한 및 overflow).
+- 목표: ECSS-E-ST-50-12C Rev.1 Encoding/Data Link 핵심 subset 18개 Requirement에 대해 **Spec → Golden → RTL → Test → Evidence**를 탐색하고 재실행하며, 선택한 근거에 한정된 Q&A를 제공한다.
+- 범위: Data Link 11개와 Encoding 7개 카드. First Null·Null detection·Parity gate는 project-owned compliance RTL로 검증하며, imported top-level 통합과 controlled D/S reset은 범위 밖이다.
 - 다른 UI 페이지의 생성·분석·판정 기능은 목업 또는 정적 미리보기다. 시연 경로는 **Trace Explorer**와 **Verification Run**이다.
 
 ## 현재 구현
@@ -41,10 +41,10 @@ curl -fsS http://127.0.0.1:8765/api/health
 
 ## 검증 상태
 
-- 2026-09-28 작업 트리 기준 `python3 -m unittest discover -s tests -v`: 기존 기능 테스트 **45개 통과**, 로컬에 FastAPI 패키지가 없어 FastAPI 전용 **5개 skip**.
+- 2026-09-28 작업 트리 기준 `python3 -m unittest discover -s tests -v`: 기존 기능 테스트 **46개 통과**, 로컬에 FastAPI 패키지가 없어 FastAPI 전용 **5개 skip**.
 - 동일 코드의 격리 Docker 이미지에서 `test_fastapi_contract.py`: **5개 통과**. 네트워크와 운영 볼륨 없이 모의 Q&A·runner와 임시 SQLite를 사용했다.
 - `sha256sum --check manifests/SHA256SUMS`: 전체 통과.
-- 현재 `runs/latest.json`은 `20260928T044401+0000-d466b73b`의 **7/7 PASS**를 가리킨다. 실행을 다시 하면 run ID는 달라질 수 있다.
+- 현재 `runs/latest.json`은 `20260928T233433+0900-3998fb00`의 **22/22 PASS**를 가리킨다. 실행을 다시 하면 run ID는 달라질 수 있다.
 - [Q&A acceptance report](QA_ACCEPTANCE_REPORT.md): 2026-09-28 표본 10/10 적합. 이는 반복 정확도 보증이 아닌 수동 표본 검토다.
 - 기존 SQLite Q&A 이력은 2건이며, 8765 FastAPI 전환 후에도 조회됐다. 재현 환경에서는 이력 건수가 달라질 수 있다.
 
@@ -55,7 +55,8 @@ curl -fsS http://127.0.0.1:8765/api/health
 - imported `assets/`는 불변 스냅샷이다. 실행 증거는 `scripts/run_mvp.py`를 통해 생성하고 `runs/` 파일을 수동 수정하지 않는다.
 - `manifests/catalog.json`이 trace의 기준이다. SQLite Spec index는 검색용 복제본이다.
 - Q&A의 범위 판정과 질문 유형 판정은 일부 키워드 규칙을 사용한다. 출처 ID가 존재해도 답변 문장과 출처의 의미 일치까지 자동 판정하지는 않는다.
-- 다음 작업은 새 체크아웃에서의 재현 검증과 시연 리허설이다. `.env`, 로컬 SQLite, 사용자 제공 PDF, editor swap 파일은 Git에 넣지 않았다. 참조하지 않는 과거 구조도와 개인 작업용 그림은 로컬 미추적 파일로 남아 있다.
+- ECSS 5.4 확장 분석은 [ENCODING_COVERAGE_MATRIX.md](ENCODING_COVERAGE_MATRIX.md)에 있다. 후보 7개를 모두 실행 카드로 편입했다. 새 3개는 project-owned compliance RTL과 실제 encoder D/S 연결로 검증하며 imported `spw_top` 통합은 별도 작업이다.
+- 새 체크아웃 Docker 재현 검증과 실제 OpenAI Q&A 4개를 포함한 시연 리허설을 완료했다. 발표 동선과 예상 질문은 [DEMO_SCRIPT.md](DEMO_SCRIPT.md)에 있다. `.env`, 로컬 SQLite, 사용자 제공 PDF, editor swap 파일은 Git에 넣지 않았다. 참조하지 않는 과거 구조도와 개인 작업용 그림은 로컬 미추적 파일로 남아 있다.
 - FastAPI 전환 전 SQLite와 `runs/latest.json` 백업은 `app/backend/.runtime/backups/pre-fastapi-8765-20260928T062116Z/`에 있다. 이 디렉터리는 Git에서 제외된다.
 
 ## 다음 세션 시작

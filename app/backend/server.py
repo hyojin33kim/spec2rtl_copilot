@@ -31,7 +31,7 @@ SPEC_TOTAL_PAGES = 124
 SPEC_PAGE_CACHE = ROOT / "app/backend/.runtime/spec-pages"
 ALLOWED_SOURCE_ROOTS = tuple((ROOT / path).resolve() for path in (
     "assets/golden", "assets/rtl", "assets/tb", "tests/rtl",
-    "requirements", "trace", "manifests",
+    "golden", "rtl", "requirements", "trace", "manifests",
 ))
 ALLOWED_SUFFIXES = {".py", ".sv", ".yaml", ".json", ".md", ".log", ".xml"}
 RUN_LOCK = threading.Lock()

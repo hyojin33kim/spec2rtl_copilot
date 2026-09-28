@@ -33,13 +33,13 @@ class SpecIndexStore(unittest.TestCase):
             path = pathlib.Path(temp_dir) / "spec.sqlite3"
             by_text = spec_index.search_spec("zero credit", self.catalog, path=path)
             by_clause = spec_index.search_spec("5.5.4.e.1", self.catalog, path=path)
-            self.assertEqual([item["requirement_id"] for item in by_text], ["REQ-FC-F"])
+            self.assertEqual([item["requirement_id"] for item in by_text], ["REQ-FC-F", "REQ-RC-ERR"])
             self.assertEqual([item["requirement_id"] for item in by_clause], ["REQ-FC-E1"])
             self.assertEqual({link["layer"] for link in by_text[0]["trace_links"]},
                              {"golden", "rtl", "test"})
             self.assertEqual(by_text[0]["document"], "ECSS-E-ST-50-12C Rev.1")
             with closing(sqlite3.connect(path)) as connection:
-                self.assertEqual(connection.execute("SELECT count(*) FROM spec_requirements").fetchone()[0], 4)
+                self.assertEqual(connection.execute("SELECT count(*) FROM spec_requirements").fetchone()[0], 18)
                 self.assertEqual(connection.execute("PRAGMA user_version").fetchone()[0], 2)
 
     def test_catalog_change_rebuilds_search_without_duplicates(self):
@@ -51,7 +51,7 @@ class SpecIndexStore(unittest.TestCase):
             self.assertEqual([item["requirement_id"] for item in
                               spec_index.search_spec("quasar", changed, path=path)], ["REQ-FC-E1"])
             with closing(sqlite3.connect(path)) as connection:
-                self.assertEqual(connection.execute("SELECT count(*) FROM spec_requirements").fetchone()[0], 4)
+                self.assertEqual(connection.execute("SELECT count(*) FROM spec_requirements").fetchone()[0], 18)
 
     def test_v1_qa_history_survives_schema_upgrade(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -92,7 +92,8 @@ class SpecIndexApi(unittest.TestCase):
             with mock.patch.object(history, "database_path", return_value=path):
                 with urllib.request.urlopen(self.base + "/api/spec/search?q=zero+credit") as result:
                     body = json.load(result)
-                self.assertEqual([item["requirement_id"] for item in body["items"]], ["REQ-FC-F"])
+                self.assertEqual([item["requirement_id"] for item in body["items"]],
+                                 ["REQ-FC-F", "REQ-RC-ERR"])
                 self.assertTrue(path.is_file())
                 with self.assertRaises(urllib.error.HTTPError) as caught:
                     urllib.request.urlopen(self.base + "/api/spec/search?q=")

@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>Spec2RTL Copilot 고급 프로젝트 결과 보고서</title>
+<style>
+  @page { size: A4; margin: 17mm 17mm 16mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Malgun Gothic", "맑은 고딕", sans-serif;
+    color: #172033;
+    font-size: 10.5pt;
+    line-height: 1.55;
+    margin: 0;
+  }
+  h1, h2, h3 { color: #13295a; margin-top: 0; }
+  h1 { font-size: 27pt; line-height: 1.22; margin-bottom: 8mm; }
+  h2 { font-size: 17pt; border-bottom: 2px solid #315cbd; padding-bottom: 2.5mm; margin-bottom: 5mm; }
+  h3 { font-size: 12pt; margin: 5mm 0 2mm; }
+  p { margin: 0 0 3mm; }
+  ul, ol { margin: 2mm 0 4mm 5mm; padding-left: 5mm; }
+  li { margin-bottom: 1.5mm; }
+  table { width: 100%; border-collapse: collapse; margin: 3mm 0 5mm; }
+  th { background: #eaf0ff; color: #13295a; text-align: left; font-weight: 700; }
+  th, td { border: 1px solid #c9d2e6; padding: 2.3mm 2.7mm; vertical-align: top; }
+  code { font-family: "D2Coding", "Consolas", monospace; font-size: 9pt; color: #173b7a; }
+  .cover { height: 255mm; padding-top: 34mm; position: relative; }
+  .eyebrow { color: #315cbd; font-size: 11pt; font-weight: 700; letter-spacing: 1.5px; margin-bottom: 7mm; }
+  .subtitle { font-size: 15pt; color: #43506a; line-height: 1.45; width: 85%; }
+  .cover-rule { width: 42mm; border-top: 5px solid #315cbd; margin: 12mm 0 10mm; }
+  .cover-meta { margin-top: 38mm; width: 100%; }
+  .cover-meta td { border: none; border-bottom: 1px solid #d8dfed; padding: 3mm 0; }
+  .cover-meta td:first-child { width: 35mm; color: #65708a; font-weight: 700; }
+  .cover-note { position: absolute; bottom: 8mm; color: #65708a; font-size: 9pt; }
+  .page-break { page-break-before: always; }
+  .hard-break { page-break-before: always; height: 1px; margin: 0; padding: 0; }
+  .lead { font-size: 12pt; color: #253858; line-height: 1.6; margin-bottom: 5mm; }
+  .callout { background: #edf3ff; border-left: 5px solid #315cbd; padding: 4mm 5mm; margin: 4mm 0 6mm; }
+  .success { background: #eaf8f0; border-left-color: #16845b; }
+  .warning { background: #fff7e6; border-left-color: #d88716; }
+  .metric-grid { width: 100%; border-collapse: separate; border-spacing: 3mm; margin: 0 -3mm 5mm; }
+  .metric-grid td { width: 25%; border: 1px solid #c9d2e6; background: #f8faff; padding: 4mm; }
+  .metric { font-size: 20pt; font-weight: 700; color: #315cbd; display: block; }
+  .metric-label { color: #65708a; font-size: 9pt; }
+  .architecture { width: 100%; max-height: 132mm; object-fit: contain; margin: 3mm auto 2mm; display: block; }
+  .caption { text-align: center; color: #65708a; font-size: 8.5pt; margin-bottom: 5mm; }
+  .flow td:first-child { width: 22mm; color: #315cbd; font-weight: 700; white-space: nowrap; }
+  .qa { margin-bottom: 4mm; page-break-inside: avoid; }
+  .qa b { color: #13295a; }
+  .small { font-size: 9pt; color: #59657c; }
+  .footer-note { margin-top: 7mm; border-top: 1px solid #c9d2e6; padding-top: 3mm; color: #65708a; font-size: 8.5pt; }
+</style>
+</head>
+<body>
+
+<section class="cover">
+  <div class="eyebrow">BOOTCAMP ADVANCED PROJECT</div>
+  <h1>Spec2RTL Copilot<br>고급 프로젝트 결과 보고서</h1>
+  <div class="cover-rule"></div>
+  <p class="subtitle">ECSS SpaceWire Encoding/Data Link 요구사항에서 Golden Model, RTL, Test 및 실행 증거까지 연결하는 trace 기반 분석·Q&amp;A MVP</p>
+  <table class="cover-meta">
+    <tr><td>프로젝트</td><td>Spec2RTL Copilot</td></tr>
+    <tr><td>검증 범위</td><td>ECSS-E-ST-50-12C Rev.1 · Encoding/Data Link 핵심 Requirement 18개</td></tr>
+    <tr><td>기술 스택</td><td>FastAPI · SQLite FTS5 · Docker Compose · OpenAI API · Icarus Verilog</td></tr>
+    <tr><td>보고 기준일</td><td>2026-09-28</td></tr>
+  </table>
+  <p class="cover-note">본 보고서는 동작하는 MVP와 최종 시연 리허설 결과를 기준으로 작성했다.</p>
+</section>
+
+<p class="hard-break">&nbsp;</p>
+
+<section class="page-break">
+  <h2>1. 프로젝트 요약</h2>
+  <p class="lead">이 프로젝트는 규격 문장, 참조 모델, RTL 구현, 검증 테스트와 실행 결과를 하나의 trace로 연결하고, 선택된 근거 범위 안에서 LLM이 기술 질문에 답하는 흐름을 구현한 MVP다.</p>
+
+  <div class="callout success"><b>핵심 결과</b><br>한 Requirement를 선택하면 대응하는 Spec, Golden Model, RTL, Test 및 waveform이 함께 전환된다. 실행 판정은 독립 테스트가 생성하며, LLM은 그 근거를 설명하고 인용한다.</div>
+
+  <table class="metric-grid">
+    <tr>
+      <td><span class="metric">18</span><span class="metric-label">Executable Requirements</span></td>
+      <td><span class="metric">22/22</span><span class="metric-label">Golden + RTL Checks PASS</span></td>
+      <td><span class="metric">4/4</span><span class="metric-label">실제 OpenAI Q&amp;A 성공</span></td>
+      <td><span class="metric">18/18</span><span class="metric-label">Trace Cards Linked</span></td>
+    </tr>
+  </table>
+
+  <h3>구현 범위</h3>
+  <table>
+    <tr><th>Requirement</th><th>검증 동작</th><th>대표 판정</th></tr>
+    <tr><td>REQ-FC-E1</td><td>FCT 수신 시 transmit credit 증가</td><td><code>tx_credit += 8</code></td></tr>
+    <tr><td>REQ-FC-E2</td><td>N-Char 전송 시 transmit credit 감소</td><td><code>tx_credit -= 1</code></td></tr>
+    <tr><td>REQ-FC-F</td><td>credit=0일 때 N-Char 전송 차단</td><td><code>send_nchar=0</code></td></tr>
+    <tr><td>REQ-FC-HJ</td><td>최대값 56과 추가 FCT overflow 처리</td><td>error 발생, credit=56 유지</td></tr>
+    <tr><td>REQ-ENC-SYMBOL</td><td>Data/Control symbol 직렬화와 복원</td><td>5종 roundtrip, parity 정상</td></tr>
+    <tr><td>REQ-ENC-DS-CORE</td><td>Data-Strobe core와 초기값</td><td>D/S transition, 초기 00</td></tr>
+    <tr><td>REQ-ENC-FIRST-NULL</td><td>첫 Null parity와 최초 Strobe transition</td><td>첫 D/S 상태 01</td></tr>
+    <tr><td>REQ-ENC-NULL-DETECT</td><td>9-bit Null 검출과 gotNull lifetime</td><td>011101000, hold, RX-disable clear</td></tr>
+    <tr><td>REQ-ENC-PARITY-GATE</td><td>gotNull 이후 parity error enable</td><td>raw/valid error gate</td></tr>
+    <tr><td>REQ-ENC-DISCONNECT</td><td>첫 edge 이후 disconnect 검출</td><td>850 ns idle에서 검출</td></tr>
+    <tr><td>REQ-ENC-ESC</td><td>금지된 ESC 후속 문자 검출</td><td>ESC/EOP/EEP 오류와 gate</td></tr>
+  </table>
+
+  <h3>범위 경계</h3>
+  <ul>
+    <li>실제 동작 범위는 Trace Explorer, Verification Run, 선택 Requirement Q&amp;A 및 SQLite 검색이다.</li>
+    <li>다른 화면의 설계 생성·분석·원인 판정 기능은 목업 또는 정적 미리보기다.</li>
+    <li>LLM 답변은 검증 판정을 새로 만들지 않는다. PASS/FAIL은 Golden/RTL 실행 결과가 결정한다.</li>
+  </ul>
+</section>
+
+<section class="page-break">
+  <h2>2. 시스템 구성과 기술 스택</h2>
+  <img class="architecture" src="SystemArchitecture-fastapi-current.png" alt="현재 시스템 구조도">
+  <p class="caption">현재 배포 구조: 브라우저, 단일 FastAPI 컨테이너, 호스트 저장소와 외부 OpenAI API</p>
+
+  <div class="callout"><b>구조 요약</b><br>브라우저는 로컬 8765의 FastAPI 단일 컨테이너에 연결한다. 컨테이너는 trace 조회, Q&amp;A, Golden/RTL 검증을 제공하고, SQLite·run evidence·PDF·환경 파일은 용도에 맞게 호스트에 분리한다.</div>
+</section>
+
+<section class="page-break">
+  <h2>2.1 기술 스택과 데이터 경계</h2>
+
+  <table>
+    <tr><th>계층</th><th>현재 구성</th><th>역할</th></tr>
+    <tr><td>UI</td><td>HTML / JavaScript</td><td>Trace Navigator, Spec·Golden·RTL·Test·Wave 연계 표시</td></tr>
+    <tr><td>API</td><td>FastAPI / Uvicorn</td><td>카탈로그, 소스, 검색, Q&amp;A, 실행 및 artifact API</td></tr>
+    <tr><td>데이터</td><td>SQLite FTS5</td><td>Q&amp;A 이력과 18개 Spec 카드 검색 색인</td></tr>
+    <tr><td>검증</td><td>Python Golden Model / Icarus Verilog</td><td>Golden regression, RTL compile/simulation, JUnit·VCD 생성</td></tr>
+    <tr><td>배포</td><td>Docker Compose</td><td>FastAPI·UI·runner를 단일 컨테이너로 재현</td></tr>
+    <tr><td>LLM</td><td>OpenAI Responses API · <code>gpt-5-mini</code></td><td>선택된 trace 근거 기반 설명과 인용</td></tr>
+  </table>
+
+  <div class="callout"><b>데이터 경계</b><br>SQLite와 run evidence는 호스트에 보존한다. ECSS PDF와 <code>.env</code>는 읽기 전용 mount이며 이미지에 포함하지 않는다. OpenAI에는 선택 Requirement의 제한된 발췌만 전달하고 전체 PDF·VCD와 API 키는 전달하지 않는다.</div>
+</section>
+
+<section class="page-break">
+  <h2>3. 동작 및 검증 결과</h2>
+  <h3>End-to-end trace 흐름</h3>
+  <table class="flow">
+    <tr><td>① 선택</td><td>Trace Navigator에서 Requirement를 선택한다.</td></tr>
+    <tr><td>② 추적</td><td>Spec clause와 PDF 페이지, Golden·RTL·Test 소스 위치가 함께 갱신된다.</td></tr>
+    <tr><td>③ 실행</td><td>Golden regression → RTL compile → RTL simulation을 순서대로 수행한다.</td></tr>
+    <tr><td>④ 증거</td><td>JUnit, stdout, VCD와 requirement별 waveform을 immutable run 디렉터리에 저장한다.</td></tr>
+    <tr><td>⑤ 설명</td><td>LLM은 선택 trace의 허용된 근거를 바탕으로 답하고 출처를 표시한다.</td></tr>
+    <tr><td>⑥ 보존</td><td>답변과 출처, 모델, 연결 run ID를 SQLite에 저장해 재호출 없이 다시 연다.</td></tr>
+  </table>
+
+  <h3>최종 리허설 결과</h3>
+  <table>
+    <tr><th>검증 항목</th><th>결과</th><th>확인 내용</th></tr>
+    <tr><td>Docker 서비스</td><td>정상</td><td><code>127.0.0.1:8765</code>, health OK</td></tr>
+    <tr><td>Golden + RTL 실행</td><td>PASS</td><td>22 checks, failures 0, errors 0</td></tr>
+    <tr><td>Waveform</td><td>정상</td><td>VCD 및 waveform JSON 생성</td></tr>
+    <tr><td>실제 Q&amp;A</td><td>4/4 성공</td><td>각 Requirement 답변이 SQLite에 저장·재조회됨</td></tr>
+    <tr><td>Trace 연결</td><td>18/18 구성</td><td>Spec, Golden, RTL, Test, JUnit/VCD 연결</td></tr>
+    <tr><td>확장 검증</td><td>성공</td><td>22/22 PASS, 전체 host 계약 테스트 통과</td></tr>
+  </table>
+
+  <div class="callout warning"><b>판정 해석</b><br>Q&amp;A 성공은 답변 API와 출처 연결이 동작했다는 의미다. RTL 적합성의 근거는 Golden 2개와 RTL 20개 실행 판정이며, 생성형 답변의 모든 표현을 형식 검증했다는 의미는 아니다.</div>
+</section>
+
+<section class="page-break">
+  <h2>4. 5분 시연 계획</h2>
+  <table class="flow">
+    <tr><td>0:00–1:10</td><td><b>Requirement에서 구현까지</b><br><code>REQ-FC-F</code>를 선택하고 Spec p.74, EMPTY behavior, Golden·RTL 강조 위치와 trace ID를 설명한다.</td></tr>
+    <tr><td>1:10–2:40</td><td><b>독립 검증 증거</b><br>Run Golden + RTL Test를 실행하고 22/22 PASS, 단계별 로그, waveform, JUnit/VCD를 보여준다.</td></tr>
+    <tr><td>2:40–4:00</td><td><b>근거 기반 Q&amp;A</b><br>“credit이 0인데 N-Char가 대기 중이면 어떻게 되는가?”를 질문하고 답변의 Spec·소스·Test·run 출처를 확인한다. Previous questions에서 저장 이력을 다시 연다.</td></tr>
+    <tr><td>4:00–5:00</td><td><b>기술 스택과 범위</b><br>구조도에서 FastAPI, SQLite, Docker, OpenAI API의 역할을 짚고 ECSS 5.5 11개와 5.4 실행 카드 7개를 설명한다.</td></tr>
+  </table>
+
+  <h3>발표 핵심 문장</h3>
+  <div class="callout">“ECSS의 TX-credit 요구사항을 선택하면 대응하는 Golden Model, RTL, Test와 실행 증거가 한 화면에서 연결되고, LLM은 선택된 근거 안에서 그 trace를 설명합니다.”</div>
+
+  <h3>시연 전 점검</h3>
+  <ol>
+    <li><code>docker compose ps</code>에서 <code>spec2rtl-app</code>이 healthy인지 확인한다.</li>
+    <li><code>/api/health</code>, ECSS PDF, 기존 PASS run과 저장 Q&amp;A를 확인한다.</li>
+    <li>API 키 값은 화면이나 터미널에 출력하지 않는다.</li>
+    <li>라이브 실행이 실패하면 기존 evidence를 사용하되 실패를 PASS로 설명하지 않는다.</li>
+  </ol>
+</section>
+
+<section class="page-break">
+  <h2>5. 예상 질의응답</h2>
+  <div class="qa"><b>Q1. LLM이 RTL의 PASS/FAIL을 판정합니까?</b><br>아니다. PASS/FAIL은 Golden regression과 RTL compile/simulation의 22개 실행 판정이 생성한다. LLM은 연결된 근거와 기존 실행 결과를 설명한다.</div>
+  <div class="qa"><b>Q2. 왜 SQLite를 사용했습니까?</b><br>현재 단일 사용자·18개 Requirement MVP에는 별도 DB 서버가 필요 없고 배포가 단순한 SQLite가 적합하다. Q&amp;A 이력과 FTS5 Spec 색인에 사용했다.</div>
+  <div class="qa"><b>Q3. Docker에는 무엇이 들어 있습니까?</b><br>FastAPI, 정적 UI, Golden Model, Icarus runner가 기본 단일 컨테이너에 있다. SQLite·run evidence·PDF·환경 파일은 호스트 mount로 분리했다.</div>
+  <div class="qa"><b>Q4. OpenAI로 어떤 데이터가 전달됩니까?</b><br>선택 Requirement의 제한된 Spec·Golden·RTL·Test 발췌만 전달한다. 전체 PDF와 VCD, API 키는 전달하지 않는다.</div>
+  <div class="qa"><b>Q5. Chapter 5.4는 어디까지 확장했습니까?</b><br>선정한 7개 후보를 모두 실행 카드로 편입했다. First Null은 실제 encoder D/S 출력으로, Null detection과 parity gate는 project-owned compliance RTL로 검증한다. imported top-level 통합은 별도다.</div>
+  <div class="qa"><b>Q6. 재현성은 어떻게 확인했습니까?</b><br>새 Git checkout에서 Docker를 다시 빌드하고 FastAPI·SQLite 검색·source/JUnit 조회와 Golden/RTL 실행을 검증했다. 발견된 초기 SQLite 디렉터리 권한 문제도 수정 후 재검증했다.</div>
+  <div class="qa"><b>Q7. 규모가 커지면 무엇을 먼저 바꿉니까?</b><br>simulation worker와 queue를 API 서버에서 분리하고, SQLite를 PostgreSQL로 전환한 뒤 run artifact를 별도 저장소로 이동한다.</div>
+
+  <h3>실패 시 대응</h3>
+  <ul>
+    <li>Q&amp;A 지연: 저장된 Previous questions와 기존 출처 링크를 시연한다.</li>
+    <li>Run 실패: 실패 단계 로그를 열고, 기존 PASS run의 JUnit과 waveform을 보조 증거로 제시한다.</li>
+    <li>PDF 미설치: catalog의 clause·page·excerpt와 연결 소스로 provenance를 설명한다.</li>
+    <li>Docker 비정상: 현장에서 재빌드를 반복하지 않고 상태와 health까지만 진단한다.</li>
+  </ul>
+</section>
+
+<section class="page-break">
+  <h2>6. 한계, 확장 방향 및 결론</h2>
+  <h3>현재 한계</h3>
+  <ul>
+    <li>새 Null/parity compliance RTL은 runner에 연결됐지만 imported <code>spw_top</code>에는 아직 인스턴스되지 않았다.</li>
+    <li>5.4.4.c–e의 controlled Data/Strobe reset은 현재 실행 카드 범위에 포함하지 않았다.</li>
+    <li>Q&amp;A 범위와 질문 유형 분류 일부가 키워드 규칙에 의존한다.</li>
+    <li>출처 ID의 존재는 검사하지만 답변 문장과 근거의 의미 일치를 완전히 자동 판정하지 않는다.</li>
+    <li>단일 컨테이너에서 API와 simulation을 실행하므로 다중 사용자·장시간 작업 확장에는 제약이 있다.</li>
+  </ul>
+
+  <h3>Chapter 확장 가능 범위</h3>
+  <table>
+    <tr><th>단계</th><th>총 카드</th><th>판단 근거</th></tr>
+    <tr><td>현재</td><td>18</td><td>5.5 Data Link 11개 + 5.4 Encoding 7개, 22/22 실행 판정</td></tr>
+    <tr><td>제품 RTL 통합</td><td>18 유지</td><td>compliance guard를 imported top-level의 RX Enable·raw parity 경계에 연결</td></tr>
+    <tr><td>5.6 일부 확장</td><td>20~22</td><td>보유 RTL 기준 Packet, EOP/EEP, Time-code만 선택 편입</td></tr>
+  </table>
+  <p class="small">5.3 전기 특성, 5.6 distributed interrupt·routing, 5.7 전체 MIB는 현재 RTL과 검증 환경으로 직접 판정할 수 없어 목표 수치에서 제외했다.</p>
+
+  <h3>우선순위별 확장</h3>
+  <table>
+    <tr><th>우선순위</th><th>확장 항목</th><th>전환 조건</th></tr>
+    <tr><td>1</td><td>simulation worker + job queue 분리</td><td>동시 실행 또는 장시간 regression 필요</td></tr>
+    <tr><td>2</td><td>SQLite → PostgreSQL</td><td>다중 사용자·동시 쓰기·대규모 trace 관리</td></tr>
+    <tr><td>3</td><td>artifact object storage와 검색 계층</td><td>VCD·로그·문서 규모 증가 및 장기 보존</td></tr>
+  </table>
+
+  <h3>결론</h3>
+  <div class="callout success">본 MVP는 “Spec → Golden → RTL → Test → Evidence → Q&amp;A”의 연결을 실제 실행 가능한 형태로 증명했다. SQLite와 Docker는 단순 기술 나열이 아니라 이력·검색과 재현 가능한 배포에 사용됐으며, FastAPI는 UI와 검증·Q&amp;A 기능을 하나의 명확한 API 경계로 제공한다.</div>
+
+  <p>부트캠프 발표에서는 기능 수보다 다음 세 가지를 중심으로 설명한다.</p>
+  <ol>
+    <li>Requirement 선택이 실제 소스와 검증 증거까지 일관되게 연결되는가.</li>
+    <li>LLM 설명과 독립적인 실행 판정이 분리돼 있는가.</li>
+    <li>새 환경에서 Docker로 같은 동작을 재현할 수 있는가.</li>
+  </ol>
+
+  <p class="footer-note">관련 문서: <code>DEMO_SCRIPT.md</code>, <code>QA_ACCEPTANCE_REPORT.md</code>, <code>ENCODING_COVERAGE_MATRIX.md</code>, <code>PROJECT_HANDOFF.md</code><br>실행 주소: <code>http://127.0.0.1:8765/</code> · OpenAPI: <code>/docs</code></p>
+</section>
+
+</body>
+</html>

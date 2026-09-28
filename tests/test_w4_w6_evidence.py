@@ -16,6 +16,38 @@ EXPECTED_SIGNALS = {
     "tx_credit_overflow",
     "nchar_valid",
     "nchar_ready",
+    "rx_credit",
+    "send_fct",
+    "got_nchar",
+    "rx_credit_error",
+    "rx_free_space",
+    "fct_send_ok",
+    "initial_fct_requests",
+    "link_start",
+    "port_reset",
+    "disconnect_error",
+    "parity_error",
+    "esc_error",
+    "eep_pending",
+    "eep_write_now",
+    "tx_flushing",
+    "enc_tx_char",
+    "enc_tx_valid",
+    "enc_tx_ready",
+    "enc_rx_char",
+    "enc_rx_valid",
+    "enc_parity_error",
+    "ds_data",
+    "ds_strobe",
+    "phy_rx_strobe",
+    "phy_seen_edge",
+    "phy_disconnect",
+    "enc_rx_enable",
+    "enc_raw_parity_error",
+    "enc_got_null",
+    "enc_valid_parity_error",
+    "enc_null_window",
+    "enc_null_window_bits",
 }
 
 
@@ -36,7 +68,7 @@ class W4W6EvidenceTest(unittest.TestCase):
         schema = json.loads((ROOT / "manifests/run-schema.json").read_text(encoding="utf-8"))
         self.assertTrue(set(schema["required"]).issubset(self.run_payload))
         self.assertEqual(1, self.run_payload["schema_version"])
-        self.assertEqual(7, self.run_payload["summary"]["total"])
+        self.assertEqual(22, self.run_payload["summary"]["total"])
         self.assertEqual(0, self.run_payload["summary"]["failed"])
         self.assertFalse(self.run_payload["summary"]["command_failed"])
 
@@ -46,11 +78,11 @@ class W4W6EvidenceTest(unittest.TestCase):
             self.assertTrue(path.is_file(), path)
             self.assertGreater(path.stat().st_size, 0, path)
 
-    def test_junit_contains_seven_passing_cases(self):
+    def test_junit_contains_twenty_two_passing_cases(self):
         suite = ET.parse(self.run_dir / "junit.xml").getroot()
-        self.assertEqual("7", suite.attrib["tests"])
+        self.assertEqual("22", suite.attrib["tests"])
         self.assertEqual("0", suite.attrib["failures"])
-        self.assertEqual(7, len(suite.findall("testcase")))
+        self.assertEqual(22, len(suite.findall("testcase")))
 
     def test_waveform_has_canonical_timelines(self):
         waveform = json.loads((self.run_dir / "waveform.json").read_text(encoding="utf-8"))

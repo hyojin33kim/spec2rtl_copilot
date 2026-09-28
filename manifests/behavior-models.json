@@ -23,6 +23,85 @@
         {"id": "overflow_above_48", "from": "AVAILABLE", "to": "AVAILABLE", "event": "got_fct", "guard": "49 <= tx_credit <= 55", "action": "credit_error = 1; tx_credit unchanged", "trace_ids": ["REQ-FC-HJ"]},
         {"id": "overflow_at_max", "from": "MAX", "to": "MAX", "event": "got_fct", "guard": "tx_credit == 56", "action": "credit_error = 1; tx_credit unchanged", "trace_ids": ["REQ-FC-HJ"]}
       ]
+    },
+    {
+      "id": "BEH-RX-CREDIT",
+      "title": "Receive-credit accounting",
+      "kind": "behavioral_state_abstraction",
+      "implementation_note": "Counter-state abstraction for verification; not an RTL control FSM.",
+      "variable": {"name": "rx_credit", "minimum": 0, "maximum": 56},
+      "states": [
+        {"id": "EMPTY", "label": "EMPTY", "invariant": "rx_credit == 0", "x": 70, "y": 112},
+        {"id": "AVAILABLE", "label": "AVAILABLE", "invariant": "1 <= rx_credit <= 48", "x": 220, "y": 112},
+        {"id": "LIMIT", "label": "LIMIT", "invariant": "49 <= rx_credit <= 56", "x": 370, "y": 112}
+      ],
+      "transitions": [
+        {"id": "grant_eight", "from": "EMPTY", "to": "AVAILABLE", "event": "send_fct", "guard": "fifo_space >= 8", "action": "rx_credit += 8", "trace_ids": ["REQ-RC-ACCOUNT", "REQ-FCT-INIT"]},
+        {"id": "grant_more", "from": "AVAILABLE", "to": "AVAILABLE", "event": "send_fct", "guard": "rx_credit <= 48", "action": "rx_credit += 8", "trace_ids": ["REQ-RC-ACCOUNT", "REQ-FCT-ELIGIBLE"]},
+        {"id": "consume_one", "from": "AVAILABLE", "to": "AVAILABLE", "event": "got_nchar", "guard": "rx_credit > 1", "action": "rx_credit -= 1", "trace_ids": ["REQ-RC-ACCOUNT"]},
+        {"id": "consume_last", "from": "AVAILABLE", "to": "EMPTY", "event": "got_nchar", "guard": "rx_credit == 1", "action": "rx_credit = 0", "trace_ids": ["REQ-RC-ACCOUNT"]},
+        {"id": "block_grant", "from": "LIMIT", "to": "LIMIT", "event": "fct_request", "guard": "rx_credit > 48", "action": "send_fct = 0", "trace_ids": ["REQ-FCT-ELIGIBLE"]},
+        {"id": "error_at_empty", "from": "EMPTY", "to": "EMPTY", "event": "got_nchar", "guard": "rx_credit == 0", "action": "credit_error = 1", "trace_ids": ["REQ-RC-ERR"]}
+      ]
+    },
+    {
+      "id": "BEH-LINK-INIT",
+      "title": "Link initialisation path",
+      "kind": "behavioral_state_abstraction",
+      "implementation_note": "Selected successful path through the RTL link-state FSM.",
+      "states": [
+        {"id": "ERROR_RESET", "label": "ERROR RESET", "invariant": "state == 0", "x": 65, "y": 65},
+        {"id": "ERROR_WAIT", "label": "ERROR WAIT", "invariant": "state == 1", "x": 190, "y": 65},
+        {"id": "READY", "label": "READY", "invariant": "state == 2", "x": 315, "y": 65},
+        {"id": "STARTED", "label": "STARTED", "invariant": "state == 3", "x": 315, "y": 165},
+        {"id": "CONNECTING", "label": "CONNECTING", "invariant": "state == 4", "x": 190, "y": 165},
+        {"id": "RUN", "label": "RUN", "invariant": "state == 5", "x": 65, "y": 165}
+      ],
+      "transitions": [
+        {"id": "reset_to_wait", "from": "ERROR_RESET", "to": "ERROR_WAIT", "event": "6.4 us elapsed", "guard": "link enabled", "action": "enable receive", "trace_ids": ["REQ-LINK-INIT"]},
+        {"id": "wait_to_ready", "from": "ERROR_WAIT", "to": "READY", "event": "12.8 us elapsed", "guard": "no error", "action": "enter Ready", "trace_ids": ["REQ-LINK-INIT"]},
+        {"id": "ready_to_started", "from": "READY", "to": "STARTED", "event": "link_start", "guard": "link enabled", "action": "send Nulls", "trace_ids": ["REQ-LINK-INIT"]},
+        {"id": "started_to_connecting", "from": "STARTED", "to": "CONNECTING", "event": "gotNull", "guard": "within timeout", "action": "send FCTs/Nulls", "trace_ids": ["REQ-LINK-INIT"]},
+        {"id": "connecting_to_run", "from": "CONNECTING", "to": "RUN", "event": "gotFCT && sentFCT", "guard": "link enabled", "action": "enable full traffic", "trace_ids": ["REQ-LINK-INIT"]},
+        {"id": "error_to_reset", "from": "RUN", "to": "ERROR_RESET", "event": "link error", "guard": "error detected", "action": "disable link", "trace_ids": ["REQ-LINK-ERROR"]}
+      ]
+    },
+    {
+      "id": "BEH-PACKET-RECOVERY",
+      "title": "Interrupted-packet recovery",
+      "kind": "behavioral_state_abstraction",
+      "implementation_note": "Recovery abstraction spanning RX EEP insertion and TX remainder discard.",
+      "states": [
+        {"id": "NORMAL", "label": "NORMAL", "invariant": "no recovery pending", "x": 90, "y": 112},
+        {"id": "RECOVERY", "label": "RECOVERY", "invariant": "EEP or TX flush pending", "x": 220, "y": 112},
+        {"id": "COMPLETE", "label": "COMPLETE", "invariant": "packet boundary restored", "x": 350, "y": 112}
+      ],
+      "transitions": [
+        {"id": "arm_recovery", "from": "NORMAL", "to": "RECOVERY", "event": "error during packet", "guard": "RX or TX packet active", "action": "arm EEP/flush", "trace_ids": ["REQ-PKT-RECOVERY"]},
+        {"id": "insert_eep", "from": "RECOVERY", "to": "COMPLETE", "event": "RX FIFO space", "guard": "EEP pending", "action": "write EEP", "trace_ids": ["REQ-PKT-RECOVERY"]},
+        {"id": "flush_tx", "from": "RECOVERY", "to": "COMPLETE", "event": "TX terminator", "guard": "TX flush active", "action": "discard through EOP/EEP", "trace_ids": ["REQ-PKT-RECOVERY"]}
+      ]
+    },
+    {
+      "id": "BEH-ENCODING-LAYER",
+      "title": "Encoding and link-error observables",
+      "kind": "behavioral_state_abstraction",
+      "implementation_note": "Verification abstraction spanning symbol encoding, D/S transport and receive-side errors.",
+      "states": [
+        {"id": "READY", "label": "READY", "invariant": "encoder ready", "x": 65, "y": 112},
+        {"id": "SERIAL", "label": "SERIAL", "invariant": "symbol bits active", "x": 180, "y": 112},
+        {"id": "RECEIVED", "label": "RECEIVED", "invariant": "decoded symbol valid", "x": 295, "y": 112},
+        {"id": "ERROR", "label": "ERROR", "invariant": "encoding/link error active", "x": 405, "y": 112}
+      ],
+      "transitions": [
+        {"id": "symbol_roundtrip", "from": "READY", "to": "RECEIVED", "event": "tx_char_valid", "guard": "encoder ready", "action": "serialize and decode in order", "trace_ids": ["REQ-ENC-SYMBOL"]},
+        {"id": "ds_transport", "from": "SERIAL", "to": "RECEIVED", "event": "D/S transition", "guard": "symbol bits active", "action": "recover data bits", "trace_ids": ["REQ-ENC-DS-CORE"]},
+        {"id": "first_null", "from": "READY", "to": "SERIAL", "event": "TX enable", "guard": "first Null begins", "action": "emit parity 0 so Strobe transitions first", "trace_ids": ["REQ-ENC-FIRST-NULL"]},
+        {"id": "detect_first_null", "from": "SERIAL", "to": "RECEIVED", "event": "011101000 detected", "guard": "RX enabled and all three parity bits observed", "action": "gotNull = 1 until RX disable", "trace_ids": ["REQ-ENC-NULL-DETECT"]},
+        {"id": "gate_parity", "from": "RECEIVED", "to": "ERROR", "event": "non-odd parity", "guard": "RX enabled and gotNull asserted", "action": "valid parity error = 1", "trace_ids": ["REQ-ENC-PARITY-GATE"]},
+        {"id": "disconnect_timeout", "from": "READY", "to": "ERROR", "event": "no D/S transition", "guard": "first edge seen and idle >= 850 ns", "action": "disconnect = 1", "trace_ids": ["REQ-ENC-DISCONNECT"]},
+        {"id": "invalid_esc_pair", "from": "RECEIVED", "to": "ERROR", "event": "ESC + invalid control", "guard": "gotNull asserted", "action": "esc_error = 1", "trace_ids": ["REQ-ENC-ESC"]}
+      ]
     }
   ]
 }

@@ -1,0 +1,219 @@
+{
+  "schema_version": 1,
+  "run_id": "20260928T233433+0900-3998fb00",
+  "status": "PASS",
+  "started_at": "2026-09-28T23:34:33+09:00",
+  "finished_at": "2026-09-28T23:34:35+09:00",
+  "duration_seconds": 2.479902,
+  "source_snapshot": "spacewire-flow-control-2026-09-17",
+  "fault_injection": "none",
+  "tool_versions": {
+    "python": "Python 3.13.14",
+    "iverilog": "Icarus Verilog version 12.0 (stable) ()",
+    "vvp": "Icarus Verilog runtime version 12.0 (stable) ()"
+  },
+  "commands": [
+    {
+      "stage": "golden",
+      "argv": [
+        "python3",
+        "spw_ref_model_test_v5.py"
+      ],
+      "cwd": "assets/golden",
+      "exit_code": 0,
+      "duration_seconds": 2.271128,
+      "timed_out": false
+    },
+    {
+      "stage": "encoding_golden",
+      "argv": [
+        "python3",
+        "golden/encoding_compliance.py"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "duration_seconds": 0.031044,
+      "timed_out": false
+    },
+    {
+      "stage": "rtl_compile",
+      "argv": [
+        "iverilog",
+        "-g2005-sv",
+        "-s",
+        "tb_credit_mvp",
+        "-o",
+        "/home/hyojinkim/work/3_Company_PJT/spec2rtl_copilot/runs/20260928T233433+0900-3998fb00/build/tb_credit_mvp.vvp",
+        "/home/hyojinkim/work/3_Company_PJT/spec2rtl_copilot/assets/rtl/spw_datalink_v2.sv",
+        "/home/hyojinkim/work/3_Company_PJT/spec2rtl_copilot/assets/rtl/spw_enc.sv",
+        "/home/hyojinkim/work/3_Company_PJT/spec2rtl_copilot/assets/rtl/spw_network.sv",
+        "/home/hyojinkim/work/3_Company_PJT/spec2rtl_copilot/assets/rtl/spw_phy_v2.sv",
+        "/home/hyojinkim/work/3_Company_PJT/spec2rtl_copilot/assets/rtl/spw_top.sv",
+        "/home/hyojinkim/work/3_Company_PJT/spec2rtl_copilot/rtl/spw_encoding_compliance.sv",
+        "/home/hyojinkim/work/3_Company_PJT/spec2rtl_copilot/tests/rtl/tb_credit_mvp.sv"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "duration_seconds": 0.111018,
+      "timed_out": false
+    },
+    {
+      "stage": "rtl_simulation",
+      "argv": [
+        "vvp",
+        "/home/hyojinkim/work/3_Company_PJT/spec2rtl_copilot/runs/20260928T233433+0900-3998fb00/build/tb_credit_mvp.vvp"
+      ],
+      "cwd": "runs/20260928T233433+0900-3998fb00",
+      "exit_code": 0,
+      "duration_seconds": 0.060062,
+      "timed_out": false
+    }
+  ],
+  "tests": [
+    {
+      "id": "GOLDEN-BASELINE-147",
+      "layer": "golden",
+      "status": "PASS",
+      "detail": "PASS 147 / FAIL 0"
+    },
+    {
+      "id": "GOLDEN-ENCODING-COMPLIANCE",
+      "layer": "golden",
+      "status": "PASS",
+      "detail": "first Null, complete Null detection and parity gate PASS"
+    },
+    {
+      "id": "REQ-FC-E1",
+      "layer": "rtl",
+      "status": "PASS",
+      "detail": "tx_credit=16 expected=16"
+    },
+    {
+      "id": "REQ-FC-E2",
+      "layer": "rtl",
+      "status": "PASS",
+      "detail": "send=1 tx_credit=4 expected=4"
+    },
+    {
+      "id": "REQ-FC-F",
+      "layer": "rtl",
+      "status": "PASS",
+      "detail": "send=0 ready=0 tx_credit=0"
+    },
+    {
+      "id": "DEC-FC-SIMULTANEOUS-001",
+      "layer": "rtl",
+      "status": "PASS",
+      "detail": "got_fct=1 send=1 tx_credit=17 expected=17"
+    },
+    {
+      "id": "REQ-FC-HJ-COMB",
+      "layer": "rtl",
+      "status": "PASS",
+      "detail": "credit_error=1 overflow=1"
+    },
+    {
+      "id": "REQ-FC-HJ-STATE",
+      "layer": "rtl",
+      "status": "PASS",
+      "detail": "tx_credit=56 expected=56"
+    },
+    {
+      "id": "REQ-RC-ACCOUNT",
+      "layer": "rtl",
+      "status": "PASS",
+      "detail": "send_fct=1 rx_credit=16 expected=16"
+    },
+    {
+      "id": "REQ-FCT-INIT",
+      "layer": "rtl",
+      "status": "PASS",
+      "detail": "initial_fct_requests=7 expected=7"
+    },
+    {
+      "id": "REQ-FCT-ELIGIBLE",
+      "layer": "rtl",
+      "status": "PASS",
+      "detail": "space=8 rx_credit=49 send_ok=0"
+    },
+    {
+      "id": "REQ-RC-ERR",
+      "layer": "rtl",
+      "status": "PASS",
+      "detail": "rx_credit_error=1 credit_error=1 next_state=0"
+    },
+    {
+      "id": "REQ-LINK-INIT",
+      "layer": "rtl",
+      "status": "PASS",
+      "detail": "link_state=5 expected=5(Run)"
+    },
+    {
+      "id": "REQ-LINK-ERROR",
+      "layer": "rtl",
+      "status": "PASS",
+      "detail": "disconnect=0 parity=0 esc=1 next_state=0"
+    },
+    {
+      "id": "REQ-PKT-RECOVERY",
+      "layer": "rtl",
+      "status": "PASS",
+      "detail": "eep_pending=0 tx_flushing=0 ready=0"
+    },
+    {
+      "id": "REQ-ENC-SYMBOL",
+      "layer": "rtl",
+      "status": "PASS",
+      "detail": "last_char=0x103 parity=0"
+    },
+    {
+      "id": "REQ-ENC-DS-CORE",
+      "layer": "rtl",
+      "status": "PASS",
+      "detail": "ds_transitions=26 initial_reset=00"
+    },
+    {
+      "id": "REQ-ENC-DISCONNECT",
+      "layer": "rtl",
+      "status": "PASS",
+      "detail": "seen_edge=1 detected=1 timeout_ns=850"
+    },
+    {
+      "id": "REQ-ENC-ESC",
+      "layer": "rtl",
+      "status": "PASS",
+      "detail": "raw_esc_error=1 gated_next_state=5"
+    },
+    {
+      "id": "REQ-ENC-FIRST-NULL",
+      "layer": "rtl",
+      "status": "PASS",
+      "detail": "first_ds=01 first_symbol=0x103"
+    },
+    {
+      "id": "REQ-ENC-NULL-DETECT",
+      "layer": "rtl",
+      "status": "PASS",
+      "detail": "pattern=0x0e8 bits=9 cleared=1"
+    },
+    {
+      "id": "REQ-ENC-PARITY-GATE",
+      "layer": "rtl",
+      "status": "PASS",
+      "detail": "rx_enable=0 got_null=0 valid_error=0"
+    }
+  ],
+  "summary": {
+    "total": 22,
+    "passed": 22,
+    "failed": 0,
+    "command_failed": false
+  },
+  "waveform_error": null,
+  "artifacts": {
+    "stdout": "stdout.log",
+    "junit": "junit.xml",
+    "waveform_vcd": "waveform.vcd",
+    "waveform_json": "waveform.json"
+  }
+}

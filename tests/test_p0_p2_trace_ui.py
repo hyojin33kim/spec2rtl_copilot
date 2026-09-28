@@ -19,10 +19,19 @@ class TraceUiContract(unittest.TestCase):
         cls.html = (ROOT / "app/ui/spec2rtl_harness_demo_v1_7_4.html").read_text(encoding="utf-8")
 
     def test_pdf_provenance_is_explicit(self):
-        expected_pages = {"REQ-FC-E1": 74, "REQ-FC-E2": 74, "REQ-FC-F": 74, "REQ-FC-HJ": 75}
+        expected_pages = {
+            "REQ-FC-E1": [74], "REQ-FC-E2": [74], "REQ-FC-F": [74], "REQ-FC-HJ": [75],
+            "REQ-RC-ACCOUNT": [75], "REQ-FCT-INIT": [75], "REQ-FCT-ELIGIBLE": [75],
+            "REQ-RC-ERR": [75], "REQ-LINK-INIT": [77], "REQ-LINK-ERROR": [81],
+            "REQ-PKT-RECOVERY": [82],
+            "REQ-ENC-SYMBOL": [64, 65], "REQ-ENC-DS-CORE": [67],
+            "REQ-ENC-FIRST-NULL": [69], "REQ-ENC-NULL-DETECT": [69, 70],
+            "REQ-ENC-PARITY-GATE": [70],
+            "REQ-ENC-DISCONNECT": [70], "REQ-ENC-ESC": [70],
+        }
         for requirement in self.catalog["requirements"]:
             spec = requirement["spec"]
-            self.assertEqual(spec["pdf_pages"], [expected_pages[requirement["id"]]])
+            self.assertEqual(spec["pdf_pages"], expected_pages[requirement["id"]])
             self.assertEqual(spec["printed_pages"], spec["pdf_pages"])
             self.assertGreater(len(spec["excerpt"]), 40)
             self.assertTrue(spec["highlights"])

@@ -1,0 +1,1772 @@
+{
+  "schema_version": 1,
+  "source": "waveform.vcd",
+  "timescale": "1ps",
+  "signals": {
+    "link_state": {
+      "source": "tb_credit_mvp.dut.r_state",
+      "changes": [
+        {
+          "time": 0,
+          "value": "x",
+          "integer": null
+        },
+        {
+          "time": 5000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 115000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 285000,
+          "value": "10",
+          "integer": 2
+        },
+        {
+          "time": 335000,
+          "value": "11",
+          "integer": 3
+        },
+        {
+          "time": 365000,
+          "value": "100",
+          "integer": 4
+        },
+        {
+          "time": 385000,
+          "value": "101",
+          "integer": 5
+        },
+        {
+          "time": 580000,
+          "value": "100",
+          "integer": 4
+        },
+        {
+          "time": 610000,
+          "value": "101",
+          "integer": 5
+        }
+      ]
+    },
+    "tx_credit": {
+      "source": "tb_credit_mvp.dut.r_tx_credit",
+      "changes": [
+        {
+          "time": 0,
+          "value": "x",
+          "integer": null
+        },
+        {
+          "time": 5000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 385000,
+          "value": "1000",
+          "integer": 8
+        },
+        {
+          "time": 475000,
+          "value": "10000",
+          "integer": 16
+        },
+        {
+          "time": 490000,
+          "value": "101",
+          "integer": 5
+        },
+        {
+          "time": 505000,
+          "value": "100",
+          "integer": 4
+        },
+        {
+          "time": 520000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 550000,
+          "value": "1010",
+          "integer": 10
+        },
+        {
+          "time": 575000,
+          "value": "10001",
+          "integer": 17
+        },
+        {
+          "time": 585000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 590000,
+          "value": "111000",
+          "integer": 56
+        },
+        {
+          "time": 645000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 656000,
+          "value": "10",
+          "integer": 2
+        }
+      ]
+    },
+    "got_fct": {
+      "source": "tb_credit_mvp.dut.w_got_fct",
+      "changes": [
+        {
+          "time": 0,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 365000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 370000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 380000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 390000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 470000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 480000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 570000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 580000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 600000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 610000,
+          "value": "0",
+          "integer": 0
+        }
+      ]
+    },
+    "send_nchar": {
+      "source": "tb_credit_mvp.dut.w_send_nchar",
+      "changes": [
+        {
+          "time": 0,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 500000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 510000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 570000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 580000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 670000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 685000,
+          "value": "0",
+          "integer": 0
+        }
+      ]
+    },
+    "credit_error": {
+      "source": "tb_credit_mvp.dut.w_credit_err",
+      "changes": [
+        {
+          "time": 0,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 600000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 610000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 620000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 621000,
+          "value": "0",
+          "integer": 0
+        }
+      ]
+    },
+    "tx_credit_overflow": {
+      "source": "tb_credit_mvp.dut.w_tx_credit_err",
+      "changes": [
+        {
+          "time": 0,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 600000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 610000,
+          "value": "0",
+          "integer": 0
+        }
+      ]
+    },
+    "nchar_valid": {
+      "source": "tb_credit_mvp.nchar_valid",
+      "changes": [
+        {
+          "time": 0,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 500000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 510000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 530000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 540000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 570000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 580000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 670000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 696000,
+          "value": "0",
+          "integer": 0
+        }
+      ]
+    },
+    "nchar_ready": {
+      "source": "tb_credit_mvp.nchar_ready",
+      "changes": [
+        {
+          "time": 0,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 500000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 510000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 570000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 580000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 670000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 695000,
+          "value": "0",
+          "integer": 0
+        }
+      ]
+    },
+    "rx_credit": {
+      "source": "tb_credit_mvp.dut.r_rx_credit",
+      "changes": [
+        {
+          "time": 0,
+          "value": "x",
+          "integer": null
+        },
+        {
+          "time": 5000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 375000,
+          "value": "1000",
+          "integer": 8
+        },
+        {
+          "time": 385000,
+          "value": "10000",
+          "integer": 16
+        },
+        {
+          "time": 391000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 393000,
+          "value": "110001",
+          "integer": 49
+        },
+        {
+          "time": 400000,
+          "value": "1000",
+          "integer": 8
+        },
+        {
+          "time": 415000,
+          "value": "111",
+          "integer": 7
+        },
+        {
+          "time": 430000,
+          "value": "1000",
+          "integer": 8
+        },
+        {
+          "time": 455000,
+          "value": "10000",
+          "integer": 16
+        },
+        {
+          "time": 585000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 624000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 685000,
+          "value": "0",
+          "integer": 0
+        }
+      ]
+    },
+    "send_fct": {
+      "source": "tb_credit_mvp.dut.w_send_fct",
+      "changes": [
+        {
+          "time": 0,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 371000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 385000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 445000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 456000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 580000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 585000,
+          "value": "0",
+          "integer": 0
+        }
+      ]
+    },
+    "got_nchar": {
+      "source": "tb_credit_mvp.dut.w_got_nchar",
+      "changes": [
+        {
+          "time": 0,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 410000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 420000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 620000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 621000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 635000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 640000,
+          "value": "0",
+          "integer": 0
+        }
+      ]
+    },
+    "rx_credit_error": {
+      "source": "tb_credit_mvp.dut.w_rx_credit_err",
+      "changes": [
+        {
+          "time": 0,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 620000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 621000,
+          "value": "0",
+          "integer": 0
+        }
+      ]
+    },
+    "rx_free_space": {
+      "source": "tb_credit_mvp.rx_free_space",
+      "changes": [
+        {
+          "time": 0,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 391000,
+          "value": "111",
+          "integer": 7
+        },
+        {
+          "time": 392000,
+          "value": "1000",
+          "integer": 8
+        },
+        {
+          "time": 394000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 437000,
+          "value": "1000",
+          "integer": 8
+        },
+        {
+          "time": 456000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 646000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 656000,
+          "value": "0",
+          "integer": 0
+        }
+      ]
+    },
+    "fct_send_ok": {
+      "source": "tb_credit_mvp.dut.w_fct_send_ok",
+      "changes": [
+        {
+          "time": 0,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 392000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 393000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 437000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 456000,
+          "value": "0",
+          "integer": 0
+        }
+      ]
+    },
+    "initial_fct_requests": {
+      "source": "tb_credit_mvp.dut.r_req_initial_fct",
+      "changes": [
+        {
+          "time": 0,
+          "value": "x",
+          "integer": null
+        },
+        {
+          "time": 5000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 365000,
+          "value": "111",
+          "integer": 7
+        },
+        {
+          "time": 375000,
+          "value": "110",
+          "integer": 6
+        },
+        {
+          "time": 385000,
+          "value": "101",
+          "integer": 5
+        },
+        {
+          "time": 455000,
+          "value": "100",
+          "integer": 4
+        },
+        {
+          "time": 585000,
+          "value": "11",
+          "integer": 3
+        }
+      ]
+    },
+    "link_start": {
+      "source": "tb_credit_mvp.link_start",
+      "changes": [
+        {
+          "time": 0,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 326000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 336000,
+          "value": "0",
+          "integer": 0
+        }
+      ]
+    },
+    "port_reset": {
+      "source": "tb_credit_mvp.port_reset",
+      "changes": [
+        {
+          "time": 0,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 641000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 646000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 676000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 686000,
+          "value": "0",
+          "integer": 0
+        }
+      ]
+    },
+    "disconnect_error": {
+      "source": "tb_credit_mvp.err_disconnect",
+      "changes": [
+        {
+          "time": 0,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 621000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 622000,
+          "value": "0",
+          "integer": 0
+        }
+      ]
+    },
+    "parity_error": {
+      "source": "tb_credit_mvp.err_parity",
+      "changes": [
+        {
+          "time": 0,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 622000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 623000,
+          "value": "0",
+          "integer": 0
+        }
+      ]
+    },
+    "esc_error": {
+      "source": "tb_credit_mvp.err_esc",
+      "changes": [
+        {
+          "time": 0,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 345000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 350000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 623000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 624000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 4936000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 4940000,
+          "value": "0",
+          "integer": 0
+        }
+      ]
+    },
+    "eep_pending": {
+      "source": "tb_credit_mvp.dut.r_eep_pending",
+      "changes": [
+        {
+          "time": 0,
+          "value": "x",
+          "integer": null
+        },
+        {
+          "time": 5000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 585000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 655000,
+          "value": "0",
+          "integer": 0
+        }
+      ]
+    },
+    "eep_write_now": {
+      "source": "tb_credit_mvp.dut.w_eep_write_now",
+      "changes": [
+        {
+          "time": 0,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 646000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 655000,
+          "value": "0",
+          "integer": 0
+        }
+      ]
+    },
+    "tx_flushing": {
+      "source": "tb_credit_mvp.dut.r_tx_flushing",
+      "changes": [
+        {
+          "time": 0,
+          "value": "x",
+          "integer": null
+        },
+        {
+          "time": 5000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 585000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 595000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 685000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 695000,
+          "value": "0",
+          "integer": 0
+        }
+      ]
+    },
+    "enc_tx_char": {
+      "source": "tb_credit_mvp.enc_tx_char",
+      "changes": [
+        {
+          "time": 0,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 710000,
+          "value": "100000011",
+          "integer": 259
+        },
+        {
+          "time": 1030000,
+          "value": "100000000",
+          "integer": 256
+        },
+        {
+          "time": 1350000,
+          "value": "100000011",
+          "integer": 259
+        },
+        {
+          "time": 1700000,
+          "value": "10100101",
+          "integer": 165
+        },
+        {
+          "time": 2620000,
+          "value": "100000000",
+          "integer": 256
+        },
+        {
+          "time": 2940000,
+          "value": "100000010",
+          "integer": 258
+        },
+        {
+          "time": 3260000,
+          "value": "100000001",
+          "integer": 257
+        },
+        {
+          "time": 3580000,
+          "value": "100000011",
+          "integer": 259
+        }
+      ]
+    },
+    "enc_tx_valid": {
+      "source": "tb_credit_mvp.enc_tx_valid",
+      "changes": [
+        {
+          "time": 0,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 710000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 720000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 1030000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 1040000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 1350000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 1360000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 1700000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 1710000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 2620000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 2630000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 2940000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 2950000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 3260000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 3270000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 3580000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 3590000,
+          "value": "0",
+          "integer": 0
+        }
+      ]
+    },
+    "enc_tx_ready": {
+      "source": "tb_credit_mvp.enc_tx_ready",
+      "changes": [
+        {
+          "time": 0,
+          "value": "x",
+          "integer": null
+        },
+        {
+          "time": 5000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 696000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 706000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 715000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 1015000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 1035000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 1335000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 1355000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 1655000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 1705000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 2605000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 2625000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 2925000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 2945000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 3245000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 3265000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 3565000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 3585000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 3885000,
+          "value": "1",
+          "integer": 1
+        }
+      ]
+    },
+    "enc_rx_char": {
+      "source": "tb_credit_mvp.enc_rx_char",
+      "changes": [
+        {
+          "time": 0,
+          "value": "x",
+          "integer": null
+        },
+        {
+          "time": 5000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 1025000,
+          "value": "100000011",
+          "integer": 259
+        },
+        {
+          "time": 1345000,
+          "value": "100000000",
+          "integer": 256
+        },
+        {
+          "time": 1665000,
+          "value": "100000011",
+          "integer": 259
+        },
+        {
+          "time": 2615000,
+          "value": "10100101",
+          "integer": 165
+        },
+        {
+          "time": 2935000,
+          "value": "100000000",
+          "integer": 256
+        },
+        {
+          "time": 3255000,
+          "value": "100000010",
+          "integer": 258
+        },
+        {
+          "time": 3575000,
+          "value": "100000001",
+          "integer": 257
+        },
+        {
+          "time": 3895000,
+          "value": "100000011",
+          "integer": 259
+        }
+      ]
+    },
+    "enc_rx_valid": {
+      "source": "tb_credit_mvp.enc_rx_valid",
+      "changes": [
+        {
+          "time": 0,
+          "value": "x",
+          "integer": null
+        },
+        {
+          "time": 5000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 1025000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 1035000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 1345000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 1355000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 1665000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 1675000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 2615000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 2625000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 2935000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 2945000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 3255000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 3265000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 3575000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 3585000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 3895000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 3905000,
+          "value": "0",
+          "integer": 0
+        }
+      ]
+    },
+    "enc_parity_error": {
+      "source": "tb_credit_mvp.enc_parity_err",
+      "changes": [
+        {
+          "time": 0,
+          "value": "x",
+          "integer": null
+        },
+        {
+          "time": 5000,
+          "value": "0",
+          "integer": 0
+        }
+      ]
+    },
+    "ds_data": {
+      "source": "tb_credit_mvp.enc_ds_data",
+      "changes": [
+        {
+          "time": 0,
+          "value": "x",
+          "integer": null
+        },
+        {
+          "time": 5000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 815000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 1035000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 1135000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 1235000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 1455000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 1805000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 1905000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 2005000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 2105000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 2205000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 2405000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 2505000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 2605000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 2625000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 2725000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 2825000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 2945000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 3145000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 3245000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 3565000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 3685000,
+          "value": "1",
+          "integer": 1
+        }
+      ]
+    },
+    "ds_strobe": {
+      "source": "tb_credit_mvp.enc_ds_strobe",
+      "changes": [
+        {
+          "time": 0,
+          "value": "x",
+          "integer": null
+        },
+        {
+          "time": 5000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 715000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 915000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 1015000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 1335000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 1355000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 1555000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 1655000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 1705000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 2305000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 2925000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 3045000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 3265000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 3365000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 3465000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 3585000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 3785000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 3885000,
+          "value": "1",
+          "integer": 1
+        }
+      ]
+    },
+    "phy_rx_strobe": {
+      "source": "tb_credit_mvp.phy_rx_strobe",
+      "changes": [
+        {
+          "time": 0,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 3900000,
+          "value": "1",
+          "integer": 1
+        }
+      ]
+    },
+    "phy_seen_edge": {
+      "source": "tb_credit_mvp.phy_dut.r_seen_any_transition",
+      "changes": [
+        {
+          "time": 0,
+          "value": "x",
+          "integer": null
+        },
+        {
+          "time": 5000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 3925000,
+          "value": "1",
+          "integer": 1
+        }
+      ]
+    },
+    "phy_disconnect": {
+      "source": "tb_credit_mvp.phy_disconnect",
+      "changes": [
+        {
+          "time": 0,
+          "value": "x",
+          "integer": null
+        },
+        {
+          "time": 5000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 4785000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 4795000,
+          "value": "0",
+          "integer": 0
+        }
+      ]
+    },
+    "enc_rx_enable": {
+      "source": "tb_credit_mvp.enc_comp_rx_enable",
+      "changes": [
+        {
+          "time": 0,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 706000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 1690000,
+          "value": "0",
+          "integer": 0
+        }
+      ]
+    },
+    "enc_raw_parity_error": {
+      "source": "tb_credit_mvp.enc_comp_raw_parity",
+      "changes": [
+        {
+          "time": 0,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 706000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 707000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 1686000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 1696000,
+          "value": "0",
+          "integer": 0
+        }
+      ]
+    },
+    "enc_got_null": {
+      "source": "tb_credit_mvp.enc_comp_got_null",
+      "changes": [
+        {
+          "time": 0,
+          "value": "x",
+          "integer": null
+        },
+        {
+          "time": 5000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 1365000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 1695000,
+          "value": "0",
+          "integer": 0
+        }
+      ]
+    },
+    "enc_valid_parity_error": {
+      "source": "tb_credit_mvp.enc_comp_parity_error",
+      "changes": [
+        {
+          "time": 0,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 1686000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 1690000,
+          "value": "0",
+          "integer": 0
+        }
+      ]
+    },
+    "enc_null_window": {
+      "source": "tb_credit_mvp.enc_comp_null_window",
+      "changes": [
+        {
+          "time": 0,
+          "value": "x",
+          "integer": null
+        },
+        {
+          "time": 5000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 825000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 925000,
+          "value": "11",
+          "integer": 3
+        },
+        {
+          "time": 1025000,
+          "value": "111",
+          "integer": 7
+        },
+        {
+          "time": 1045000,
+          "value": "1110",
+          "integer": 14
+        },
+        {
+          "time": 1145000,
+          "value": "11101",
+          "integer": 29
+        },
+        {
+          "time": 1245000,
+          "value": "111010",
+          "integer": 58
+        },
+        {
+          "time": 1345000,
+          "value": "1110100",
+          "integer": 116
+        },
+        {
+          "time": 1365000,
+          "value": "11101000",
+          "integer": 232
+        },
+        {
+          "time": 1695000,
+          "value": "0",
+          "integer": 0
+        }
+      ]
+    },
+    "enc_null_window_bits": {
+      "source": "tb_credit_mvp.enc_comp_window_bits",
+      "changes": [
+        {
+          "time": 0,
+          "value": "x",
+          "integer": null
+        },
+        {
+          "time": 5000,
+          "value": "0",
+          "integer": 0
+        },
+        {
+          "time": 725000,
+          "value": "1",
+          "integer": 1
+        },
+        {
+          "time": 825000,
+          "value": "10",
+          "integer": 2
+        },
+        {
+          "time": 925000,
+          "value": "11",
+          "integer": 3
+        },
+        {
+          "time": 1025000,
+          "value": "100",
+          "integer": 4
+        },
+        {
+          "time": 1045000,
+          "value": "101",
+          "integer": 5
+        },
+        {
+          "time": 1145000,
+          "value": "110",
+          "integer": 6
+        },
+        {
+          "time": 1245000,
+          "value": "111",
+          "integer": 7
+        },
+        {
+          "time": 1345000,
+          "value": "1000",
+          "integer": 8
+        },
+        {
+          "time": 1365000,
+          "value": "1001",
+          "integer": 9
+        },
+        {
+          "time": 1695000,
+          "value": "0",
+          "integer": 0
+        }
+      ]
+    }
+  }
+}

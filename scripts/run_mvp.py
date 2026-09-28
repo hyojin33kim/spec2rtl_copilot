@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the Golden and RTL TX-credit pilot and persist immutable evidence."""
+"""Run the Golden and RTL SpaceWire data-link pilot and persist evidence."""
 
 from __future__ import annotations
 
@@ -26,6 +26,20 @@ EXPECTED_RTL_TESTS = (
     "DEC-FC-SIMULTANEOUS-001",
     "REQ-FC-HJ-COMB",
     "REQ-FC-HJ-STATE",
+    "REQ-RC-ACCOUNT",
+    "REQ-FCT-INIT",
+    "REQ-FCT-ELIGIBLE",
+    "REQ-RC-ERR",
+    "REQ-LINK-INIT",
+    "REQ-LINK-ERROR",
+    "REQ-PKT-RECOVERY",
+    "REQ-ENC-SYMBOL",
+    "REQ-ENC-DS-CORE",
+    "REQ-ENC-DISCONNECT",
+    "REQ-ENC-ESC",
+    "REQ-ENC-FIRST-NULL",
+    "REQ-ENC-NULL-DETECT",
+    "REQ-ENC-PARITY-GATE",
 )
 
 
@@ -159,9 +173,32 @@ def main() -> int:
             "detail": "PASS 147 / FAIL 0" if golden_pass else "Golden baseline failed or summary missing",
         })
 
+        encoding_golden = execute(
+            "encoding_golden",
+            ["python3", "golden/encoding_compliance.py"],
+            ROOT,
+            10,
+            log,
+        )
+        commands.append({key: value for key, value in encoding_golden.items() if key != "output"})
+        encoding_golden_pass = (
+            encoding_golden["exit_code"] == 0
+            and "ENCODING_GOLDEN|PASS" in encoding_golden["output"]
+        )
+        tests.append({
+            "id": "GOLDEN-ENCODING-COMPLIANCE",
+            "layer": "golden",
+            "status": "PASS" if encoding_golden_pass else "FAIL",
+            "detail": (
+                "first Null, complete Null detection and parity gate PASS"
+                if encoding_golden_pass else "Encoding compliance oracle failed"
+            ),
+        })
+
         rtl_binary = build_dir / "tb_credit_mvp.vvp"
         compile_sources = [
             *[str(path) for path in sorted((ROOT / "assets/rtl").glob("*.sv"))],
+            *[str(path) for path in sorted((ROOT / "rtl").glob("*.sv"))],
             str(ROOT / "tests/rtl/tb_credit_mvp.sv"),
         ]
         if args.fault == "compile":

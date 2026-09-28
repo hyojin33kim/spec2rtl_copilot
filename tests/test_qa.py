@@ -138,6 +138,16 @@ class QaContract(unittest.TestCase):
                 self.assertEqual([source["id"] for source in response["sources"]], ["S1"])
         provider.assert_not_called()
 
+    def test_expanded_topic_is_allowed_for_its_selected_requirement(self):
+        req = next(item for item in self.catalog["requirements"] if item["id"] == "REQ-RC-ACCOUNT")
+        response = FakeResponse(json.dumps({"output": [{"type": "message", "content": [
+            {"type": "output_text", "text": "수신 크레딧은 FCT 송신 시 8 증가합니다 [S1]."}]}]}).encode())
+        with mock.patch.object(qa, "setting", side_effect=lambda name: "test-key" if name == "OPENAI_API_KEY" else ""), \
+             mock.patch.object(qa.urllib.request, "urlopen", return_value=response) as provider:
+            result = qa.answer_question(req, "수신 크레딧 accounting은 어떻게 동작합니까?")
+        self.assertEqual(result["mode"], "llm")
+        provider.assert_called_once()
+
 
 class QaApiContract(unittest.TestCase):
     @classmethod

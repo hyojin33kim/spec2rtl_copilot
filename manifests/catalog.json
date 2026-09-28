@@ -2,11 +2,11 @@
   "schema_version": 2,
   "pilot": {
     "id": "PILOT-TX-CREDIT",
-    "title": "SpaceWire transmit-credit control",
+    "title": "SpaceWire data-link verification subset",
     "document": "ECSS-E-ST-50-12C Rev.1",
     "published": "2019-05-15",
     "spec_asset": "assets/spec/ECSS-E-ST-50-12C-Rev.1(15May2019).pdf",
-    "scope": "5.5.4.e.1, 5.5.4.e.2, 5.5.4.f, 5.5.4.h, 5.5.4.j, 5.5.5.a.2"
+    "scope": "18 executable cards across ECSS 5.4 and 5.5; controlled D/S reset, full enable-interface equivalence and 5.5.6 sending priority remain conditional"
   },
   "requirements": [
     {
@@ -26,7 +26,7 @@
         "rtl": [{"file":"assets/rtl/spw_datalink_v2.sv","symbol":"r_tx_credit","start":657,"end":680,"role":"sequential implementation"}],
         "test": [{"file":"tests/rtl/tb_credit_mvp.sv","symbol":"REQ-FC-E1","start":125,"end":129,"role":"executable check"}]
       },
-      "waveform": {"signals":["got_fct","tx_credit"],"event_signal":"got_fct","window_start":400000,"window_end":425000,"annotation":"FCT event: tx_credit 8 → 16"}
+      "waveform": {"signals":["got_fct","tx_credit"],"event_signal":"got_fct","window_start":460000,"window_end":485000,"annotation":"FCT event: tx_credit 8 → 16"}
     },
     {
       "id": "REQ-FC-E2",
@@ -48,7 +48,7 @@
         ],
         "test": [{"file":"tests/rtl/tb_credit_mvp.sv","symbol":"REQ-FC-E2","start":131,"end":140,"role":"executable check"}]
       },
-      "waveform": {"signals":["send_nchar","tx_credit"],"event_signal":"send_nchar","window_start":430000,"window_end":455000,"annotation":"N-Char accepted: tx_credit 5 → 4"}
+      "waveform": {"signals":["send_nchar","tx_credit"],"event_signal":"send_nchar","window_start":485000,"window_end":515000,"annotation":"N-Char accepted: tx_credit 5 → 4"}
     },
     {
       "id": "REQ-FC-F",
@@ -70,7 +70,7 @@
         ],
         "test": [{"file":"tests/rtl/tb_credit_mvp.sv","symbol":"REQ-FC-F","start":142,"end":152,"role":"executable check"}]
       },
-      "waveform": {"signals":["nchar_valid","nchar_ready","send_nchar","tx_credit"],"event_signal":"nchar_valid","window_start":455000,"window_end":485000,"annotation":"Pending N-Char blocked at zero credit"}
+      "waveform": {"signals":["nchar_valid","nchar_ready","send_nchar","tx_credit"],"event_signal":"nchar_valid","window_start":515000,"window_end":545000,"annotation":"Pending N-Char blocked at zero credit"}
     },
     {
       "id": "REQ-FC-HJ",
@@ -93,7 +93,231 @@
         ],
         "test": [{"file":"tests/rtl/tb_credit_mvp.sv","symbol":"REQ-FC-HJ","start":173,"end":190,"role":"combinational and state checks"}]
       },
-      "waveform": {"signals":["got_fct","tx_credit","credit_error","tx_credit_overflow"],"event_signal":"credit_error","window_start":525000,"window_end":555000,"annotation":"Overflow attempt: error asserted, tx_credit remains 56"}
+      "waveform": {"signals":["got_fct","tx_credit","credit_error","tx_credit_overflow"],"event_signal":"credit_error","window_start":590000,"window_end":615000,"annotation":"Overflow attempt: error asserted, tx_credit remains 56"}
+    },
+    {
+      "id": "REQ-RC-ACCOUNT",
+      "trace_id": "REQ-RC-ACCOUNT",
+      "behavior_model": {"model_id": "BEH-RX-CREDIT", "transition_ids": ["grant_eight", "grant_more", "consume_one", "consume_last"]},
+      "title": "Receive-credit accounting",
+      "spec": {"clause":"5.5.4.l.1–l.2","pdf_pages":[75],"printed_pages":[75],"excerpt":"Increment the receive credit count by eight each time an FCT is passed to the encoding layer, and decrement it by one each time an N-Char is received.","highlights":[{"x":29.0,"y":37.0,"width":60.0,"height":13.0,"label":"§5.5.4.l"}]},
+      "behavior": {"trigger":"An independent FCT is sent or an N-Char is received.","precondition":"Link state is Connecting or Run and no receive-credit error is active.","expected":"send_fct adds eight; got_nchar subtracts one.","verdict":"PASS when both receive-credit deltas are observed."},
+      "observables": ["send_fct", "got_nchar", "rx_credit"],
+      "result_ids": ["REQ-RC-ACCOUNT"],
+      "trace": {
+        "golden": [{"file":"assets/golden/spw_ref_model.py","symbol":"SpWLink.on_char / note_tx_char_sent","start":619,"end":669,"role":"receive-credit oracle"},{"file":"assets/golden/spw_ref_model_test_v5.py","symbol":"scenario_3_flow_control","start":230,"end":268,"role":"Golden flow-control scenario"}],
+        "rtl": [{"file":"assets/rtl/spw_datalink_v2.sv","symbol":"r_rx_credit","start":688,"end":708,"role":"sequential accounting"}],
+        "test": [{"file":"tests/rtl/tb_credit_mvp.sv","symbol":"REQ-RC-ACCOUNT","start":165,"end":179,"role":"executable increment/decrement check"}]
+      },
+      "waveform": {"signals":["send_fct","got_nchar","rx_credit"],"event_signal":"send_fct","window_start":400000,"window_end":460000,"annotation":"N-Char consumes one; independent FCT grants eight"}
+    },
+    {
+      "id": "REQ-FCT-INIT",
+      "trace_id": "REQ-FCT-INIT",
+      "behavior_model": {"model_id": "BEH-RX-CREDIT", "transition_ids": ["grant_eight"]},
+      "title": "Initial FCT allocation",
+      "spec": {"clause":"5.5.4.k","pdf_pages":[75],"printed_pages":[75],"excerpt":"When the link is initialised or re-initialised, one FCT shall be sent for every eight N-Chars that can be held in the receive FIFO up to the maximum of seven FCTs.","highlights":[{"x":28.0,"y":25.0,"width":61.0,"height":8.0,"label":"§5.5.4.k"}]},
+      "behavior": {"trigger":"The link enters Connecting.","precondition":"RX_FIFO_DEPTH is 128 and the encoder is held until the request count is observed.","expected":"initial_fct_requests = min(128/8, 7) = 7.","verdict":"PASS when seven initial FCT requests are loaded."},
+      "observables": ["link_state", "initial_fct_requests"],
+      "result_ids": ["REQ-FCT-INIT"],
+      "trace": {
+        "golden": [{"file":"assets/golden/spw_ref_model.py","symbol":"SpWLink._enter","start":533,"end":570,"role":"initial allocation oracle"},{"file":"assets/golden/spw_ref_model_test_v5.py","symbol":"scenario_1_link_init","start":154,"end":163,"role":"Golden initialization scenario"}],
+        "rtl": [{"file":"assets/rtl/spw_datalink_v2.sv","symbol":"r_req_initial_fct","start":710,"end":719,"role":"initial FCT request counter"}],
+        "test": [{"file":"tests/rtl/tb_credit_mvp.sv","symbol":"REQ-FCT-INIT","start":125,"end":133,"role":"executable count check"}]
+      },
+      "waveform": {"signals":["link_state","initial_fct_requests","send_fct"],"event_signal":"link_state","window_start":350000,"window_end":390000,"annotation":"Connecting entry loads seven initial FCT requests"}
+    },
+    {
+      "id": "REQ-FCT-ELIGIBLE",
+      "trace_id": "REQ-FCT-ELIGIBLE",
+      "behavior_model": {"model_id": "BEH-RX-CREDIT", "transition_ids": ["grant_more", "block_grant"]},
+      "title": "FCT eligibility gate",
+      "spec": {"clause":"5.5.4.n–p","pdf_pages":[75],"printed_pages":[75],"excerpt":"An FCT shall only be sent when there is room to receive another eight N-Chars and the receive credit count is at least eight below its maximum value.","highlights":[{"x":28.0,"y":53.0,"width":61.0,"height":20.0,"label":"§5.5.4.n–p"}]},
+      "behavior": {"trigger":"The FCT sending gate is evaluated.","precondition":"No packet-recovery EEP is pending.","expected":"send_fct is eligible only with FIFO space >= 8 and rx_credit <= 48.","verdict":"PASS when both lower-space and upper-credit boundary cases block the gate."},
+      "observables": ["rx_free_space", "rx_credit", "fct_send_ok"],
+      "result_ids": ["REQ-FCT-ELIGIBLE"],
+      "trace": {
+        "golden": [{"file":"assets/golden/spw_ref_model.py","symbol":"SpWNode.tick","start":882,"end":895,"role":"Golden FCT request gate"},{"file":"assets/golden/spw_ref_model_test_v5.py","symbol":"scenario_8_credit_boundary_sweep","start":508,"end":568,"role":"Golden boundary scenario"}],
+        "rtl": [{"file":"assets/rtl/spw_datalink_v2.sv","symbol":"w_fct_send_ok","start":741,"end":754,"role":"FCT eligibility expression"}],
+        "test": [{"file":"tests/rtl/tb_credit_mvp.sv","symbol":"REQ-FCT-ELIGIBLE","start":147,"end":163,"role":"executable boundary check"}]
+      },
+      "waveform": {"signals":["rx_free_space","rx_credit","fct_send_ok"],"event_signal":"fct_send_ok","window_start":385000,"window_end":400000,"annotation":"FIFO and credit boundaries jointly gate FCT"}
+    },
+    {
+      "id": "REQ-RC-ERR",
+      "trace_id": "REQ-RC-ERR",
+      "behavior_model": {"model_id": "BEH-RX-CREDIT", "transition_ids": ["error_at_empty"]},
+      "title": "N-Char at zero receive credit raises error",
+      "spec": {"clause":"5.5.5.a.1","pdf_pages":[75],"printed_pages":[75],"excerpt":"A credit error shall be detected when an N-Char is received when the receive credit counter is zero.","highlights":[{"x":31.0,"y":79.0,"width":57.0,"height":8.0,"label":"§5.5.5.a.1"}]},
+      "behavior": {"trigger":"An N-Char arrives in Run.","precondition":"rx_credit equals zero.","expected":"credit_error is asserted and next state is ErrorReset.","verdict":"PASS when the cause and state transition are both asserted."},
+      "observables": ["got_nchar", "rx_credit", "rx_credit_error", "credit_error", "link_state"],
+      "result_ids": ["REQ-RC-ERR"],
+      "trace": {
+        "golden": [{"file":"assets/golden/spw_ref_model.py","symbol":"SpWLink.on_char","start":625,"end":637,"role":"zero-credit error oracle"},{"file":"assets/golden/spw_ref_model_test_v5.py","symbol":"scenario_9_credit_error_injection","start":571,"end":607,"role":"Golden credit-error transition"}],
+        "rtl": [{"file":"assets/rtl/spw_datalink_v2.sv","symbol":"w_rx_credit_err","start":645,"end":655,"role":"error detection"},{"file":"assets/rtl/spw_datalink_v2.sv","symbol":"w_immediate_error","start":204,"end":220,"role":"ErrorReset cause"}],
+        "test": [{"file":"tests/rtl/tb_credit_mvp.sv","symbol":"REQ-RC-ERR","start":248,"end":262,"role":"new direct error-injection check"}]
+      },
+      "waveform": {"signals":["got_nchar","rx_credit","rx_credit_error","credit_error","link_state"],"event_signal":"rx_credit_error","window_start":615000,"window_end":625000,"annotation":"N-Char at zero credit asserts error and selects ErrorReset"}
+    },
+    {
+      "id": "REQ-LINK-INIT",
+      "trace_id": "REQ-LINK-INIT",
+      "behavior_model": {"model_id": "BEH-LINK-INIT", "transition_ids": ["reset_to_wait", "wait_to_ready", "ready_to_started", "started_to_connecting", "connecting_to_run"]},
+      "title": "ErrorReset-to-Run link initialization",
+      "spec": {"clause":"5.5.7.2–5.5.7.7","pdf_pages":[77],"printed_pages":[77],"excerpt":"The link initialization state machine progresses through ErrorReset, ErrorWait, Ready, Started and Connecting, and enters Run after an FCT has both been sent and received.","highlights":[{"x":9.0,"y":13.0,"width":82.0,"height":68.0,"label":"Figure 5-19"}]},
+      "behavior": {"trigger":"Link enable and LinkStart are asserted and the peer supplies Null and FCT.","precondition":"Shortened simulation timers preserve the state conditions.","expected":"The state machine reaches Run through the initialization path.","verdict":"PASS when Run state is reached before the Connecting timeout."},
+      "observables": ["link_state", "link_start", "got_fct", "send_fct"],
+      "result_ids": ["REQ-LINK-INIT"],
+      "trace": {
+        "golden": [{"file":"assets/golden/spw_ref_model.py","symbol":"SpWLink.tick","start":670,"end":720,"role":"link FSM oracle"},{"file":"assets/golden/spw_ref_model_test_v5.py","symbol":"scenario_1_link_init","start":154,"end":163,"role":"Golden Run-entry scenario"}],
+        "rtl": [{"file":"assets/rtl/spw_datalink_v2.sv","symbol":"w_next_state","start":228,"end":309,"role":"link-state implementation"}],
+        "test": [{"file":"tests/rtl/tb_credit_mvp.sv","symbol":"REQ-LINK-INIT","start":109,"end":145,"role":"executable initialization path"}]
+      },
+      "waveform": {"signals":["link_state","link_start","got_fct","send_fct"],"event_signal":"link_state","window_start":0,"window_end":430000,"annotation":"ErrorReset → ErrorWait → Ready → Started → Connecting → Run"}
+    },
+    {
+      "id": "REQ-LINK-ERROR",
+      "trace_id": "REQ-LINK-ERROR",
+      "behavior_model": {"model_id": "BEH-LINK-INIT", "transition_ids": ["error_to_reset"]},
+      "title": "Link-error transition to ErrorReset",
+      "spec": {"clause":"5.5.7.7.b / 5.5.8.3.b","pdf_pages":[81],"printed_pages":[81],"excerpt":"The link state machine shall leave Run and move to ErrorReset when a disconnect, parity error, ESC error, credit error, or LinkDisabled condition occurs.","highlights":[{"x":28.0,"y":8.0,"width":62.0,"height":25.0,"label":"§5.5.7.7.b"}]},
+      "behavior": {"trigger":"Disconnect, parity error, or invalid ESC pair is injected in Run.","precondition":"gotNull is latched for parity and ESC error enablement.","expected":"Each error cause selects ErrorReset.","verdict":"PASS when all three causes assert their output and next_state=ErrorReset."},
+      "observables": ["disconnect_error", "parity_error", "esc_error", "link_state"],
+      "result_ids": ["REQ-LINK-ERROR"],
+      "trace": {
+        "golden": [{"file":"assets/golden/spw_ref_model.py","symbol":"SpWLink.tick","start":670,"end":720,"role":"error-transition oracle"},{"file":"assets/golden/spw_ref_model_test_v5.py","symbol":"scenario_6_disconnect","start":385,"end":420,"role":"Golden disconnect scenario"}],
+        "rtl": [{"file":"assets/rtl/spw_datalink_v2.sv","symbol":"w_immediate_error","start":204,"end":220,"role":"combined error transition"},{"file":"assets/rtl/spw_datalink_v2.sv","symbol":"ow_err_disconnect/parity/esc","start":1008,"end":1026,"role":"error observables"}],
+        "test": [{"file":"tests/rtl/tb_credit_mvp.sv","symbol":"REQ-LINK-ERROR","start":264,"end":283,"role":"multi-cause executable check"}]
+      },
+      "waveform": {"signals":["disconnect_error","parity_error","esc_error","link_state"],"event_signal":"esc_error","window_start":618000,"window_end":627000,"annotation":"Three link-error causes independently select ErrorReset"}
+    },
+    {
+      "id": "REQ-PKT-RECOVERY",
+      "trace_id": "REQ-PKT-RECOVERY",
+      "behavior_model": {"model_id": "BEH-PACKET-RECOVERY", "transition_ids": ["arm_recovery", "insert_eep", "flush_tx"]},
+      "title": "Interrupted-packet EEP and TX flush recovery",
+      "spec": {"clause":"5.5.8.4.a.1–a.4","pdf_pages":[82],"printed_pages":[82],"excerpt":"In Recovery, discard the unsent remainder of a transmitted packet and write an EEP after received data, waiting for receive-FIFO space when necessary.","highlights":[{"x":28.0,"y":57.0,"width":63.0,"height":31.0,"label":"§5.5.8.4.a.1–a.4"}]},
+      "behavior": {"trigger":"PortReset interrupts active receive and transmit packets.","precondition":"The RX side has an unterminated DATA character and the TX side has sent DATA before its terminator.","expected":"RX EEP remains pending until space exists; TX input is discarded through its terminator.","verdict":"PASS when EEP insertion and TX flush both complete without normal N-Char transmission."},
+      "observables": ["port_reset", "eep_pending", "eep_write_now", "tx_flushing", "nchar_ready", "send_nchar"],
+      "result_ids": ["REQ-PKT-RECOVERY"],
+      "trace": {
+        "golden": [{"file":"assets/golden/spw_ref_model.py","symbol":"SpWLink._enter / SpWNode.tick","start":548,"end":570,"role":"recovery oracle"},{"file":"assets/golden/spw_ref_model_test_v5.py","symbol":"scenario_18_eep_auto_recovery / scenario_22_tx_flush_recovery","start":1101,"end":1140,"role":"Golden recovery scenarios"}],
+        "rtl": [{"file":"assets/rtl/spw_datalink_v2.sv","symbol":"r_eep_pending / w_eep_write_now","start":535,"end":579,"role":"RX EEP recovery"},{"file":"assets/rtl/spw_datalink_v2.sv","symbol":"r_tx_flushing","start":583,"end":617,"role":"TX remainder discard"}],
+        "test": [{"file":"tests/rtl/tb_credit_mvp.sv","symbol":"REQ-PKT-RECOVERY","start":285,"end":326,"role":"RX and TX executable recovery check"}]
+      },
+      "waveform": {"signals":["port_reset","eep_pending","eep_write_now","tx_flushing","nchar_ready","send_nchar"],"event_signal":"port_reset","window_start":630000,"window_end":705000,"annotation":"RX EEP waits for space; TX remainder is discarded through terminator"}
+    },
+    {
+      "id": "REQ-ENC-SYMBOL",
+      "trace_id": "REQ-ENC-SYMBOL",
+      "behavior_model": {"model_id": "BEH-ENCODING-LAYER", "transition_ids": ["symbol_roundtrip"]},
+      "title": "Data and control symbol serialization",
+      "spec": {"clause":"5.4.2.a–b / 5.4.3.1–5.4.3.2","pdf_pages":[64,65],"printed_pages":[64,65],"excerpt":"Characters and control codes shall be serialised in order; data characters use a 10-bit symbol and FCT, EOP, EEP and ESC use their defined control character types.","highlights":[{"x":27.0,"y":17.0,"width":63.0,"height":66.0,"label":"§5.4.2–5.4.3.1"}]},
+      "behavior": {"trigger":"A DATA, FCT, EOP, EEP or ESC character is accepted by the encoder.","precondition":"The encoder is ready and the self-loopback decoder is reset and aligned.","expected":"The decoded character equals the transmitted character with no parity error.","verdict":"PASS when all five representative symbol classes round-trip exactly in order."},
+      "observables": ["enc_tx_char", "enc_tx_valid", "enc_rx_char", "enc_rx_valid", "enc_parity_error"],
+      "result_ids": ["REQ-ENC-SYMBOL"],
+      "trace": {
+        "golden": [{"file":"assets/golden/spw_ref_model.py","symbol":"SpWEncoder.send_char / SpWDecoder._finish_char","start":206,"end":235,"role":"serialization oracle"},{"file":"assets/golden/spw_ref_model.py","symbol":"SpWDecoder._consume_bit","start":327,"end":357,"role":"decode oracle"}],
+        "rtl": [{"file":"assets/rtl/spw_enc.sv","symbol":"w_tx_load_bits / TX shift","start":87,"end":152,"role":"symbol encoding and serialization"},{"file":"assets/rtl/spw_enc.sv","symbol":"RX parser","start":238,"end":286,"role":"symbol reconstruction"}],
+        "test": [{"file":"tests/rtl/tb_credit_mvp.sv","symbol":"REQ-ENC-SYMBOL","start":385,"end":409,"role":"five-class executable roundtrip"}]
+      },
+      "waveform": {"signals":["enc_tx_char","enc_tx_valid","enc_rx_char","enc_rx_valid","enc_parity_error"],"event_signal":"enc_rx_valid","window_start":1700000,"window_end":3900000,"annotation":"DATA and four control symbols are serialized and reconstructed exactly"}
+    },
+    {
+      "id": "REQ-ENC-DS-CORE",
+      "trace_id": "REQ-ENC-DS-CORE",
+      "behavior_model": {"model_id": "BEH-ENCODING-LAYER", "transition_ids": ["ds_transport"]},
+      "title": "Data-Strobe encoding and decoding core",
+      "spec": {"clause":"5.4.4.a–b","pdf_pages":[67],"printed_pages":[67],"excerpt":"The Data signal carries the data bit and Strobe changes whenever Data has the same value from one bit to the next; both signals are zero on power-up reset.","highlights":[{"x":27.0,"y":57.0,"width":64.0,"height":30.0,"label":"§5.4.4.a–b"}]},
+      "behavior": {"trigger":"The serializer emits the representative symbol sequence.","precondition":"Data and Strobe start at zero; controlled ErrorReset sequencing is outside this card.","expected":"D/S transitions carry enough bit events for the loopback decoder to reconstruct every symbol.","verdict":"PASS when D/S transitions occur and all symbol roundtrips pass."},
+      "observables": ["ds_data", "ds_strobe", "enc_rx_valid"],
+      "result_ids": ["REQ-ENC-DS-CORE"],
+      "trace": {
+        "golden": [{"file":"assets/golden/spw_ref_model.py","symbol":"SpWEncoder.tick / SpWDecoder.tick","start":226,"end":235,"role":"D/S transmit oracle"},{"file":"assets/golden/spw_ref_model.py","symbol":"SpWDecoder.tick","start":285,"end":305,"role":"D/S receive oracle"}],
+        "rtl": [{"file":"assets/rtl/spw_enc.sv","symbol":"D/S encoder","start":154,"end":171,"role":"D/S transition implementation"},{"file":"assets/rtl/spw_enc.sv","symbol":"w_rx_changed","start":174,"end":218,"role":"D/S bit recovery"}],
+        "test": [{"file":"tests/rtl/tb_credit_mvp.sv","symbol":"REQ-ENC-DS-CORE","start":385,"end":409,"role":"self-loopback transition check"}]
+      },
+      "waveform": {"signals":["ds_data","ds_strobe","enc_rx_valid"],"event_signal":"ds_strobe","window_start":1700000,"window_end":3900000,"annotation":"Data/Strobe transitions transport the serialized symbols"}
+    },
+    {
+      "id": "REQ-ENC-FIRST-NULL",
+      "trace_id": "REQ-ENC-FIRST-NULL",
+      "behavior_model": {"model_id": "BEH-ENCODING-LAYER", "transition_ids": ["first_null"]},
+      "title": "First Null starts with a Strobe transition",
+      "spec": {"clause":"5.4.5","pdf_pages":[69],"printed_pages":[69],"excerpt":"After Transmitter Enable is asserted, the first bit of the first Null shall be parity zero so that the first transition occurs on Strobe.","highlights":[{"x":27.0,"y":9.0,"width":64.0,"height":34.0,"label":"§5.4.5"}]},
+      "behavior": {"trigger":"The first Null starts after the encoding path is reset and enabled.","precondition":"Data and Strobe are both zero and no prior symbol has been transmitted.","expected":"The first parity bit is zero: Data remains zero and Strobe changes to one.","verdict":"PASS when the first observed D/S state is 01 and the ESC symbol completes."},
+      "observables": ["enc_tx_char", "enc_tx_valid", "ds_data", "ds_strobe"],
+      "result_ids": ["GOLDEN-ENCODING-COMPLIANCE", "REQ-ENC-FIRST-NULL"],
+      "trace": {
+        "golden": [{"file":"golden/encoding_compliance.py","symbol":"FIRST_NULL_BITS / ds_encode","start":9,"end":22,"role":"first-Null D/S oracle"}],
+        "rtl": [{"file":"assets/rtl/spw_enc.sv","symbol":"w_tx_p_bit / D/S encoder","start":87,"end":165,"role":"first parity and Strobe generation"}],
+        "test": [{"file":"tests/rtl/tb_credit_mvp.sv","symbol":"REQ-ENC-FIRST-NULL","start":403,"end":448,"role":"first D/S transition executable check"}]
+      },
+      "waveform": {"signals":["enc_tx_char","enc_tx_valid","ds_data","ds_strobe"],"event_signal":"enc_tx_valid","window_start":690000,"window_end":1050000,"annotation":"First Null parity zero keeps Data low and toggles Strobe first"}
+    },
+    {
+      "id": "REQ-ENC-NULL-DETECT",
+      "trace_id": "REQ-ENC-NULL-DETECT",
+      "behavior_model": {"model_id": "BEH-ENCODING-LAYER", "transition_ids": ["detect_first_null"]},
+      "title": "Complete first-Null detection and gotNull lifetime",
+      "spec": {"clause":"5.4.6","pdf_pages":[69,70],"printed_pages":[69,70],"excerpt":"Null detection is enabled with RX Enable; first detection includes all three related parity bits, asserts gotNull only after 011101000, and clears it only when RX Enable is de-asserted.","highlights":[{"x":27.0,"y":45.0,"width":64.0,"height":48.0,"label":"§5.4.6"}]},
+      "behavior": {"trigger":"D/S transitions deliver the first Null sequence after RX Enable.","precondition":"The compliance guard is cleared and RX Enable is asserted.","expected":"gotNull remains low for the first eight bits, asserts on 011101000, stays asserted, and clears on RX disable.","verdict":"PASS when detection, hold and clear all occur in that order."},
+      "observables": ["enc_rx_enable", "enc_null_window", "enc_null_window_bits", "enc_got_null"],
+      "result_ids": ["GOLDEN-ENCODING-COMPLIANCE", "REQ-ENC-NULL-DETECT"],
+      "trace": {
+        "golden": [{"file":"golden/encoding_compliance.py","symbol":"NullParityGuard","start":25,"end":64,"role":"nine-bit detection and lifetime oracle"}],
+        "rtl": [{"file":"rtl/spw_encoding_compliance.sv","symbol":"FIRST_NULL_PATTERN / ow_got_null","start":15,"end":50,"role":"D/S sequence detector and gotNull latch"}],
+        "test": [{"file":"tests/rtl/tb_credit_mvp.sv","symbol":"REQ-ENC-NULL-DETECT","start":443,"end":478,"role":"three-parity, hold and clear executable check"}]
+      },
+      "waveform": {"signals":["enc_rx_enable","enc_null_window","enc_null_window_bits","enc_got_null","ds_data","ds_strobe"],"event_signal":"enc_got_null","window_start":690000,"window_end":1720000,"annotation":"gotNull waits for all nine required bits, holds, then clears with RX Enable"}
+    },
+    {
+      "id": "REQ-ENC-PARITY-GATE",
+      "trace_id": "REQ-ENC-PARITY-GATE",
+      "behavior_model": {"model_id": "BEH-ENCODING-LAYER", "transition_ids": ["gate_parity"]},
+      "title": "Parity error enabled only after gotNull",
+      "spec": {"clause":"5.4.7","pdf_pages":[70],"printed_pages":[70],"excerpt":"Parity detection shall be enabled whenever the receiver is enabled and gotNull is asserted; a parity error is detected when parity is not odd.","highlights":[{"x":27.0,"y":12.0,"width":64.0,"height":25.0,"label":"§5.4.7"}]},
+      "behavior": {"trigger":"A raw non-odd parity indication is presented before and after first-Null detection.","precondition":"RX Enable remains asserted while the gate is tested.","expected":"The external parity error is suppressed before gotNull, asserted after gotNull, and suppressed after RX disable.","verdict":"PASS when all three gate states match the clause."},
+      "observables": ["enc_rx_enable", "enc_got_null", "enc_raw_parity_error", "enc_valid_parity_error"],
+      "result_ids": ["GOLDEN-ENCODING-COMPLIANCE", "REQ-ENC-PARITY-GATE"],
+      "trace": {
+        "golden": [{"file":"golden/encoding_compliance.py","symbol":"NullParityGuard.parity_error","start":46,"end":64,"role":"parity enable oracle"}],
+        "rtl": [{"file":"rtl/spw_encoding_compliance.sv","symbol":"ow_parity_error","start":52,"end":54,"role":"RX Enable and gotNull gate"}],
+        "test": [{"file":"tests/rtl/tb_credit_mvp.sv","symbol":"REQ-ENC-PARITY-GATE","start":416,"end":481,"role":"pre/post-gotNull and disable gate check"}]
+      },
+      "waveform": {"signals":["enc_rx_enable","enc_got_null","enc_raw_parity_error","enc_valid_parity_error"],"event_signal":"enc_valid_parity_error","window_start":690000,"window_end":1720000,"annotation":"Raw parity is externally valid only while RX Enable and gotNull are both high"}
+    },
+    {
+      "id": "REQ-ENC-DISCONNECT",
+      "trace_id": "REQ-ENC-DISCONNECT",
+      "behavior_model": {"model_id": "BEH-ENCODING-LAYER", "transition_ids": ["disconnect_timeout"]},
+      "title": "Disconnect after first edge and 850 ns idle",
+      "spec": {"clause":"5.4.8","pdf_pages":[70],"printed_pages":[70],"excerpt":"Disconnect detection is enabled after the first Data or Strobe edge and shall assert when neither line transitions for longer than 727 ns and no more than 1 microsecond.","highlights":[{"x":27.0,"y":43.0,"width":64.0,"height":16.0,"label":"§5.4.8"}]},
+      "behavior": {"trigger":"One Strobe edge is observed, followed by no D/S transitions.","precondition":"The 100 MHz test configuration uses an 850 ns timeout.","expected":"No disconnect occurs before the first edge; a one-cycle disconnect pulse occurs after the idle timeout.","verdict":"PASS when both the enable gate and timeout detection are observed."},
+      "observables": ["phy_rx_strobe", "phy_seen_edge", "phy_disconnect"],
+      "result_ids": ["REQ-ENC-DISCONNECT"],
+      "trace": {
+        "golden": [{"file":"assets/golden/spw_ref_model.py","symbol":"SpWDecoder.tick / reset_framing","start":285,"end":325,"role":"disconnect oracle"},{"file":"assets/golden/spw_ref_model_test_v5.py","symbol":"scenario_6_disconnect","start":385,"end":415,"role":"Golden timeout scenario"}],
+        "rtl": [{"file":"assets/rtl/spw_phy_v2.sv","symbol":"r_seen_any_transition / r_no_change_cnt","start":118,"end":164,"role":"first-edge gate and timeout"}],
+        "test": [{"file":"tests/rtl/tb_credit_mvp.sv","symbol":"REQ-ENC-DISCONNECT","start":411,"end":428,"role":"850 ns executable check"}]
+      },
+      "waveform": {"signals":["phy_rx_strobe","phy_seen_edge","phy_disconnect"],"event_signal":"phy_disconnect","window_start":3880000,"window_end":4820000,"annotation":"First edge enables the timer; 850 ns idle asserts disconnect"}
+    },
+    {
+      "id": "REQ-ENC-ESC",
+      "trace_id": "REQ-ENC-ESC",
+      "behavior_model": {"model_id": "BEH-ENCODING-LAYER", "transition_ids": ["invalid_esc_pair"]},
+      "title": "Invalid ESC pair detection",
+      "spec": {"clause":"5.4.9","pdf_pages":[70],"printed_pages":[70],"excerpt":"ESC followed by ESC, EOP or EEP is an invalid sequence and shall produce an ESC error while gotNull is asserted.","highlights":[{"x":27.0,"y":62.0,"width":64.0,"height":15.0,"label":"§5.4.9"}]},
+      "behavior": {"trigger":"ESC is followed by ESC, EOP or EEP.","precondition":"Run is selected; gotNull is tested both asserted and de-asserted.","expected":"All invalid pairs raise raw ESC error, and ErrorReset is selected only while gotNull is asserted.","verdict":"PASS when all three invalid pairs and the gotNull gate agree with the contract."},
+      "observables": ["esc_error", "link_state"],
+      "result_ids": ["REQ-ENC-ESC"],
+      "trace": {
+        "golden": [{"file":"assets/golden/spw_ref_model.py","symbol":"SpWLink.on_char / tick","start":576,"end":637,"role":"ESC parsing and error gate"},{"file":"assets/golden/spw_ref_model_test_v5.py","symbol":"scenario_25_decision18_gotnull_gate","start":1675,"end":1727,"role":"Golden gotNull gate"}],
+        "rtl": [{"file":"assets/rtl/spw_datalink_v2.sv","symbol":"w_esc_error","start":442,"end":507,"role":"invalid ESC sequence detection"},{"file":"assets/rtl/spw_datalink_v2.sv","symbol":"w_immediate_error","start":204,"end":220,"role":"gotNull error gate"}],
+        "test": [{"file":"tests/rtl/tb_credit_mvp.sv","symbol":"REQ-ENC-ESC","start":430,"end":449,"role":"three invalid-pair and gate check"}]
+      },
+      "waveform": {"signals":["esc_error","link_state"],"event_signal":"esc_error","window_start":4925000,"window_end":4950000,"annotation":"ESC+ESC/EOP/EEP error is enabled as a link reset cause after gotNull"}
     }
   ]
 }

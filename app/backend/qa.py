@@ -1,4 +1,4 @@
-"""Evidence-scoped Q&A for the four TX-credit pilot requirements."""
+"""Evidence-scoped Q&A for the selected SpaceWire data-link requirement."""
 
 from __future__ import annotations
 
@@ -16,11 +16,13 @@ API_URL = "https://api.openai.com/v1/responses"
 DEFAULT_MODEL = "gpt-5-mini"
 MAX_QUESTION = 1000
 OUT_OF_SCOPE = (
-    (re.compile(r"receive[\s_-]*credit|rx[\s_-]*credit|수신\s*(?:크레딧|신용)", re.I), "수신 크레딧 accounting"),
-    (re.compile(r"router|routing|라우터|라우팅", re.I), "Router 라우팅"),
-    (re.compile(r"FCT\s*(?:generation|생성|발생)|(?:generation|생성|발생)\s*(?:of\s*)?FCT", re.I), "FCT 생성 정책"),
-    (re.compile(r"sending\s+priority|송신\s*우선순위|전송\s*우선순위", re.I), "송신 우선순위"),
-    (re.compile(r"link\s+initiali[sz]ation|링크\s*초기화", re.I), "링크 초기화"),
+    (re.compile(r"receive[\s_-]*credit|rx[\s_-]*credit|수신\s*(?:크레딧|신용)", re.I),
+     "수신 크레딧 accounting", {"REQ-RC-ACCOUNT", "REQ-FCT-ELIGIBLE", "REQ-RC-ERR"}),
+    (re.compile(r"router|routing|라우터|라우팅", re.I), "Router 라우팅", set()),
+    (re.compile(r"FCT\s*(?:generation|생성|발생)|(?:generation|생성|발생)\s*(?:of\s*)?FCT", re.I),
+     "FCT 생성 정책", {"REQ-RC-ACCOUNT", "REQ-FCT-INIT", "REQ-FCT-ELIGIBLE"}),
+    (re.compile(r"sending\s+priority|송신\s*우선순위|전송\s*우선순위", re.I), "송신 우선순위", set()),
+    (re.compile(r"link\s+initiali[sz]ation|링크\s*초기화", re.I), "링크 초기화", {"REQ-LINK-INIT"}),
 )
 TEST_EVIDENCE_QUESTION = re.compile(
     r"test|verification|validate|run|evidence|pass|fail|observed|actual|coverage|"
@@ -52,10 +54,15 @@ def setting(name: str) -> str:
     return ""
 
 
+def spec_page_label(spec: dict) -> str:
+    pages = spec["pdf_pages"]
+    return f"PDF p.{pages[0]}" if len(pages) == 1 else f"PDF pp.{pages[0]}–{pages[-1]}"
+
+
 def evidence_context(req: dict, run: dict | None, include_tests: bool = True) -> tuple[str, list[dict]]:
     """Build a bounded, labeled bundle only from the selected trace."""
     spec = req["spec"]
-    sources = [{"id": "S1", "kind": "spec", "label": f"ECSS §{spec['clause']} · PDF p.{spec['pdf_pages'][0]}",
+    sources = [{"id": "S1", "kind": "spec", "label": f"ECSS §{spec['clause']} · {spec_page_label(spec)}",
                 "page": spec["pdf_pages"][0]}]
     blocks = [f"[S1] Normative excerpt: {spec['excerpt']}",
               f"Selected requirement: {req['id']} — {req['title']}",
@@ -90,15 +97,15 @@ def answer_question(req: dict, question: str, run: dict | None = None) -> dict:
     question = question.strip()
     if not question or len(question) > MAX_QUESTION:
         raise QAError("BAD_QUESTION", f"Question must be 1–{MAX_QUESTION} characters")
-    for pattern, topic in OUT_OF_SCOPE:
-        if pattern.search(question):
+    for pattern, topic, allowed_requirements in OUT_OF_SCOPE:
+        if pattern.search(question) and req["id"] not in allowed_requirements:
             spec = req["spec"]
             return {
                 "requirement_id": req["id"],
                 "mode": "scope", "model": None,
-                "answer": (f"선택된 {req['id']}의 근거는 ECSS §{spec['clause']} 송신 크레딧 동작입니다 [S1]. "
+                "answer": (f"선택된 {req['id']}의 근거는 ECSS §{spec['clause']} 동작입니다 [S1]. "
                            f"질문하신 {topic}은 이 항목의 근거로 설명하거나 PASS/FAIL을 판정할 수 없습니다."),
-                "sources": [{"id": "S1", "kind": "spec", "label": f"ECSS §{spec['clause']} · PDF p.{spec['pdf_pages'][0]}",
+                "sources": [{"id": "S1", "kind": "spec", "label": f"ECSS §{spec['clause']} · {spec_page_label(spec)}",
                              "page": spec["pdf_pages"][0]}],
             }
     key = setting("OPENAI_API_KEY")
