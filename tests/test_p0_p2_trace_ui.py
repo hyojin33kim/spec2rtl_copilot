@@ -138,6 +138,20 @@ class TraceUiContract(unittest.TestCase):
         ):
             self.assertNotIn(duplicated_layer, navigator)
 
+    def test_navigator_follows_ecss_toc_and_defaults_to_542(self):
+        self.assertIn("mvpSelected='REQ-ENC-SYMBOL'", self.html)
+        self.assertIn("5.4 Encoding Layer", self.html)
+        self.assertIn("5.5 Data Link Layer", self.html)
+        self.assertIn("a.spec.clause.localeCompare(b.spec.clause", self.html)
+        self.assertLess(self.html.index("5.4 Encoding Layer"), self.html.index("5.5 Data Link Layer"))
+
+    def test_ask_ai_is_a_prominent_requirement_action(self):
+        self.assertIn('class="btn qaButton"', self.html)
+        self.assertIn('class="qaIcon" aria-hidden="true">✦</span>Ask AI', self.html)
+        self.assertIn('aria-label="Ask AI about ${esc(req.id)}"', self.html)
+        self.assertIn(".qaContext", self.html)
+        self.assertNotIn("Ask about this trace", self.html)
+
     def test_behavior_model_is_an_explicit_counter_abstraction(self):
         model = self.behavior_models["models"][0]
         self.assertEqual(model["kind"], "behavioral_state_abstraction")

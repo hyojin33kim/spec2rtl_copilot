@@ -2,6 +2,7 @@ __pycache__/
 .env
 .env.*
 !.env.example
+/ngrok-policy.yml
 *.sqlite3
 *.sqlite3-journal
 *.sqlite3-wal

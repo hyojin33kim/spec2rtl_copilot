@@ -2,7 +2,8 @@
 
 ## 기준과 목표
 
-- 기준일: 2026-09-28. 이 문서는 `main`의 로컬 **FastAPI TX-credit MVP 기준 커밋**을 설명한다. 원격 `origin/main`에는 아직 push하지 않았다.
+- 기준일: 2026-09-29. 현재 `main`은 ECSS 목차순 Navigator, 5.4.2 최초 선택,
+  `Ask AI` 강조, 최신 UI screenshot과 인증된 ngrok 데모 절차를 포함한다.
 - 목표: ECSS-E-ST-50-12C Rev.1 Encoding/Data Link 핵심 subset 18개 Requirement에 대해 **Spec → Golden → RTL → Test → Evidence**를 탐색하고 재실행하며, 선택한 근거에 한정된 Q&A를 제공한다.
 - 범위: Data Link 11개와 Encoding 7개 카드. First Null·Null detection·Parity gate는 project-owned compliance RTL로 검증하며, imported top-level 통합과 controlled D/S reset은 범위 밖이다.
 - 다른 UI 페이지의 생성·분석·판정 기능은 목업 또는 정적 미리보기다. 시연 경로는 **Trace Explorer**와 **Verification Run**이다.
@@ -41,12 +42,13 @@ curl -fsS http://127.0.0.1:8765/api/health
 
 ## 검증 상태
 
-- 2026-09-28 작업 트리 기준 `python3 -m unittest discover -s tests -v`: 기존 기능 테스트 **46개 통과**, 로컬에 FastAPI 패키지가 없어 FastAPI 전용 **5개 skip**.
+- 2026-09-29 작업 트리 기준 `python3 -m unittest discover -s tests -v`: 기능 테스트
+  **48개 통과**, 로컬에 FastAPI 패키지가 없어 FastAPI 전용 **5개 skip**.
 - 동일 코드의 격리 Docker 이미지에서 `test_fastapi_contract.py`: **5개 통과**. 네트워크와 운영 볼륨 없이 모의 Q&A·runner와 임시 SQLite를 사용했다.
 - `sha256sum --check manifests/SHA256SUMS`: 전체 통과.
 - 현재 `runs/latest.json`은 `20260928T233433+0900-3998fb00`의 **22/22 PASS**를 가리킨다. 실행을 다시 하면 run ID는 달라질 수 있다.
 - [Q&A acceptance report](QA_ACCEPTANCE_REPORT.md): 2026-09-28 표본 10/10 적합. 이는 반복 정확도 보증이 아닌 수동 표본 검토다.
-- 기존 SQLite Q&A 이력은 2건이며, 8765 FastAPI 전환 후에도 조회됐다. 재현 환경에서는 이력 건수가 달라질 수 있다.
+- SQLite Q&A 이력 건수는 runtime-local 상태이므로 재현 기준으로 사용하지 않는다.
 
 전체 검증 명령과 격리 FastAPI 테스트 명령은 [README](../README.md)에 있다. 시연 순서는 [DEMO_SCRIPT.md](DEMO_SCRIPT.md)에 정리했다.
 

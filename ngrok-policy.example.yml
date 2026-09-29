@@ -1,0 +1,10 @@
+# Copy this file outside the repository and replace the placeholder password.
+# Never commit a policy containing a real credential.
+on_http_request:
+  - actions:
+      - type: basic-auth
+        config:
+          realm: spec2rtl-demo
+          credentials:
+            - "demo-user:REPLACE_WITH_A_LONG_TEMPORARY_PASSWORD"
+          enforce: true

@@ -1,11 +1,17 @@
 # Spec2RTL Copilot MVP
 
-This directory is the standalone MVP workspace for proving one executable
-trace from ECSS requirement to Golden Model, RTL, and verification evidence.
+This directory is the standalone MVP workspace for proving a bounded executable
+trace set from ECSS requirements to Golden Model, RTL, tests, and verification
+evidence.
 
 ## Scope
 
-- Pilot: ECSS-E-ST-50-12C Rev.1, clause 5.5.4.e/f/h/j (TX credit)
+- Current executable subset: 18 Requirement cards from ECSS-E-ST-50-12C Rev.1
+  (seven Encoding Layer 5.4 cards and eleven Data Link Layer 5.5 cards).
+- Original pilot and core demo path: clause 5.5.4.e/f/h/j TX credit.
+- This is not a claim of complete 5.4 or 5.5 compliance. Controlled Data/Strobe
+  reset, imported-top integration, PortReset FIFO semantics, and unresolved
+  transmit-priority policy remain outside the approved executable subset.
 - Implementation baseline: `spec2rtl/spacewire`
 - Imported assets under `assets/` are immutable snapshots.
 - The ECSS PDF is user-supplied and intentionally excluded from Git for public
@@ -38,8 +44,12 @@ trace from ECSS requirement to Golden Model, RTL, and verification evidence.
   separates Golden/compile/simulation logs into tabs, and renders a
   requirement-specific waveform window with a verdict-event marker.
 - Basic P2 navigation is included: direct PDF-page opening, eighteen-requirement
-  switching, and JUnit/VCD artifact access. Cross-pilot search remains deferred.
-- Trace Properties now offers evidence-scoped Q&A for the eighteen executable requirements.
+  switching, and JUnit/VCD artifact access. The Trace Navigator is the executable
+  subset, not the complete ECSS table of contents. It groups cards in ECSS order
+  (5.4 Encoding, then 5.5 Data Link), sorts by representative clause, and selects
+  `REQ-ENC-SYMBOL` (5.4.2) on a normal first visit. Cross-pilot search remains deferred.
+- Trace Properties offers a prominent `Ask AI` action for evidence-scoped Q&A on
+  the selected Requirement.
   Answers cite the selected Spec, Golden, RTL, Test, and latest run sources;
   verification verdicts still come from the executable tests.
 - Q&A history is stored locally in SQLite and shown by selected Requirement.
@@ -52,6 +62,29 @@ Start the legacy local server directly and open `http://127.0.0.1:8765`:
 cd spec2rtl_copilot
 python3 app/backend/server.py
 ```
+
+`127.0.0.1` is loopback-only: it is available to a browser on the same machine,
+but not directly to a remote ChatGPT environment or an external reviewer.
+
+### Temporary external demo with ngrok
+
+Use an authenticated tunnel for a short external review. Keep the real policy
+outside the repository because it contains a credential:
+
+```bash
+cp ngrok-policy.example.yml /tmp/spec2rtl-ngrok-policy.yml
+nano /tmp/spec2rtl-ngrok-policy.yml
+ngrok http 127.0.0.1:8765 \
+  --traffic-policy-file /tmp/spec2rtl-ngrok-policy.yml
+```
+
+Replace the placeholder with a long temporary password, then send the assigned
+HTTPS URL and the Basic Auth credential to the intended reviewer. Stop ngrok
+with `Ctrl+C` after the demo. Do not expose this application without access
+control: authenticated users can read the local specification, source excerpts,
+Q&A history and run artifacts, invoke `/api/run`, and consume the configured
+OpenAI API through `/api/qa`. The root `ngrok-policy.yml` name is ignored by Git
+as an additional guard, but `/tmp` is the recommended location.
 
 The embedded, highlighted PDF page view is enabled when the user has placed the
 specification at the documented local path and Poppler's `pdftoppm` is
@@ -92,9 +125,14 @@ The [presentation report PDF](docs/Spec2RTL_Copilot_Demo_Report.pdf) packages
 the implementation, verification results, demo flow, and expected Q&A.
 The [RTL-based 12-item coverage matrix](docs/RTL_COVERAGE_MATRIX.md) separates
 implemented, tested, and MVP-integrated scope for the next expansion.
-The [Encoding Layer coverage matrix](docs/ENCODING_COVERAGE_MATRIX.md) evaluates
-seven ECSS 5.4 candidates and separates four immediately integrable cards from
-three items that need a dedicated test or layer-boundary decision.
+The [Encoding Layer coverage matrix](docs/ENCODING_COVERAGE_MATRIX.md) records
+the seven integrated ECSS 5.4 executable cards and the remaining full-compliance
+gaps at the enable/reset and imported-top boundaries.
+
+The current checked-in evidence run `20260928T233433+0900-3998fb00` is 22/22
+PASS. The host acceptance suite runs 53 tests; five FastAPI-only contracts are
+skipped when FastAPI is not installed locally and are covered by the isolated
+image command below.
 
 Run the complete acceptance suite:
 
@@ -175,11 +213,12 @@ cd assets/golden && python3 spw_ref_model_test_v5.py
 RTL regression uses Icarus Verilog 12.0 with `-g2005-sv`; `-g2012` is
 intentionally excluded because of the documented Icarus multi-instance issue.
 
-## UI baseline screenshot
+## Current Trace Explorer screenshot
 
-The v0.2.0 screenshot predates the Q&A button in Trace Properties.
+The current screenshot shows the ECSS-ordered executable subset and the
+Requirement-scoped `Ask AI` action.
 
-![Spec2RTL Copilot Trace Explorer v0.2.0 baseline](docs/images/trace-explorer-v0.2.0.png)
+![Current Spec2RTL Copilot Trace Explorer](docs/images/trace-explorer-current.png)
 
 ## Expanded deployment architecture
 

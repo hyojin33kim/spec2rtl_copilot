@@ -63,6 +63,10 @@
 
 Trace 탐색을 위한 **tree navigator**다.
 
+Navigator는 ECSS 목차 순서로 5.4 Encoding Layer, 5.5 Data Link Layer를 표시하고
+각 그룹 안에서 대표 clause를 자연 정렬한다. 일반 접속의 최초 선택은 목차 첫 실행
+항목인 `REQ-ENC-SYMBOL`(5.4.2)이다.
+
 | 요소 | 용어 | 코드 이름 |
 |---|---|---|
 | clause 한 줄 | Tree row | `.treeRow` |
@@ -130,7 +134,8 @@ PDF 본문의 글자는 이미지(raster)이므로 일반 CSS 폰트 크기로 �
 
 ### 선택 항목 Q&A
 
-`Ask about this trace`는 TRACE PROPERTIES 패널 본문 맨 위에 있으며,
+`Ask AI`는 TRACE PROPERTIES 패널 본문 맨 위에서 선택된 Requirement 제목과 clause
+옆에 강조 색상과 아이콘으로 표시되며,
 현재 선택된 Requirement에 대한 질문 창을 연다. 질문을 보내면
 Backend가 해당 Requirement의 Spec excerpt, Golden/RTL/Test 연결 소스와 최신 실행
 결과를 근거로 사용한다. Test와 최신 실행 결과는 질문이 검증·실행 증거를 요구할 때만
