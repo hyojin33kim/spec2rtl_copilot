@@ -1,5 +1,10 @@
 # Spec2RTL Copilot MVP
 
+## Project reports
+
+- [고급 PJT 업무일지 (PDF)](docs/고급PJT_업무일지.pdf)
+- [Spec2RTL Copilot 프로젝트 진행 및 성과 보고서 (PDF)](docs/Spec2RTL_Copilot_Project_Report_20260930.pdf)
+
 This directory is the standalone MVP workspace for proving a bounded executable
 trace set from ECSS requirements to Golden Model, RTL, tests, and verification
 evidence.
